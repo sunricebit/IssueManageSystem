@@ -1,0 +1,127 @@
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+
+namespace IMS.Models
+{
+    public partial class IMSContext : DbContext
+    {
+        public IMSContext()
+        {
+        }
+
+        public IMSContext(DbContextOptions<IMSContext> options)
+            : base(options)
+        {
+        }
+
+        public virtual DbSet<Contact> Contacts { get; set; } = null!;
+        public virtual DbSet<Post> Posts { get; set; } = null!;
+        public virtual DbSet<Setting> Settings { get; set; } = null!;
+        public virtual DbSet<User> Users { get; set; } = null!;
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseMySQL("server=localhost;uid=root;pwd=123456789;database=IMS");
+            }
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Contact>(entity =>
+            {
+                entity.ToTable("Contact", "IMS");
+
+                entity.Property(e => e.Email).HasMaxLength(191);
+
+                entity.Property(e => e.Message).HasMaxLength(191);
+
+                entity.Property(e => e.Name).HasMaxLength(191);
+
+                entity.Property(e => e.Phone).HasMaxLength(191);
+            });
+
+            modelBuilder.Entity<Post>(entity =>
+            {
+                entity.ToTable("Post", "IMS");
+
+                entity.HasIndex(e => e.UserId, "Post_UserId_fkey");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
+
+                entity.Property(e => e.Description).HasColumnType("text");
+
+                entity.Property(e => e.ImageUrl).HasMaxLength(191);
+
+                entity.Property(e => e.Title).HasColumnType("text");
+
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Posts)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Post_UserId_fkey");
+            });
+
+            modelBuilder.Entity<Setting>(entity =>
+            {
+                entity.ToTable("Setting", "IMS");
+
+                entity.HasIndex(e => e.Id, "Setting_Id_idx");
+
+                entity.Property(e => e.Type).HasMaxLength(191);
+
+                entity.Property(e => e.Value).HasMaxLength(191);
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.ToTable("User", "IMS");
+
+                entity.HasIndex(e => e.Email, "User_Email_idx");
+
+                entity.HasIndex(e => e.Email, "User_Email_key")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.Id, "User_Id_idx");
+
+                entity.HasIndex(e => e.RoleId, "User_RoleId_fkey");
+
+                entity.Property(e => e.Address).HasMaxLength(191);
+
+                entity.Property(e => e.Avatar).HasMaxLength(191);
+
+                entity.Property(e => e.ConfirmToken).HasMaxLength(191);
+
+                entity.Property(e => e.Email).HasMaxLength(191);
+
+                entity.Property(e => e.Gender).HasColumnType("datetime(3)");
+
+                entity.Property(e => e.Name).HasMaxLength(191);
+
+                entity.Property(e => e.Password).HasMaxLength(191);
+
+                entity.Property(e => e.Phone).HasMaxLength(191);
+
+                entity.Property(e => e.ResetToken).HasMaxLength(191);
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("User_RoleId_fkey");
+            });
+
+            OnModelCreatingPartial(modelBuilder);
+        }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+    }
+}
