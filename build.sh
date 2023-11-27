@@ -1,0 +1,1 @@
+﻿Scaffold-DbContext "server=localhost;uid=root;pwd=123456789;database=IMS" MySql.EntityFrameworkCore -OutputDir Models -context "IMSContext" -Force 
