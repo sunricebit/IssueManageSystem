@@ -35,6 +35,18 @@
 
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
             }
+            @if (!string.IsNullOrEmpty(ViewBag.Success))
+            {
+                <div class="text-success text-center mt-3">
+                    @ViewBag.Success
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(ViewBag.Error))
+            {
+                <div class="text-danger text-center mt-3">
+                    @ViewBag.Error
+                </div>
+            }
             <p class="text-center mt-4">or</p>
             <div class="">
                 <button class="border bg-white w-100 d-flex justify-content-between align-items-center p-2 my-3 shadow-sm fw-bold">

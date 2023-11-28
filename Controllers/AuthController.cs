@@ -32,22 +32,42 @@ namespace IMS.Controllers
         {
             if (!ModelState.IsValid) return View(vm);
 
-            var role = _context.Settings.FirstOrDefault(s => s.Type == "ROLE" && s.Value == "Student");
-            if(role ==  null) return View(vm);
-
-            User user = new()
+            var user = _context.Users.FirstOrDefault(user => user.Email == vm.Email);
+            if(user != null )
             {
-                Email = vm.Email.Trim(),
-                Name = mailService.GetAddress(vm.Email)!,
-                Password = hashService.HashPassword(vm.Password),
-                ConfirmToken = hashService.RandomHash(),
-                RoleId = role.Id
+                ViewBag.Error = "Email already registered. Try another one";
+                return View(vm);
+            }
+
+            var role = _context.Settings.FirstOrDefault(s => s.Type == "ROLE" && s.Value == "Student");
+            if (role == null)
+            {
+                return View(vm);
             };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            mailService.SendMailConfirm(user.Email, user.ConfirmToken);
+            try
+            {
+                User userCreate = new User
+                {
+                    Email = vm.Email.Trim(),
+                    Name = mailService.GetAddress(vm.Email)!,
+                    Password = hashService.HashPassword(vm.Password),
+                    ConfirmToken = hashService.RandomHash(),
+                    RoleId = role.Id
+                };
+                _context.Users.Add(userCreate);
+                await _context.SaveChangesAsync();
+                mailService.SendMailConfirm(userCreate.Email, userCreate.ConfirmToken!);
+                ViewBag.Success = "Success! Your registration is complete. Check your email for confirmation";
+                return View(new SignUpViewModel());
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = "Something error";
+            }
+
             return View(new SignUpViewModel());
+
         }
 
         [Route("sign-in")]
