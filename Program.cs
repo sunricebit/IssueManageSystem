@@ -2,6 +2,9 @@
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<IMSContext>(options => new IMSContext());
+builder.Services.AddSingleton<IHashService, HashService>();
+builder.Services.AddSingleton<IMailService, MailService>();
+
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = "SessionCookie";

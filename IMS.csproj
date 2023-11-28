@@ -18,12 +18,21 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.11" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Services\" />
+    <None Remove="ViewModels\" />
+    <None Remove="ViewModels\Auth\" />
+    <None Remove="Views\Home\" />
+    <None Remove="Views\Auth\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
+    <Folder Include="ViewModels\" />
+    <Folder Include="ViewModels\Auth\" />
+    <Folder Include="Views\Home\" />
+    <Folder Include="Views\Auth\" />
     <Folder Include="wwwroot\assets\" />
   </ItemGroup>
 </Project>
