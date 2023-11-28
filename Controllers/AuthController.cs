@@ -1,3 +1,4 @@
+using IMS.Services;
 using IMS.ViewModels.Auth;
 using Microsoft.AspNetCore.Mvc;
 
@@ -87,8 +88,8 @@ namespace IMS.Controllers
         public IActionResult SignIn(SignInViewModel vm, [FromServices] IHashService hashService)
         {
             if (!ModelState.IsValid) return View();
-            var user = _context.Users.Include(s => s.Role).FirstOrDefault(user => user.Email == vm.Email);
-            if (user == null || !hashService.Verify(vm.Password, user.Password))
+            var user = _context.Users.Include(s => s.Role).FirstOrDefault(user => user.Email == vm.Email && hashService.Verify(vm.Password, user.Password));
+            if (user == null)
             {
                 ViewBag.Error = "Email or password incorrect!";
                 return View();
@@ -112,5 +113,61 @@ namespace IMS.Controllers
             return Redirect("/");
         }
 
+        [Route("forgot-password")]
+        public IActionResult ForgotPassword()
+        {
+            return View(new ForgotPasswordViewModel());
+        }
+
+
+        [Route("forgot-password")]
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel vm, [FromServices] IMailService mailService, [FromServices] IHashService hashService)
+        {
+            if (!ModelState.IsValid) return View();
+
+            User? user = _context.Users.FirstOrDefault(user => user.Email == vm.Email);
+            if (user == null)
+            {
+                ViewBag.Error = "This account does not exist";
+                return View();
+            }
+
+            string hash = hashService.RandomHash();
+            user.ResetToken = hash;
+            await _context.SaveChangesAsync();
+            mailService.SendResetPassword(vm.Email, hash);
+            ViewBag.Success = "Check your email for a password reset token";
+            ModelState.Clear();
+            return View();
+        }
+
+        [Route("reset-password/{token}")]
+        public IActionResult ResetPassword()
+        {
+            return View(new ResetPasswordViewModel());
+        }
+
+        [Route("reset-password/{token}")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel vm, [FromServices] IHashService hashService, string token)
+        {
+            if (!ModelState.IsValid) return View();
+
+            User? user = _context.Users.FirstOrDefault(user => user.ResetToken == token);
+            if (user == null)
+            {
+                ViewBag.Error = "This token is not valid!!";
+                return View();
+            }
+
+            user.ResetToken = null;
+            user.Password = hashService.HashPassword(vm.Password);
+            await _context.SaveChangesAsync();
+            ViewBag.Success = "Password has been reset successfully!!";
+            ModelState.Clear();
+            return View();
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿@model IMS.ViewModels.Auth.SignInViewModel;
 
 @{
-    ViewData["Title"] = "Sign up";
+    ViewData["Title"] = "Sign In";
     Layout = "~/Views/Shared/AuthLayout.cshtml";
 }
 
@@ -23,10 +23,19 @@
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
 
-              
 
-                <div class="form-group mb-3">
-                    <a href="/auth/sign-up">You already haven't' an account?</a>
+
+
+                <div class="d-flex justify-content-between">
+
+                    <div class="form-group mb-3">
+                        <a class="text-primary text-decoration-none" href="/auth/sign-up">You already haven't' an account?</a>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <a class="text-primary text-decoration-none" href="/auth/forgot-password">Forgot password?</a>
+                    </div>
+
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
