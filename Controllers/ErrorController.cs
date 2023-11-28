@@ -10,5 +10,11 @@ namespace IMS.Controllers
         {
             return View();
         }
+
+        [Route("404")]
+        public IActionResult NotFound()
+        {
+            return View();
+        }
     }
 }

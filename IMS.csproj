@@ -33,5 +33,6 @@
     <Folder Include="ViewModels\Auth\" />
     <Folder Include="Views\Home\" />
     <Folder Include="Views\Auth\" />
+    <Folder Include="wwwroot\assets\" />
   </ItemGroup>
 </Project>
