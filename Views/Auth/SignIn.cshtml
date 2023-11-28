@@ -1,4 +1,4 @@
-﻿@model IMS.ViewModels.Auth.SignUpViewModel;
+﻿@model IMS.ViewModels.Auth.SignInViewModel;
 
 @{
     ViewData["Title"] = "Sign up";
@@ -8,9 +8,9 @@
 <div class="d-flex flex-column align-items-center justify-content-between mt-5">
     <div>
         <div style="min-width: 800px" class="shadow-sm px-5 py-3">
-            <p class="fw-bold">Register</p>
+            <p class="fw-bold">Login</p>
 
-            @using (Html.BeginForm("SignUp", "Auth", FormMethod.Post))
+            @using (Html.BeginForm("SignIn", "Auth", FormMethod.Post))
             {
                 <div class="form-group mb-3">
                     <label asp-for="Email">Email</label>
@@ -23,15 +23,10 @@
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
 
-                <div class="form-group mb-3">
-                    <label asp-for="ConfirmPassword">Confirm Password</label>
-                    @Html.TextBoxFor(m => m.ConfirmPassword, new { @class = "form-control", @type = "password" })
-                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                </div>
-
+              
 
                 <div class="form-group mb-3">
-                    <a href="/auth/sign-in">You already have an account?</a>
+                    <a href="/auth/sign-up">You already haven't' an account?</a>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100">Submit</button>
