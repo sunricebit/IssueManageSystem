@@ -1,0 +1,61 @@
+﻿@model IMS.ViewModels.Auth.SignUpViewModel;
+
+@{
+    ViewData["Title"] = "Sign up";
+    Layout = "~/Views/Shared/AuthLayout.cshtml";
+}
+
+<div class="d-flex flex-column align-items-center justify-content-between mt-5">
+    <div>
+        <div style="min-width: 800px" class="shadow-sm px-5 py-3">
+            <p class="fw-bold">Register</p>
+
+            @using (Html.BeginForm("SignUp", "Auth", FormMethod.Post))
+            {
+                <div class="form-group mb-3">
+                    <label asp-for="Email">Email</label>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="Password">Password</label>
+                    @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @type = "password" })
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="ConfirmPassword">Confirm Password</label>
+                    @Html.TextBoxFor(m => m.ConfirmPassword, new { @class = "form-control", @type = "password" })
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+                </div>
+
+                <div class="form-group mb-3">
+                    <a href="/auth/sign-in">Are you have account?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Submit</button>
+            }
+            @if (!string.IsNullOrEmpty(ViewBag.Success))
+            {
+                <div class="text-success text-center mt-3">
+                    @ViewBag.Success
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(ViewBag.Error))
+            {
+                <div class="text-danger text-center mt-3">
+                    @ViewBag.Error
+                </div>
+            }
+            <p class="text-center mt-4">or</p>
+            <div class="">
+                <button class="border bg-white w-100 d-flex justify-content-between align-items-center p-2 my-3 shadow-sm fw-bold">
+                    <img src="https://aid-frontend.prod.atl-paas.net/atlassian-id/front-end/5.0.410/static/media/google-logo.e086107b.svg"
+                         alt="google-logo" height="18px">
+                    <a class="text-decoration-none text-dark w-100" href="#">Continue with Google</a>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>

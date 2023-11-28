@@ -21,7 +21,7 @@ CREATE TABLE `User` (
     `Password` VARCHAR(191) NOT NULL,
     `RoleId` INTEGER NOT NULL,
     `Name` VARCHAR(191) NOT NULL,
-    `Avatar` VARCHAR(191) NOT NULL,
+    `Avatar` VARCHAR(191) NULL,
     `Gender` DATETIME(3) NULL,
     `Phone` VARCHAR(191) NULL,
     `Address` VARCHAR(191) NULL,
