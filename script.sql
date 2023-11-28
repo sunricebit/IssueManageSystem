@@ -67,3 +67,5 @@ ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFE
 
 -- AddForeignKey
 ALTER TABLE `Post` ADD CONSTRAINT `Post_UserId_fkey` FOREIGN KEY (`UserId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+INSERT INTO `IMS`.`Setting` (`Type`, `Value`) VALUES ('ROLE', 'Admin'), ('ROLE', 'Marketer'), ('ROLE', 'Teacher'), ('ROLE', 'Student');
