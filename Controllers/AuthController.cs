@@ -1,4 +1,7 @@
-using IMS.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using IMS.ViewModels.Auth;
 using Microsoft.AspNetCore.Mvc;
 
@@ -88,8 +91,16 @@ namespace IMS.Controllers
         public IActionResult SignIn(SignInViewModel vm, [FromServices] IHashService hashService)
         {
             if (!ModelState.IsValid) return View();
-            var user = _context.Users.Include(s => s.Role).FirstOrDefault(user => user.Email == vm.Email && hashService.Verify(vm.Password, user.Password));
+            var user = _context.Users.Include(s => s.Role).FirstOrDefault(p => p.Email == vm.Email);
+
             if (user == null)
+            {
+                ViewBag.Error = "Email or password incorrect!";
+                return View();
+            }
+
+            bool validPass = hashService.Verify(vm.Password, user.Password);
+            if (!validPass)
             {
                 ViewBag.Error = "Email or password incorrect!";
                 return View();

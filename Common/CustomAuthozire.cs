@@ -1,28 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using MySqlX.XDevAPI;
-using System.Net;
-using System.Web.Mvc;
 
 namespace IMS.Common
 {
-    public class CustomAuthorize
+    [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
+    public class CustomAuthorizeAttribute : ActionFilterAttribute
     {
-        private readonly string[] allowedroles;
+        private readonly string[] _requiredRoles;
 
-        public CustomAuthorize(params string[] roles) => allowedroles = roles;
-
-        public bool Authorize(HttpContext context)
+        public CustomAuthorizeAttribute(params string[] requiredRole)
         {
-            string role = context.Session.GetString("role");
-            if (!string.IsNullOrEmpty(role))
+            _requiredRoles = requiredRole;
+        }
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            var role = context.HttpContext.Session.GetString("role"); 
+
+            if (_requiredRoles.Contains(role))
             {
-                if (allowedroles.Contains(role))
-                {
-                    return true;
-                }
+                base.OnActionExecuting(context);
             }
-            return false;
+            else
+            {
+                context.Result = new RedirectToActionResult("NotAccess", "Error", null);
+            }
         }
     }
 }
