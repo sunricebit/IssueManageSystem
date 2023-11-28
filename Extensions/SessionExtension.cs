@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using IMS.ViewModels.Auth;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IMS.Services
+namespace IMS.Extensions
 {
     public static class SessionExtensions
     {
@@ -23,4 +23,6 @@ namespace IMS.Services
             return JsonSerializer.Deserialize<User>(userJsonString);
         }
     }
+
 }
+

@@ -26,6 +26,7 @@
     <None Remove="ViewModels\Auth\" />
     <None Remove="Views\Home\" />
     <None Remove="Views\Auth\" />
+    <None Remove="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
@@ -34,5 +35,6 @@
     <Folder Include="Views\Home\" />
     <Folder Include="Views\Auth\" />
     <Folder Include="wwwroot\assets\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 </Project>

@@ -107,6 +107,7 @@ namespace IMS.Controllers
             }
 
             HttpContext.Session.SetUser(user);
+
             ModelState.Clear();
             return Redirect("/");
         }
