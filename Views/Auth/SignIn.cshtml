@@ -1,8 +1,17 @@
 ﻿@model IMS.ViewModels.Auth.SignInViewModel;
+@using Microsoft.Extensions.Configuration;
+@inject IConfiguration _config;
 
 @{
     ViewData["Title"] = "Sign In";
     Layout = "~/Views/Shared/AuthLayout.cshtml";
+
+    var state = Guid.NewGuid().ToString();
+
+    string clientId = _config["Authentication:Google:ClientId"];
+    string clientSecret = _config["Authentication:Google:ClientSecret"];
+    string redirectUri = _config["Authentication:Google:RedirectUri"];
+    string googleStringBuilder = string.Format("https://accounts.google.com/o/oauth2/auth?client_id={0}&redirect_uri={1}&response_type=code&scope=email&profile&state={2}", clientId, redirectUri, state);
 }
 
 <div class="d-flex flex-column align-items-center justify-content-between mt-5">
@@ -23,7 +32,7 @@
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
 
-
+                <h1>@_config["Company:Name"]</h1>
 
 
                 <div class="d-flex justify-content-between">
@@ -56,8 +65,8 @@
             <div class="">
                 <button class="border bg-white w-100 d-flex justify-content-between align-items-center p-2 my-3 shadow-sm fw-bold">
                     <img src="https://aid-frontend.prod.atl-paas.net/atlassian-id/front-end/5.0.410/static/media/google-logo.e086107b.svg"
-                         alt="google-logo" height="18px">
-                    <a class="text-decoration-none text-dark w-100" href="#">Continue with Google</a>
+                         alt="google-logo" height="18">
+                    <a class="text-decoration-none text-dark w-100" href="@googleStringBuilder" target="_blank">Continue with Google</a>
                 </button>
             </div>
         </div>
