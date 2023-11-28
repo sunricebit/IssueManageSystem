@@ -16,9 +16,9 @@ namespace IMS.Common
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var role = context.HttpContext.Session.GetString("role"); 
+            var role = context.HttpContext.Session.GetUser().Role; 
 
-            if (_requiredRoles.Contains(role))
+            if (_requiredRoles.Contains(role.Value))
             {
                 base.OnActionExecuting(context);
             }
