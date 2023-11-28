@@ -16,10 +16,7 @@ namespace IMS.Models
         {
         }
 
-        public virtual DbSet<Contact> Contacts { get; set; } = null!;
-        public virtual DbSet<Post> Posts { get; set; } = null!;
-        public virtual DbSet<Setting> Settings { get; set; } = null!;
-        public virtual DbSet<User> Users { get; set; } = null!;
+        public virtual DbSet<PrismaMigration> PrismaMigrations { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -32,101 +29,40 @@ namespace IMS.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Contact>(entity =>
+            modelBuilder.Entity<PrismaMigration>(entity =>
             {
-                entity.ToTable("Contact", "IMS");
+                entity.ToTable("_prisma_migrations", "IMS");
 
-                entity.Property(e => e.CreatedAt)
+                entity.Property(e => e.Id)
+                    .HasMaxLength(36)
+                    .HasColumnName("id");
+
+                entity.Property(e => e.AppliedStepsCount).HasColumnName("applied_steps_count");
+
+                entity.Property(e => e.Checksum)
+                    .HasMaxLength(64)
+                    .HasColumnName("checksum");
+
+                entity.Property(e => e.FinishedAt)
                     .HasColumnType("datetime(3)")
-                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
+                    .HasColumnName("finished_at");
 
-                entity.Property(e => e.Email).HasMaxLength(191);
+                entity.Property(e => e.Logs)
+                    .HasColumnType("text")
+                    .HasColumnName("logs");
 
-                entity.Property(e => e.IsValid)
-                    .IsRequired()
-                    .HasDefaultValueSql("'1'");
+                entity.Property(e => e.MigrationName)
+                    .HasMaxLength(255)
+                    .HasColumnName("migration_name");
 
-                entity.Property(e => e.Message).HasMaxLength(191);
-
-                entity.Property(e => e.Name).HasMaxLength(191);
-
-                entity.Property(e => e.Phone).HasMaxLength(191);
-
-                entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
-            });
-
-            modelBuilder.Entity<Post>(entity =>
-            {
-                entity.ToTable("Post", "IMS");
-
-                entity.HasIndex(e => e.UserId, "Post_UserId_fkey");
-
-                entity.Property(e => e.CreatedAt)
+                entity.Property(e => e.RolledBackAt)
                     .HasColumnType("datetime(3)")
+                    .HasColumnName("rolled_back_at");
+
+                entity.Property(e => e.StartedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasColumnName("started_at")
                     .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
-
-                entity.Property(e => e.Description).HasColumnType("text");
-
-                entity.Property(e => e.ImageUrl).HasMaxLength(191);
-
-                entity.Property(e => e.Title).HasColumnType("text");
-
-                entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.Posts)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("Post_UserId_fkey");
-            });
-
-            modelBuilder.Entity<Setting>(entity =>
-            {
-                entity.ToTable("Setting", "IMS");
-
-                entity.HasIndex(e => e.Id, "Setting_Id_idx");
-
-                entity.Property(e => e.Type).HasMaxLength(191);
-
-                entity.Property(e => e.Value).HasMaxLength(191);
-            });
-
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.ToTable("User", "IMS");
-
-                entity.HasIndex(e => e.Email, "User_Email_idx");
-
-                entity.HasIndex(e => e.Email, "User_Email_key")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.Id, "User_Id_idx");
-
-                entity.HasIndex(e => e.RoleId, "User_RoleId_fkey");
-
-                entity.Property(e => e.Address).HasMaxLength(191);
-
-                entity.Property(e => e.Avatar).HasMaxLength(191);
-
-                entity.Property(e => e.ConfirmToken).HasMaxLength(191);
-
-                entity.Property(e => e.Email).HasMaxLength(191);
-
-                entity.Property(e => e.Gender).HasColumnType("datetime(3)");
-
-                entity.Property(e => e.Name).HasMaxLength(191);
-
-                entity.Property(e => e.Password).HasMaxLength(191);
-
-                entity.Property(e => e.Phone).HasMaxLength(191);
-
-                entity.Property(e => e.ResetToken).HasMaxLength(191);
-
-                entity.HasOne(d => d.Role)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.RoleId)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("User_RoleId_fkey");
             });
 
             OnModelCreatingPartial(modelBuilder);
