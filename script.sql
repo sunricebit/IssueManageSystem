@@ -7,7 +7,7 @@ USE IMS;
 -- CreateTable
 CREATE TABLE `Setting` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `Type` VARCHAR(10) NOT NULL,
+    `Type` VARCHAR(191) NOT NULL,
     `Value` VARCHAR(191) NOT NULL,
 
     INDEX `Setting_Id_idx`(`Id`),
@@ -42,6 +42,9 @@ CREATE TABLE `Contact` (
     `Phone` VARCHAR(191) NULL,
     `Name` VARCHAR(191) NOT NULL,
     `Message` VARCHAR(191) NOT NULL,
+    `IsValid` BOOLEAN NOT NULL DEFAULT true,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `UpdatedAt` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -64,3 +67,5 @@ ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFE
 
 -- AddForeignKey
 ALTER TABLE `Post` ADD CONSTRAINT `Post_UserId_fkey` FOREIGN KEY (`UserId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+INSERT INTO `IMS`.`Setting` (`Type`, `Value`) VALUES ('ROLE', 'Admin'), ('ROLE', 'Marketer'), ('ROLE', 'Teacher'), ('ROLE', 'Student');

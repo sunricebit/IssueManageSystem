@@ -36,13 +36,23 @@ namespace IMS.Models
             {
                 entity.ToTable("Contact", "IMS");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
+
                 entity.Property(e => e.Email).HasMaxLength(191);
+
+                entity.Property(e => e.IsValid)
+                    .IsRequired()
+                    .HasDefaultValueSql("'1'");
 
                 entity.Property(e => e.Message).HasMaxLength(191);
 
                 entity.Property(e => e.Name).HasMaxLength(191);
 
                 entity.Property(e => e.Phone).HasMaxLength(191);
+
+                entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
             });
 
             modelBuilder.Entity<Post>(entity =>
