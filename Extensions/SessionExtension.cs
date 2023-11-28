@@ -1,7 +1,5 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using IMS.ViewModels.Auth;
-using Microsoft.AspNetCore.Mvc;
 
 namespace IMS.Extensions
 {
@@ -19,7 +17,8 @@ namespace IMS.Extensions
 
         public static User? GetUser(this ISession session)
         {
-            string userJsonString = session.GetString("User")!;
+            string? userJsonString = session.GetString("User")!;
+            if (userJsonString == null) return null;
             return JsonSerializer.Deserialize<User>(userJsonString);
         }
     }

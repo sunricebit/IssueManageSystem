@@ -1,4 +1,3 @@
-﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -16,16 +15,23 @@ namespace IMS.Common
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            var role = context.HttpContext.Session.GetUser().Role; 
-
-            if (_requiredRoles.Contains(role.Value))
+            User? user = context.HttpContext.Session.GetUser();
+            if (user == null)
             {
-                base.OnActionExecuting(context);
+                context.Result = new RedirectToRouteResult(new RouteValueDictionary(new
+                {
+                    controller = "Auth",
+                    action = "SignIn"
+                }));
+                return;
             }
-            else
+
+            if (!_requiredRoles.Contains(user!.Role.Value))
             {
                 context.Result = new RedirectToActionResult("NotAccess", "Error", null);
+                return;
             }
+            base.OnActionExecuting(context);
         }
     }
 }
