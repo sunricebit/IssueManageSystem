@@ -88,13 +88,13 @@ namespace IMS.Controllers
         {
             if (!ModelState.IsValid) return View();
             var user = _context.Users.Include(s => s.Role).FirstOrDefault(user => user.Email == vm.Email);
-            if(user == null || !hashService.Verify(vm.Password, user.Password))
+            if (user == null || !hashService.Verify(vm.Password, user.Password))
             {
                 ViewBag.Error = "Email or password incorrect!";
                 return View();
             }
 
-            if(user.Status == null)
+            if (user.Status == null)
             {
                 ViewBag.Error = "This account has not been verified yet!";
                 return View();
