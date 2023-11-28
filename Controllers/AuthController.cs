@@ -2,6 +2,7 @@ using IMS.ViewModels.Auth;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
+
 namespace IMS.Controllers
 {
     [Route("/auth")]
@@ -122,8 +123,9 @@ namespace IMS.Controllers
         public IActionResult SignIn(SignInViewModel vm, [FromServices] IHashService hashService)
         {
             if (!ModelState.IsValid) return View();
-            var user = _context.Users.Include(s => s.Role).FirstOrDefault(user => user.Email == vm.Email && hashService.Verify(vm.Password, user.Password));
-            if (user == null)
+            var user = _context.Users.Include(s => s.Role).FirstOrDefault(user => user.Email == vm.Email);
+
+            if (user == null || !hashService.Verify(vm.Password, user.Password))
             {
                 ViewBag.Error = "Email or password incorrect!";
                 return View();
