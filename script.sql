@@ -7,10 +7,12 @@ USE IMS;
 -- CreateTable
 CREATE TABLE `Setting` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `Type` VARCHAR(191) NOT NULL,
-    `Value` VARCHAR(191) NOT NULL,
+    `Type` VARCHAR(20) NOT NULL,
+    `Value` VARCHAR(50) NOT NULL,
 
+    INDEX `Setting_Type_Value_idx`(`Type`, `Value`),
     INDEX `Setting_Id_idx`(`Id`),
+    UNIQUE INDEX `Setting_Type_Value_key`(`Type`, `Value`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -69,4 +71,24 @@ ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFE
 -- AddForeignKey
 ALTER TABLE `Post` ADD CONSTRAINT `Post_UserId_fkey` FOREIGN KEY (`UserId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
-INSERT INTO `IMS`.`Setting` (`Type`, `Value`) VALUES ('ROLE', 'Admin'), ('ROLE', 'Marketer'), ('ROLE', 'Teacher'), ('ROLE', 'Student');
+INSERT INTO `IMS`.`Setting` (`Type`, `Value`)
+VALUES ('ROLE', 'Admin'),
+       ('ROLE', 'Marketer'),
+       ('ROLE', 'Teacher'),
+       ('ROLE', 'Student');
+
+
+INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)
+VALUES ('admin@gmail.com', '$2a$11$C0XheCBSOFNJThlyh.1YuOfznCCkteW8NJsXFbTSawA9DhcE2UwlK',4,'Administrator', 1);
+
+
+INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)
+VALUES ('marketer@gmail.com', '$2a$11$C0XheCBSOFNJThlyh.1YuOfznCCkteW8NJsXFbTSawA9DhcE2UwlK',4,'Marketer', 1);
+
+
+INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)
+VALUES ('teacher@gmail.com', '$2a$11$C0XheCBSOFNJThlyh.1YuOfznCCkteW8NJsXFbTSawA9DhcE2UwlK',4,'Teacher', 1);
+
+
+INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)
+VALUES ('student@gmail.com', '$2a$11$C0XheCBSOFNJThlyh.1YuOfznCCkteW8NJsXFbTSawA9DhcE2UwlK',4,'Student', 1);
