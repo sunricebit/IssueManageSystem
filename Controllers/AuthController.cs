@@ -73,7 +73,7 @@ namespace IMS.Controllers
 
             HttpContext.Session.SetUser(user);
 
-            return Redirect("/");
+            return RedirectToAction("Index", "Home");
         }
 
         [Route("sign-up")]
