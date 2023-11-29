@@ -17,17 +17,17 @@ CREATE TABLE `Setting` (
 -- CreateTable
 CREATE TABLE `User` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `Email` VARCHAR(191) NOT NULL,
-    `Password` VARCHAR(191) NOT NULL,
+    `Email` VARCHAR(100) NOT NULL,
+    `Password` VARCHAR(64) NOT NULL,
     `RoleId` INTEGER NOT NULL,
-    `Name` VARCHAR(191) NOT NULL,
-    `Avatar` VARCHAR(191) NULL,
-    `Gender` DATETIME(3) NULL,
-    `Phone` VARCHAR(191) NULL,
+    `Name` VARCHAR(50) NOT NULL,
+    `Avatar` VARCHAR(100) NULL,
+    `Gender` BOOLEAN NULL,
+    `Phone` VARCHAR(15) NULL,
     `Address` VARCHAR(191) NULL,
     `Status` BOOLEAN NULL,
-    `ConfirmToken` VARCHAR(191) NULL,
-    `ResetToken` VARCHAR(191) NULL,
+    `ConfirmToken` VARCHAR(64) NULL,
+    `ResetToken` VARCHAR(64) NULL,
 
     UNIQUE INDEX `User_Email_key`(`Email`),
     INDEX `User_Id_idx`(`Id`),
@@ -38,14 +38,15 @@ CREATE TABLE `User` (
 -- CreateTable
 CREATE TABLE `Contact` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `Email` VARCHAR(191) NOT NULL,
-    `Phone` VARCHAR(191) NULL,
-    `Name` VARCHAR(191) NOT NULL,
-    `Message` VARCHAR(191) NOT NULL,
+    `Email` VARCHAR(100) NOT NULL,
+    `Phone` VARCHAR(15) NULL,
+    `Name` VARCHAR(50) NOT NULL,
+    `Message` TEXT NOT NULL,
     `IsValid` BOOLEAN NOT NULL DEFAULT true,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `UpdatedAt` DATETIME(3) NOT NULL,
 
+    UNIQUE INDEX `Contact_Email_key`(`Email`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -57,7 +58,7 @@ CREATE TABLE `Post` (
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `UpdatedAt` DATETIME(3) NOT NULL,
     `UserId` INTEGER NOT NULL,
-    `ImageUrl` VARCHAR(191) NULL,
+    `ImageUrl` VARCHAR(100) NULL,
 
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

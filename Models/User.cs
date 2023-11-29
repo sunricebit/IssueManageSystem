@@ -16,7 +16,7 @@ namespace IMS.Models
         public int RoleId { get; set; }
         public string Name { get; set; } = null!;
         public string? Avatar { get; set; }
-        public DateTime? Gender { get; set; }
+        public bool? Gender { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
         public bool? Status { get; set; }

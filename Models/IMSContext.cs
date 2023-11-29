@@ -37,21 +37,24 @@ namespace IMS.Models
             {
                 entity.ToTable("Contact", "IMS");
 
+                entity.HasIndex(e => e.Email, "Contact_Email_key")
+                    .IsUnique();
+
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime(3)")
                     .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
 
-                entity.Property(e => e.Email).HasMaxLength(191);
+                entity.Property(e => e.Email).HasMaxLength(100);
 
                 entity.Property(e => e.IsValid)
                     .IsRequired()
                     .HasDefaultValueSql("'1'");
 
-                entity.Property(e => e.Message).HasMaxLength(191);
+                entity.Property(e => e.Message).HasColumnType("text");
 
-                entity.Property(e => e.Name).HasMaxLength(191);
+                entity.Property(e => e.Name).HasMaxLength(50);
 
-                entity.Property(e => e.Phone).HasMaxLength(191);
+                entity.Property(e => e.Phone).HasMaxLength(15);
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
             });
@@ -68,7 +71,7 @@ namespace IMS.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
-                entity.Property(e => e.ImageUrl).HasMaxLength(191);
+                entity.Property(e => e.ImageUrl).HasMaxLength(100);
 
                 entity.Property(e => e.Title).HasColumnType("text");
 
@@ -143,21 +146,19 @@ namespace IMS.Models
 
                 entity.Property(e => e.Address).HasMaxLength(191);
 
-                entity.Property(e => e.Avatar).HasMaxLength(191);
+                entity.Property(e => e.Avatar).HasMaxLength(100);
 
-                entity.Property(e => e.ConfirmToken).HasMaxLength(191);
+                entity.Property(e => e.ConfirmToken).HasMaxLength(64);
 
-                entity.Property(e => e.Email).HasMaxLength(191);
+                entity.Property(e => e.Email).HasMaxLength(100);
 
-                entity.Property(e => e.Gender).HasColumnType("datetime(3)");
+                entity.Property(e => e.Name).HasMaxLength(50);
 
-                entity.Property(e => e.Name).HasMaxLength(191);
+                entity.Property(e => e.Password).HasMaxLength(64);
 
-                entity.Property(e => e.Password).HasMaxLength(191);
+                entity.Property(e => e.Phone).HasMaxLength(15);
 
-                entity.Property(e => e.Phone).HasMaxLength(191);
-
-                entity.Property(e => e.ResetToken).HasMaxLength(191);
+                entity.Property(e => e.ResetToken).HasMaxLength(64);
 
                 entity.HasOne(d => d.Role)
                     .WithMany(p => p.Users)

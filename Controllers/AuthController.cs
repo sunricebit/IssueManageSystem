@@ -234,9 +234,9 @@ namespace IMS.Controllers
         [Route("logout")]
         public IActionResult Logout()
         {
-            
+
             HttpContext.Session.Clear();
-            return RedirectToAction("SignIn")
+            return RedirectToAction("SignIn");
         }
 
     }
