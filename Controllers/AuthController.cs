@@ -1,9 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using IMS.ViewModels.Auth;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
+
 
 namespace IMS.Controllers
 {
@@ -13,12 +11,71 @@ namespace IMS.Controllers
         private readonly IConfiguration Configuration;
         private readonly IMSContext _context;
 
+        private readonly string clientId;
+        private readonly string clientSecret;
+        private readonly string redirectUri;
+
+
         public AuthController(IMSContext context, IConfiguration configuration)
         {
             _context = context;
             Configuration = configuration;
+            clientId = Configuration["Authentication:Google:ClientId"];
+            clientSecret = Configuration["Authentication:Google:ClientSecret"];
+            redirectUri = Configuration["Authentication:Google:RedirectUri"];
         }
 
+        [Route("google/callback")]
+        public async Task<ActionResult> Google([FromQuery] string code, [FromServices] IMailService mailService, [FromServices] IHashService hashService)
+        {
+            string authorizationCode = code;
+
+            var httpClient = new HttpClient();
+            var tokenRequest = new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                { "code", authorizationCode },
+                { "client_id", clientId },
+                { "client_secret", clientSecret },
+                { "redirect_uri", redirectUri },
+                { "grant_type", "authorization_code" }
+            });
+            var tokenResponse = await httpClient.PostAsync("https://accounts.google.com/o/oauth2/token", tokenRequest);
+            var tokenContent = await tokenResponse.Content.ReadAsStringAsync();
+            GoogleInfo tokenInfo = JsonSerializer.Deserialize<GoogleInfo>(tokenContent)!;
+
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenInfo.access_token);
+            var peopleResponse = await httpClient.GetAsync("https://www.googleapis.com/oauth2/v2/userinfo");
+            string mailContent = await peopleResponse.Content.ReadAsStringAsync();
+            MailInfo mailInfo = JsonSerializer.Deserialize<MailInfo>(mailContent)!;
+            string email = mailInfo.email;
+
+            var user = _context.Users.FirstOrDefault(user => user.Email == email);
+            if (user == null)
+            {
+                var role = _context.Settings.FirstOrDefault(s => s.Type == "ROLE" && s.Value == "Student");
+                if (role == null)
+                {
+                    return View();
+                };
+
+                var userCreate = new User
+                {
+                    Email = email,
+                    Password = hashService.HashPassword(hashService.RandomStringGenerator(8)),
+                    Name = mailService.GetAddress(email)!,
+                    Status = true,
+                    RoleId = role.Id,
+                };
+                HttpContext.Session.SetUser(userCreate);
+
+            }
+            else
+            {
+                return RedirectToAction("/NotAccess");
+            }
+
+            return Redirect("/");
+        }
 
         [Route("sign-up")]
         public IActionResult SignUp()
@@ -48,8 +105,8 @@ namespace IMS.Controllers
             User userCreate = new User
             {
                 Email = vm.Email.Trim(),
-                Name = mailService.GetAddress(vm.Email)!,
                 Password = hashService.HashPassword(vm.Password),
+                Name = mailService.GetAddress(vm.Email)!,
                 ConfirmToken = hashService.RandomHash(),
                 RoleId = role.Id
             };
@@ -91,16 +148,9 @@ namespace IMS.Controllers
         public IActionResult SignIn(SignInViewModel vm, [FromServices] IHashService hashService)
         {
             if (!ModelState.IsValid) return View();
-            var user = _context.Users.Include(s => s.Role).FirstOrDefault(p => p.Email == vm.Email);
+            var user = _context.Users.Include(s => s.Role).FirstOrDefault(user => user.Email == vm.Email);
 
-            if (user == null)
-            {
-                ViewBag.Error = "Email or password incorrect!";
-                return View();
-            }
-
-            bool validPass = hashService.Verify(vm.Password, user.Password);
-            if (!validPass)
+            if (user == null || !hashService.Verify(vm.Password, user.Password))
             {
                 ViewBag.Error = "Email or password incorrect!";
                 return View();
@@ -180,5 +230,14 @@ namespace IMS.Controllers
             ModelState.Clear();
             return View();
         }
+
+        [Route("logout")]
+        public IActionResult Logout()
+        {
+            
+            HttpContext.Session.Clear();
+            return RedirectToAction("SignIn")
+        }
+
     }
 }
