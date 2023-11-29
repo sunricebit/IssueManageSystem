@@ -126,9 +126,14 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.Id, "Setting_Id_idx");
 
-                entity.Property(e => e.Type).HasMaxLength(191);
+                entity.HasIndex(e => new { e.Type, e.Value }, "Setting_Type_Value_idx");
 
-                entity.Property(e => e.Value).HasMaxLength(191);
+                entity.HasIndex(e => new { e.Type, e.Value }, "Setting_Type_Value_key")
+                    .IsUnique();
+
+                entity.Property(e => e.Type).HasMaxLength(20);
+
+                entity.Property(e => e.Value).HasMaxLength(50);
             });
 
             modelBuilder.Entity<User>(entity =>

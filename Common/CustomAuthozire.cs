@@ -26,7 +26,7 @@ namespace IMS.Common
                 return;
             }
 
-            if (!_requiredRoles.Contains(user!.Role.Value))
+            if (_requiredRoles.Length != 0 &&!_requiredRoles.Contains(user!.Role.Value))
             {
                 context.Result = new RedirectToActionResult("NotAccess", "Error", null);
                 return;

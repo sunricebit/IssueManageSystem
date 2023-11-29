@@ -15,6 +15,7 @@ public class HomeController : Controller
     }
 
     [Route("")]
+    [CustomAuthorize()]
     public IActionResult Index()
     {
         return View();
