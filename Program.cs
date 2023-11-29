@@ -1,7 +1,12 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Microsoft.AspNetCore.Identity;
+
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<IMSContext>(options => new IMSContext());
+builder.Services.AddSingleton<IHashService, HashService>();
+builder.Services.AddSingleton<IMailService, MailService>();
+
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = "SessionCookie";
@@ -17,6 +22,16 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
+app.Use(async (context, next) =>
+{
+    await next();
+    if (context.Response.StatusCode == 404)
+    {
+        context.Request.Path = "/Error/404";
+        await next();
+    }
+});
 
 app.UseSession();
 app.UseHttpsRedirection();

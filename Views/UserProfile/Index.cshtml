@@ -1,0 +1,76 @@
+﻿@model IMS.Models.User;
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+ }
+
+<h1>User Details</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Phone)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Phone)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Gender)
+        </dt>
+        <dd class="col-sm-10">
+            @if (Model.Gender == true)
+            {
+                    <p>Male</p>
+            }
+            else{
+                <p>Female</p>
+            }
+
+        </dd>
+    </dl>
+</div>
+<div style="display:flex">
+    <div style="background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%); height:fit-content; border-radius:5px; display:flex;justify-content:center;width:fit-content;padding:5px">
+        <a style="color:white; text-decoration:none;" asp-action="Edit" asp-route-id="@Model.Id">Edit Profile</a>
+    </div>
+   
+</div>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Password)
+        </dt>
+        <dd class="col-sm-10">
+            <input style="border:none" value="@Html.DisplayFor(model => model.Password)"  type="password"/>
+            
+        </dd>
+    </dl>
+</div>
+<div style="display:flex">
+    <div style="background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%); height:fit-content; border-radius:5px; display:flex;justify-content:center;width:fit-content;padding:5px">
+        <a style="color:white; text-decoration:none;" asp-action="Edit" asp-route-id="@Model.Id">Change Password</a>
+    </div>
+  
+</div>
+

@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="NGitLab" Version="6.43.1" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="MailKit" Version="4.3.0" />
@@ -16,12 +17,23 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.11" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Services\" />
+    <None Remove="ViewModels\" />
+    <None Remove="ViewModels\Auth\" />
+    <None Remove="Views\Home\" />
+    <None Remove="Views\Auth\" />
+    <None Remove="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
-    <Folder Include="wwwroot\NewFolder\" />
+    <Folder Include="ViewModels\" />
+    <Folder Include="ViewModels\Auth\" />
+    <Folder Include="Views\Home\" />
+    <Folder Include="Views\Auth\" />
+    <Folder Include="wwwroot\assets\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 </Project>

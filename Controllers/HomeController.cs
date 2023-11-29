@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using IMS.Models;
+using IMS.Common;
+
 
 namespace IMS.Controllers;
 
@@ -14,6 +15,7 @@ public class HomeController : Controller
     }
 
     [Route("")]
+    [CustomAuthorize()]
     public IActionResult Index()
     {
         return View();
