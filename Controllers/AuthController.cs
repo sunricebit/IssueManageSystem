@@ -105,7 +105,8 @@ namespace IMS.Controllers
             {
                 Email = vm.Email.Trim(),
                 Password = hashService.HashPassword(vm.Password),
-                Name = mailService.GetAddress(vm.Email)!,
+                Name = vm.Name,
+                Phone= vm.Phone,
                 ConfirmToken = hashService.RandomHash(),
                 RoleId = role.Id
             };
