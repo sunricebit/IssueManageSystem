@@ -66,13 +66,12 @@ namespace IMS.Controllers
                     Status = true,
                     RoleId = role.Id,
                 };
+                _context.Users.Add(userCreate);
+                await _context.SaveChangesAsync();
                 HttpContext.Session.SetUser(userCreate);
 
             }
-            else
-            {
-                return RedirectToAction("/NotAccess");
-            }
+            
 
             return Redirect("/");
         }
