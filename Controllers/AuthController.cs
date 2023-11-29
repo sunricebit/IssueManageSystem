@@ -58,7 +58,7 @@ namespace IMS.Controllers
                     return View();
                 };
 
-                var userCreate = new User
+                user = new User
                 {
                     Email = email,
                     Password = hashService.HashPassword(hashService.RandomStringGenerator(8)),
@@ -66,12 +66,12 @@ namespace IMS.Controllers
                     Status = true,
                     RoleId = role.Id,
                 };
-                _context.Users.Add(userCreate);
+                _context.Users.Add(user);
                 await _context.SaveChangesAsync();
-                HttpContext.Session.SetUser(userCreate);
 
             }
-            
+
+            HttpContext.Session.SetUser(user);
 
             return Redirect("/");
         }
