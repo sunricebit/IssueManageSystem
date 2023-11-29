@@ -106,7 +106,7 @@ namespace IMS.Controllers
                 Email = vm.Email.Trim(),
                 Password = hashService.HashPassword(vm.Password),
                 Name = vm.Name,
-                Phone= vm.Phone,
+                Phone = vm.Phone,
                 ConfirmToken = hashService.RandomHash(),
                 RoleId = role.Id
             };
@@ -126,35 +126,27 @@ namespace IMS.Controllers
 
             if (user == null)
             {
-                return RedirectToAction("SignIn", new
-                {
-                    type= "error",
-                    message = "Token invalid!!!"
-                });
+                return RedirectToAction("SignIn", new { verified = false });
             }
 
             user.ConfirmToken = null;
             user.Status = true;
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("SignIn", new
-            {
-                type = "success",
-                message = "Your account has been verified"
-            }); ;
+            return RedirectToAction("SignIn", new { verified = true }); ;
         }
 
         [Route("sign-in")]
-        public IActionResult SignIn(string type, string message)
+        public IActionResult SignIn(bool? verified)
         {
-            switch (type)
+            switch (verified)
             {
 
-                case "error":
-                    ViewBag.Error = message;
+                case false:
+                    ViewBag.Error = "Token invalid!!!";
                     break;
-                case "success":
-                    ViewBag.Success = message;
+                case true:
+                    ViewBag.Success = "Your account has been verified";
                     break;
                 default:
                     break;
