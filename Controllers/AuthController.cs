@@ -126,20 +126,39 @@ namespace IMS.Controllers
 
             if (user == null)
             {
-                ViewBag.AlertMessage = "Token invalid";
-                return RedirectToAction("SignIn");
+                return RedirectToAction("SignIn", new
+                {
+                    type= "error",
+                    message = "Token invalid!!!"
+                });
             }
 
             user.ConfirmToken = null;
             user.Status = true;
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("SignIn"); ;
+            return RedirectToAction("SignIn", new
+            {
+                type = "success",
+                message = "Your account has been verified"
+            }); ;
         }
 
         [Route("sign-in")]
-        public IActionResult SignIn()
+        public IActionResult SignIn(string type, string message)
         {
+            switch (type)
+            {
+
+                case "error":
+                    ViewBag.Error = message;
+                    break;
+                case "success":
+                    ViewBag.Success = message;
+                    break;
+                default:
+                    break;
+            }
             return View(new SignInViewModel());
         }
 
