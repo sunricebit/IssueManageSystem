@@ -90,7 +90,16 @@
             @Html.DisplayNameFor(model => model.Gender)
         </dt>
         <dd class="col-sm-10">
-            @Model.Gender
+            @if(Model.Gender==true){
+                <p>Male</p>
+            }
+            else if (Model.Gender == null)
+            {
+                <p></p>
+            }
+            else{
+                <p>Female</p>
+            }
         </dd>
     </dl>
 </div>
@@ -133,11 +142,18 @@
                         <span asp-validation-for="Gender" class="text-danger"></span>
 
                     }
+                    else if (Model.Gender == null)
+                    {
+                        <label><input asp-for="Gender" type="radio" value="true" /> Male</label>
+                        <label><input asp-for="Gender" type="radio" value="false" /> Female</label>
+                        <span asp-validation-for="Gender" class="text-danger"></span>
+                    }
                     else
                     {
-                         <label><input asp-for="Gender" type="radio" value="true"  /> Male</label>
+                        <label><input asp-for="Gender" type="radio" value="true" /> Male</label>
                         <label><input asp-for="Gender" type="radio" value="false" checked /> Female</label>
                         <span asp-validation-for="Gender" class="text-danger"></span>
+                        
 
                     }                      
                     </div>
