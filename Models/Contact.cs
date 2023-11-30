@@ -11,6 +11,6 @@ namespace IMS.Models
         public string Name { get; set; } = null!;
         public string Message { get; set; } = null!;
         public bool IsValid { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        //public DateTime UpdatedAt { get; set; }
     }
 }

@@ -1,7 +1,10 @@
-﻿@{
+﻿@model IEnumerable<IMS.Models.Contact>
+
+@{
     ViewData["Title"] = "Contact List";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 
 <h2>Contact Messages</h2>
 
@@ -19,7 +22,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var message in ViewBag.ContactMessages)
+        @foreach (Contact message in Model )
         {
             <tr>
                 <th>@message.Id</th>

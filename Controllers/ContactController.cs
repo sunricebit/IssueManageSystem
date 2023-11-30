@@ -11,24 +11,25 @@ namespace IMS.Controllers
         {
             _context = context;
         }
-
+        [Route("Index")]
         public IActionResult Index()
         {
             return View();
         }
         [Route("Lists")]
-        public IActionResult List()
+        public async Task<IActionResult> List()
         {
-            var contactMessages = _context.Contacts.ToListAsync();
-            ViewBag.ContactMessages = contactMessages;
-            return View("~/Views/Contact/List.cshtml");
+             var contactMessages = await _context.Contacts.ToListAsync();
+          //  ViewBag.ContactMessages = contactMessages;
+            return View(contactMessages);
         }
 
+        [Route("MaskValid")]
         public IActionResult MarkValid(int id)
         {
             Contact contact = _context.Contacts.SingleOrDefault(n => n.Id == id);
             contact.IsValid = !contact.IsValid;
-            return List();
+            return View();
         }
 
     }
