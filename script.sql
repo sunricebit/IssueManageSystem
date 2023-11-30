@@ -28,6 +28,7 @@ CREATE TABLE `User` (
     `Phone` VARCHAR(15) NULL,
     `Address` VARCHAR(191) NULL,
     `Status` BOOLEAN NULL,
+    `LstAccessTime` DATETIME NULL, 
     `ConfirmToken` VARCHAR(64) NULL,
     `ResetToken` VARCHAR(64) NULL,
 

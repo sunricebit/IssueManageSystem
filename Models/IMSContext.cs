@@ -117,6 +117,8 @@ namespace IMS.Models
 
                 entity.Property(e => e.Email).HasMaxLength(100);
 
+                entity.Property(e => e.LstAccessTime).HasColumnType("datetime");
+
                 entity.Property(e => e.Name).HasMaxLength(50);
 
                 entity.Property(e => e.Password).HasMaxLength(64);

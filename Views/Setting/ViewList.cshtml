@@ -1,0 +1,53 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Settings</h1>
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Setting List
+        </div>
+        <div class="card-body">
+            @{
+                if (ViewBag.SettingList != null)
+                {
+                    <table id="datatablesSimple">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Type</th>
+                                <th>Value</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var setting in ViewBag.SettingList)
+                            {
+                                <tr>
+                                    <td>@setting.Id</td>
+                                    <td>@setting.Type</td>
+                                    <td>@setting.Value</td>
+                                    <td>
+                                        <a class ="btn btn-info btn-sm"></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No settings available.</p>
+                }
+            }
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="~/js/site.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+<script src="~/js/datatables-simple-demo.js"></script>
