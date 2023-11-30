@@ -15,7 +15,7 @@
             <th scope="col">User Name</th>
             <th scope="col">Message</th>
             <th scope="col">Is Valid</th>
-            <th scope="col">Updated</th>
+           
             <th scope="col">Email</th>
             <th scope="col">Phone</th>
             <th colspan="2">Action</th>
@@ -28,11 +28,25 @@
                 <th>@message.Id</th>
                 <td>@message.Name</td>
                 <td>@message.Message</td>
-                <td>@(message.IsValid ? "Yes" : "No")</td>
-                <td>@message.UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td>
+                    @if (message.IsValid == true)
+                    {
+                        <p>Yes</p>
+                    }
+                    else if (message.IsValid == null)
+                    {
+                        <p>...</p>
+                    }
+                    else
+                    {
+                        <p>No</p>
+                    }
+
+                    
+               
                 <td>@message.Email</td>
                 <td>@message.Phone</td>               
-                <td>
+                <td >
                     <a asp-action="Details" asp-route-id="@message.Id">Details</a>
                 </td>
                 <td>
