@@ -37,5 +37,6 @@
     <Folder Include="wwwroot\assets\" />
     <Folder Include="Extensions\" />
     <Folder Include="wwwroot\img\" />
+    <Folder Include="wwwroot\Avatars\" />
   </ItemGroup>
 </Project>
