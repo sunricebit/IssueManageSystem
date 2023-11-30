@@ -17,7 +17,7 @@ namespace IMS.Controllers
         [CustomAuthorize()]
         public IActionResult Index([FromQuery] string tab)
         {
-;            ViewData["tab"] = tab ?? "userdetails";
+           ViewData["tab"] = tab ?? "userdetails";
             switch (tab)
             {
                 case "userdetails":
@@ -53,7 +53,7 @@ namespace IMS.Controllers
             //user.Name = User.Name;
             _context.SaveChanges();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index),new {tab= "userdetails" });
         }
         }
 }
