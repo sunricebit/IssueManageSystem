@@ -17,7 +17,15 @@ public class HomeController : Controller
     [Route("")]
     public IActionResult Index()
     {
-        return RedirectToAction("Index", "Landing");
+        var user = HttpContext.Session.GetUser();
+        if (user == null)
+        {
+            return RedirectToAction("Index", "Landing");
+        }
+        else
+        {
+            return RedirectToAction("Blank");
+        }
     }
 
     [Route("BlankDashboard")]
