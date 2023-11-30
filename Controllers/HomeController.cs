@@ -15,11 +15,20 @@ public class HomeController : Controller
     }
 
     [Route("")]
-    [CustomAuthorize()]
     public IActionResult Index()
     {
         return View();
     }
+
+    [Route("BlankDashboard")]
+    [CustomAuthorize(RoleUser.Admin, RoleUser.Student, RoleUser.Teacher, RoleUser.Marketer)]
+    public IActionResult Blank()
+    {
+        User user = HttpContext.Session.GetUser();
+        ViewBag.LstTimeAccess = user.LstAccessTime == null ? "New account" : user.LstAccessTime.Value.ToString();
+        return View("BlankDashboard");
+    }
+
     //test
     public IActionResult Privacy()
     {
