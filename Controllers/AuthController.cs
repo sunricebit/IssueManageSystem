@@ -73,7 +73,7 @@ namespace IMS.Controllers
 
             HttpContext.Session.SetUser(user);
 
-            return Redirect("/");
+            return RedirectToAction("Blank", "Home");
         }
 
         [Route("sign-up")]
@@ -105,7 +105,8 @@ namespace IMS.Controllers
             {
                 Email = vm.Email.Trim(),
                 Password = hashService.HashPassword(vm.Password),
-                Name = mailService.GetAddress(vm.Email)!,
+                Name = vm.Name,
+                Phone = vm.Phone,
                 ConfirmToken = hashService.RandomHash(),
                 RoleId = role.Id
             };
@@ -125,20 +126,31 @@ namespace IMS.Controllers
 
             if (user == null)
             {
-                ViewBag.AlertMessage = "Token invalid";
-                return RedirectToAction("SignIn");
+                return RedirectToAction("SignIn", new { verified = false });
             }
 
             user.ConfirmToken = null;
             user.Status = true;
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("SignIn"); ;
+            return RedirectToAction("SignIn", new { verified = true }); ;
         }
 
         [Route("sign-in")]
-        public IActionResult SignIn()
+        public IActionResult SignIn(bool? verified)
         {
+            switch (verified)
+            {
+
+                case false:
+                    ViewBag.Error = "Token invalid!!!";
+                    break;
+                case true:
+                    ViewBag.Success = "Your account has been verified";
+                    break;
+                default:
+                    break;
+            }
             return View(new SignInViewModel());
         }
 
@@ -170,7 +182,7 @@ namespace IMS.Controllers
             HttpContext.Session.SetUser(user);
 
             ModelState.Clear();
-            return Redirect("/");
+            return Redirect("/BlankDashboard");
         }
 
         [Route("forgot-password")]
@@ -231,9 +243,11 @@ namespace IMS.Controllers
         }
 
         [Route("logout")]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-
+            User user = _context.Users.FirstOrDefault(u => u.Id == HttpContext.Session.GetUser().Id);
+            user.LstAccessTime = DateTime.Now;
+            await _context.SaveChangesAsync();
             HttpContext.Session.Clear();
             return RedirectToAction("SignIn");
         }

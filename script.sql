@@ -28,12 +28,13 @@ CREATE TABLE `User` (
     `Phone` VARCHAR(15) NULL,
     `Address` VARCHAR(191) NULL,
     `Status` BOOLEAN NULL,
+    `LstAccessTime` DATETIME NULL, 
     `ConfirmToken` VARCHAR(64) NULL,
     `ResetToken` VARCHAR(64) NULL,
 
-    UNIQUE INDEX `User_Email_key`(`Email`),
     INDEX `User_Id_idx`(`Id`),
     INDEX `User_Email_idx`(`Email`),
+    UNIQUE INDEX `User_Email_key`(`Email`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -46,9 +47,8 @@ CREATE TABLE `Contact` (
     `Message` TEXT NOT NULL,
     `IsValid` BOOLEAN NOT NULL DEFAULT true,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `UpdatedAt` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `Contact_Email_key`(`Email`),
+    INDEX `Contact_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -58,7 +58,7 @@ CREATE TABLE `Post` (
     `Title` TEXT NOT NULL,
     `Description` TEXT NOT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `UpdatedAt` DATETIME(3) NOT NULL,
+    `UpdatedAt` DATETIME(3) NULL,
     `UserId` INTEGER NOT NULL,
     `ImageUrl` VARCHAR(100) NULL,
 

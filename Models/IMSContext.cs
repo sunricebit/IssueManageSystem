@@ -18,7 +18,6 @@ namespace IMS.Models
 
         public virtual DbSet<Contact> Contacts { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
-        public virtual DbSet<PrismaMigration> PrismaMigrations { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
@@ -27,7 +26,7 @@ namespace IMS.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseMySQL("server=localhost;uid=root;pwd=123456789;database=IMS");
+                optionsBuilder.UseMySQL("server=localhost;uid=root;pwd=123456;database=IMS");
             }
         }
 
@@ -37,8 +36,7 @@ namespace IMS.Models
             {
                 entity.ToTable("Contact", "IMS");
 
-                entity.HasIndex(e => e.Email, "Contact_Email_key")
-                    .IsUnique();
+                entity.HasIndex(e => e.Id, "Contact_Id_idx");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime(3)")
@@ -55,8 +53,6 @@ namespace IMS.Models
                 entity.Property(e => e.Name).HasMaxLength(50);
 
                 entity.Property(e => e.Phone).HasMaxLength(15);
-
-                entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
             });
 
             modelBuilder.Entity<Post>(entity =>
@@ -82,42 +78,6 @@ namespace IMS.Models
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("Post_UserId_fkey");
-            });
-
-            modelBuilder.Entity<PrismaMigration>(entity =>
-            {
-                entity.ToTable("_prisma_migrations", "IMS");
-
-                entity.Property(e => e.Id)
-                    .HasMaxLength(36)
-                    .HasColumnName("id");
-
-                entity.Property(e => e.AppliedStepsCount).HasColumnName("applied_steps_count");
-
-                entity.Property(e => e.Checksum)
-                    .HasMaxLength(64)
-                    .HasColumnName("checksum");
-
-                entity.Property(e => e.FinishedAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("finished_at");
-
-                entity.Property(e => e.Logs)
-                    .HasColumnType("text")
-                    .HasColumnName("logs");
-
-                entity.Property(e => e.MigrationName)
-                    .HasMaxLength(255)
-                    .HasColumnName("migration_name");
-
-                entity.Property(e => e.RolledBackAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("rolled_back_at");
-
-                entity.Property(e => e.StartedAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("started_at")
-                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
             });
 
             modelBuilder.Entity<Setting>(entity =>
@@ -156,6 +116,8 @@ namespace IMS.Models
                 entity.Property(e => e.ConfirmToken).HasMaxLength(64);
 
                 entity.Property(e => e.Email).HasMaxLength(100);
+
+                entity.Property(e => e.LstAccessTime).HasColumnType("datetime");
 
                 entity.Property(e => e.Name).HasMaxLength(50);
 

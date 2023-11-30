@@ -20,6 +20,14 @@ namespace IMS.ViewModels.Auth
         [Display(Name = "Confirm Password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Required(ErrorMessage = "Please enter your name.")]
+        [Display(Name = "Name")]
+        public string Name { get; set; }
+
+        [Display(Name = "Phone")]
+        [RegularExpression(@"^\d{10}$", ErrorMessage = "Invalid phone number")]
+        public string? Phone { get; set; }
     }
 }
 
