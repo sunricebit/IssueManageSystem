@@ -1,0 +1,59 @@
+﻿@model IEnumerable<IMS.Models.Contact>
+
+@{
+    ViewData["Title"] = "Contact List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<h2>Contact Messages</h2>
+
+<table class="table" style="text-align : center">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">User Name</th>
+            <th scope="col">Message</th>
+            <th scope="col">Is Valid</th>
+           
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th colspan="2">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Contact message in Model )
+        {
+            <tr>
+                <th>@message.Id</th>
+                <td>@message.Name</td>
+                <td>@message.Message</td>
+                <td>
+                    @if (message.IsValid == true)
+                    {
+                        <p>Yes</p>
+                    }
+                    else if (message.IsValid == null)
+                    {
+                        <p>...</p>
+                    }
+                    else
+                    {
+                        <p>No</p>
+                    }
+
+                    
+               
+                <td>@message.Email</td>
+                <td>@message.Phone</td>               
+                <td >
+                    <a asp-action="Details" asp-route-id="@message.Id">Details</a>
+                </td>
+                <td>
+                    <a asp-action="MarkValid" asp-route-id="@message.Id">MarkValid</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
