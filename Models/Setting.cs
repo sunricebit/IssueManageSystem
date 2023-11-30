@@ -15,6 +15,7 @@ namespace IMS.Models
         public int Id { get; set; }
         public string Type { get; set; } = null!;
         public string Value { get; set; } = null!;
+        public string? Description { get; set; }
 
         public virtual ICollection<Contact> Contacts { get; set; }
         public virtual ICollection<Post> Posts { get; set; }

@@ -9,6 +9,7 @@ CREATE TABLE `Setting` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Type` VARCHAR(20) NOT NULL,
     `Value` VARCHAR(50) NOT NULL,
+    `Description` VARCHAR(400) NULL,
 
     INDEX `Setting_Type_Value_idx`(`Type`, `Value`),
     INDEX `Setting_Id_idx`(`Id`),
@@ -24,6 +25,7 @@ CREATE TABLE `Contact` (
     `Name` VARCHAR(50) NOT NULL,
     `Message` TEXT NOT NULL,
     `IsValid` BOOLEAN NOT NULL DEFAULT true,
+    `Reason` VARCHAR(400) NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `ContactTypeId` INTEGER NULL,
 
@@ -85,7 +87,18 @@ INSERT INTO `IMS`.`Setting` (`Type`, `Value`)
 VALUES ('ROLE', 'Admin'),
        ('ROLE', 'Marketer'),
        ('ROLE', 'Teacher'),
-       ('ROLE', 'Student');
+       ('ROLE', 'Student'),
+       ('POST_CATEGORY', 'Art and Culture'),
+       ('POST_CATEGORY', 'Travel and Adventure'),
+       ('POST_CATEGORY', 'Science and Technology'),
+       ('POST_CATEGORY', 'Health and Lifestyle'),
+       ('POST_CATEGORY', 'Learning and Personal Development'),
+       ('POST_CATEGORY', 'Family Life'),
+       ('CONTACT_TYPE', 'Networking'),
+       ('CONTACT_TYPE', 'IT Career Development'),
+       ('CONTACT_TYPE', 'Financial Aid and Scholarships'),
+       ('CONTACT_TYPE', 'Faculty and Research'),
+       ('CONTACT_TYPE', 'International Students');
 
 
 INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)
