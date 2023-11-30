@@ -73,7 +73,7 @@ namespace IMS.Controllers
 
             HttpContext.Session.SetUser(user);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Blank", "Home");
         }
 
         [Route("sign-up")]
@@ -182,7 +182,7 @@ namespace IMS.Controllers
             HttpContext.Session.SetUser(user);
 
             ModelState.Clear();
-            return Redirect("/");
+            return Redirect("/BlankDashboard");
         }
 
         [Route("forgot-password")]
@@ -243,9 +243,11 @@ namespace IMS.Controllers
         }
 
         [Route("logout")]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-
+            User user = _context.Users.FirstOrDefault(u => u.Id == HttpContext.Session.GetUser().Id);
+            user.LstAccessTime = DateTime.Now;
+            await _context.SaveChangesAsync();
             HttpContext.Session.Clear();
             return RedirectToAction("SignIn");
         }

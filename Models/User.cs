@@ -20,9 +20,9 @@ namespace IMS.Models
         public string? Phone { get; set; }
         public string? Address { get; set; }
         public bool? Status { get; set; }
+        public DateTime? LstAccessTime { get; set; }
         public string? ConfirmToken { get; set; }
         public string? ResetToken { get; set; }
-
         public virtual Setting Role { get; set; } = null!;
         public virtual ICollection<Post> Posts { get; set; }
     }
