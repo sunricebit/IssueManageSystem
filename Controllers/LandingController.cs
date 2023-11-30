@@ -28,8 +28,6 @@ namespace IMS.Controllers
                     Email = email,
                     Phone = phone,
                     Message = message,
-                    IsValid = true,
-                CreatedAt= DateTime.Now
                 };
                 context.Contacts.Add(contact);
                 context.SaveChanges();
