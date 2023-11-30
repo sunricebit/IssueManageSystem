@@ -42,14 +42,11 @@ namespace IMS.Controllers
         public async Task<IActionResult> EditUserProfile( [Bind("Id,Name,Phone,Address,Gender")]User User)
         {
 
-            //_context.Entry<User>(User).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            //    _context.SaveChanges();
             User user = _context.Users.Find(User.Id);
             user.Name = User.Name;
             user.Phone = User.Phone;
             user.Address = User.Address;
             user.Gender = User.Gender;
-            Console.WriteLine(User.Gender);
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Index),new {tab= "userdetails" });

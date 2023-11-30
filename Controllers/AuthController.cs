@@ -58,10 +58,11 @@ namespace IMS.Controllers
                     return View();
                 };
 
+                string password = hashService.RandomStringGenerator(8);
                 user = new User
                 {
                     Email = email,
-                    Password = hashService.HashPassword(hashService.RandomStringGenerator(8)),
+                    Password = hashService.HashPassword(password),
                     Name = mailService.GetAddress(email)!,
                     Status = true,
                     RoleId = role.Id,
@@ -69,6 +70,7 @@ namespace IMS.Controllers
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
+                mailService.SendPassword(email, password);
             }
 
             HttpContext.Session.SetUser(user);

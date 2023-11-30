@@ -1,3 +1,4 @@
+
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
@@ -35,6 +36,7 @@
     <Folder Include="ViewModels\Auth\" />
     <Folder Include="Views\Home\" />
     <Folder Include="wwwroot\assets\" />
+    <Folder Include="Views\Auth\" />
     <Folder Include="Extensions\" />
     <Folder Include="wwwroot\img\" />
     <Folder Include="wwwroot\Avatars\" />
