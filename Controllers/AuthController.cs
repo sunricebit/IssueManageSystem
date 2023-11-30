@@ -49,7 +49,7 @@ namespace IMS.Controllers
             MailInfo mailInfo = JsonSerializer.Deserialize<MailInfo>(mailContent)!;
             string email = mailInfo.email;
 
-            var user = _context.Users.FirstOrDefault(user => user.Email == email);
+            var user = _context.Users.Include(user => user.Role).FirstOrDefault(user => user.Email == email);
             if (user == null)
             {
                 var role = _context.Settings.FirstOrDefault(s => s.Type == "ROLE" && s.Value == "Student");
