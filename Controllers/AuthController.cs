@@ -238,5 +238,10 @@ namespace IMS.Controllers
             return RedirectToAction("SignIn");
         }
 
-    }
+        [Route("changepassword")]
+        public  IActionResult ChangePassword()
+        {
+            return View();
+        }
+        }
 }

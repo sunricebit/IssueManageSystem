@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Web.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +44,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+        pattern: "{controller=Landing}/{action=Index}/{id?}");
 });
 app.Run();
 

@@ -2,11 +2,69 @@
 
 @{
     ViewData["Title"] = "Index";
+    string tab = ViewData["tab"]?.ToString() ?? "userdetails";
     Layout = "~/Views/Shared/_Layout.cshtml";
  }
+<style>
+    .popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 1px solid #ccc;
+        padding: 20px;
+        background-color: #fff;
+        z-index: 1;
+        width:450px;
+    }
 
+    .popup-content {
+        /*text-align: center;*/
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .close:hover {
+            color: black;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #000;
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .active-color{
+                background-color: green !important;
+                color: #f8f9fa;
+        }
+</style>
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a id="Home"  class="nav-link @(@tab == "userdetails" ? "active-color":"")" href="/userprofile?tab=userdetails">User Profile</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/userprofile?tab=changepassword">Change Password</a>
+    </li>
+   
+</ul>
 <h1>User Details</h1>
-
+<div class="avatar">
+    <img src="~/img/avatarDemo.jpg" alt="Avatar">
+</div>
 <div>
     <hr />
     <dl class="row">
@@ -32,45 +90,87 @@
             @Html.DisplayNameFor(model => model.Gender)
         </dt>
         <dd class="col-sm-10">
-            @if (Model.Gender == true)
-            {
-                    <p>Male</p>
-            }
-            else{
-                <p>Female</p>
-            }
-
+            @Model.Gender
         </dd>
     </dl>
 </div>
 <div style="display:flex">
     <div style="background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%); height:fit-content; border-radius:5px; display:flex;justify-content:center;width:fit-content;padding:5px">
-        <a style="color:white; text-decoration:none;" asp-action="Edit" asp-route-id="@Model.Id">Edit Profile</a>
+        <button style="color:white; text-decoration:none;background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%); border:none" id="openPopupBtn">Edit Profile</button>
     </div>
    
 </div>
-<div>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Password)
-        </dt>
-        <dd class="col-sm-10">
-            <input style="border:none" value="@Html.DisplayFor(model => model.Password)"  type="password"/>
-            
-        </dd>
-    </dl>
-</div>
-<div style="display:flex">
-    <div style="background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%); height:fit-content; border-radius:5px; display:flex;justify-content:center;width:fit-content;padding:5px">
-        <a style="color:white; text-decoration:none;" asp-action="Edit" asp-route-id="@Model.Id">Change Password</a>
+
+
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <span class="close" id="closePopupBtn">&times;</span>
+        <div class="row">
+                <form asp-action="EditUserProfile">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Phone" class="control-label"></label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Address" class="control-label"></label>
+                        <input asp-for="Address" class="form-control" />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Gender" class="control-label"></label>
+                    @if (Model.Gender == true)
+                    {
+                        <label><input asp-for="Gender" type="radio" value="true" checked /> Male</label>
+                        <label><input asp-for="Gender" type="radio" value="false" /> Female</label>
+                        <span asp-validation-for="Gender" class="text-danger"></span>
+
+                    }
+                    else
+                    {
+                         <label><input asp-for="Gender" type="radio" value="true"  /> Male</label>
+                        <label><input asp-for="Gender" type="radio" value="false" checked /> Female</label>
+                        <span asp-validation-for="Gender" class="text-danger"></span>
+
+                    }                      
+                    </div>
+                    <div class="form-group">
+                        <input style="background-color: #43A047;border-color: #43A047; height:40px; margin-top:5px" type="submit" value="Save" class="btn btn-primary" />
+                    </div>
+                </form>
+        </div>
+
     </div>
-  
 </div>
 
+<script>
+    // Get the button and the popup
+    var openPopupBtn = document.getElementById('openPopupBtn');
+    var popup = document.getElementById('popup');
+    var closePopupBtn = document.getElementById('closePopupBtn');
+
+    // Show the popup when the button is clicked
+    openPopupBtn.addEventListener('click', function () {
+        popup.style.display = 'block';
+    });
+
+    // Close the popup when the close button is clicked
+    closePopupBtn.addEventListener('click', function () {
+        popup.style.display = 'none';
+    });
+
+    // Close the popup if the user clicks outside of it
+    window.addEventListener('click', function (event) {
+        if (event.target == popup) {
+            popup.style.display = 'none';
+        }
+    });
+
+</script>
