@@ -1,0 +1,39 @@
+﻿@model IMS.ViewModels.Auth.SignInViewModel;
+@*@using Microsoft.Extensions.Configuration;
+    @inject IConfiguration _config;*@
+
+@{
+    ViewData["Title"] = "Sign In";
+    Layout = "~/Views/Shared/AuthLayout.cshtml";
+}
+
+<p class="fw-bold">Login</p>
+
+@using (Html.BeginForm("SignIn", "Auth", FormMethod.Post))
+{
+    <div class="form-group mb-3">
+        <label asp-for="Email">Email <span class="text-danger">*</span></label>
+        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="Password">Password <span class="text-danger">*</span></label>
+        @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @type = "password" })
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+
+    <div class="d-flex justify-content-between">
+
+        <div class="form-group mb-3">
+            <a class="text-primary text-decoration-none" href="/auth/sign-up">You already haven't' an account?</a>
+        </div>
+
+        <div class="form-group mb-3">
+            <a class="text-primary text-decoration-none" href="/auth/forgot-password">Forgot password?</a>
+        </div>
+
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Submit</button>
+}

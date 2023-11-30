@@ -2,6 +2,9 @@
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<IMSContext>(options => new IMSContext());
+builder.Services.AddSingleton<IHashService, HashService>();
+builder.Services.AddSingleton<IMailService, MailService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = "SessionCookie";
@@ -18,12 +21,27 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.Use(async (context, next) =>
+{
+    await next();
+    if (context.Response.StatusCode == 404)
+    {
+        context.Request.Path = "/Error/404";
+        await next();
+    }
+});
+
 app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
-
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Landing}/{action=Index}/{id?}");
+});
 app.Run();
 

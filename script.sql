@@ -7,42 +7,29 @@ USE IMS;
 -- CreateTable
 CREATE TABLE `Setting` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `Type` VARCHAR(10) NOT NULL,
-    `Value` VARCHAR(191) NOT NULL,
+    `Type` VARCHAR(20) NOT NULL,
+    `Value` VARCHAR(50) NOT NULL,
+    `Description` VARCHAR(400) NULL,
 
+    INDEX `Setting_Type_Value_idx`(`Type`, `Value`),
     INDEX `Setting_Id_idx`(`Id`),
-    PRIMARY KEY (`Id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
-CREATE TABLE `User` (
-    `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `Email` VARCHAR(191) NOT NULL,
-    `Password` VARCHAR(191) NOT NULL,
-    `RoleId` INTEGER NOT NULL,
-    `Name` VARCHAR(191) NOT NULL,
-    `Avatar` VARCHAR(191) NOT NULL,
-    `Gender` DATETIME(3) NULL,
-    `Phone` VARCHAR(191) NULL,
-    `Address` VARCHAR(191) NULL,
-    `Status` BOOLEAN NULL,
-    `ConfirmToken` VARCHAR(191) NULL,
-    `ResetToken` VARCHAR(191) NULL,
-
-    UNIQUE INDEX `User_Email_key`(`Email`),
-    INDEX `User_Id_idx`(`Id`),
-    INDEX `User_Email_idx`(`Email`),
+    UNIQUE INDEX `Setting_Type_Value_key`(`Type`, `Value`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Contact` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `Email` VARCHAR(191) NOT NULL,
-    `Phone` VARCHAR(191) NULL,
-    `Name` VARCHAR(191) NOT NULL,
-    `Message` VARCHAR(191) NOT NULL,
+    `Email` VARCHAR(100) NOT NULL,
+    `Phone` VARCHAR(15) NULL,
+    `Name` VARCHAR(50) NOT NULL,
+    `Message` TEXT NOT NULL,
+    `IsValid` BOOLEAN NOT NULL DEFAULT true,
+    `Reason` VARCHAR(400) NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `ContactTypeId` INTEGER NULL,
 
+    INDEX `Contact_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -52,15 +39,79 @@ CREATE TABLE `Post` (
     `Title` TEXT NOT NULL,
     `Description` TEXT NOT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `UpdatedAt` DATETIME(3) NOT NULL,
+    `UpdatedAt` DATETIME(3) NULL,
     `UserId` INTEGER NOT NULL,
-    `ImageUrl` VARCHAR(191) NULL,
+    `ImageUrl` VARCHAR(100) NULL,
+    `CategoryId` INTEGER NULL,
 
+    INDEX `Post_UserId_fkey`(`UserId`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `User` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Email` VARCHAR(100) NOT NULL,
+    `Password` VARCHAR(64) NOT NULL,
+    `RoleId` INTEGER NOT NULL,
+    `Name` VARCHAR(50) NOT NULL,
+    `Avatar` VARCHAR(100) NULL,
+    `Gender` BOOLEAN NULL,
+    `Phone` VARCHAR(15) NULL,
+    `Address` VARCHAR(191) NULL,
+    `Status` BOOLEAN NULL,
+    `LstAccessTime` DATETIME(3) NULL,
+    `ConfirmToken` VARCHAR(64) NULL,
+    `ResetToken` VARCHAR(64) NULL,
+
+    UNIQUE INDEX `User_Email_key`(`Email`),
+    INDEX `User_Email_idx`(`Email`),
+    INDEX `User_Id_idx`(`Id`),
+    INDEX `User_RoleId_fkey`(`RoleId`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Contact` ADD CONSTRAINT `Contact_ContactTypeId_fkey` FOREIGN KEY (`ContactTypeId`) REFERENCES `Setting`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Post` ADD CONSTRAINT `Post_UserId_fkey` FOREIGN KEY (`UserId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Post` ADD CONSTRAINT `Post_CategoryId_fkey` FOREIGN KEY (`CategoryId`) REFERENCES `Setting`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+INSERT INTO `IMS`.`Setting` (`Type`, `Value`)
+VALUES ('ROLE', 'Admin'),
+       ('ROLE', 'Marketer'),
+       ('ROLE', 'Teacher'),
+       ('ROLE', 'Student'),
+       ('POST_CATEGORY', 'Art and Culture'),
+       ('POST_CATEGORY', 'Travel and Adventure'),
+       ('POST_CATEGORY', 'Science and Technology'),
+       ('POST_CATEGORY', 'Health and Lifestyle'),
+       ('POST_CATEGORY', 'Learning and Personal Development'),
+       ('POST_CATEGORY', 'Family Life'),
+       ('CONTACT_TYPE', 'Networking'),
+       ('CONTACT_TYPE', 'IT Career Development'),
+       ('CONTACT_TYPE', 'Financial Aid and Scholarships'),
+       ('CONTACT_TYPE', 'Faculty and Research'),
+       ('CONTACT_TYPE', 'International Students');
+
+
+INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)
+VALUES ('admin@gmail.com', '$2a$11$C0XheCBSOFNJThlyh.1YuOfznCCkteW8NJsXFbTSawA9DhcE2UwlK',4,'Administrator', 1);
+
+
+INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)
+VALUES ('marketer@gmail.com', '$2a$11$C0XheCBSOFNJThlyh.1YuOfznCCkteW8NJsXFbTSawA9DhcE2UwlK',4,'Marketer', 1);
+
+
+INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)
+VALUES ('teacher@gmail.com', '$2a$11$C0XheCBSOFNJThlyh.1YuOfznCCkteW8NJsXFbTSawA9DhcE2UwlK',4,'Teacher', 1);
+
+
+INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)
+VALUES ('student@gmail.com', '$2a$11$C0XheCBSOFNJThlyh.1YuOfznCCkteW8NJsXFbTSawA9DhcE2UwlK',4,'Student', 1);

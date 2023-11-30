@@ -1,0 +1,43 @@
+﻿@model IMS.ViewModels.Auth.SignUpViewModel;
+
+@{
+    ViewData["Title"] = "Sign up";
+    Layout = "~/Views/Shared/AuthLayout.cshtml";
+}
+
+<p class="fw-bold">Register</p>
+
+@using (Html.BeginForm("SignUp", "Auth", FormMethod.Post))
+{
+    <div class="form-group mb-3">
+        <label asp-for="Name">Fullname <span class="text-danger">*</span></label>
+        @Html.TextBoxFor(m => m.Name, new { @class = "form-control" })
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="Email">Email <span class="text-danger">*</span></label>
+        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="Password">Password <span class="text-danger">*</span></label>
+        @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @type = "password" })
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="ConfirmPassword">Confirm Password <span class="text-danger">*</span></label>
+        @Html.TextBoxFor(m => m.ConfirmPassword, new { @class = "form-control", @type = "password" })
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="Phone">Phone (Optional)</label>
+        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control" })
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <a class="text-primary text-decoration-none" href="/auth/sign-in">You already have an account?</a>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Submit</button>
+}
