@@ -17,28 +17,6 @@ CREATE TABLE `Setting` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `User` (
-    `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `Email` VARCHAR(100) NOT NULL,
-    `Password` VARCHAR(64) NOT NULL,
-    `RoleId` INTEGER NOT NULL,
-    `Name` VARCHAR(50) NOT NULL,
-    `Avatar` VARCHAR(100) NULL,
-    `Gender` BOOLEAN NULL,
-    `Phone` VARCHAR(15) NULL,
-    `Address` VARCHAR(191) NULL,
-    `Status` BOOLEAN NULL,
-    `LstAccessTime` DATETIME NULL, 
-    `ConfirmToken` VARCHAR(64) NULL,
-    `ResetToken` VARCHAR(64) NULL,
-
-    INDEX `User_Id_idx`(`Id`),
-    INDEX `User_Email_idx`(`Email`),
-    UNIQUE INDEX `User_Email_key`(`Email`),
-    PRIMARY KEY (`Id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Contact` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Email` VARCHAR(100) NOT NULL,
@@ -47,6 +25,7 @@ CREATE TABLE `Contact` (
     `Message` TEXT NOT NULL,
     `IsValid` BOOLEAN NOT NULL DEFAULT true,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `ContactTypeId` INTEGER NULL,
 
     INDEX `Contact_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
@@ -61,15 +40,46 @@ CREATE TABLE `Post` (
     `UpdatedAt` DATETIME(3) NULL,
     `UserId` INTEGER NOT NULL,
     `ImageUrl` VARCHAR(100) NULL,
+    `CategoryId` INTEGER NULL,
 
+    INDEX `Post_UserId_fkey`(`UserId`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `User` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Email` VARCHAR(100) NOT NULL,
+    `Password` VARCHAR(64) NOT NULL,
+    `RoleId` INTEGER NOT NULL,
+    `Name` VARCHAR(50) NOT NULL,
+    `Avatar` VARCHAR(100) NULL,
+    `Gender` BOOLEAN NULL,
+    `Phone` VARCHAR(15) NULL,
+    `Address` VARCHAR(191) NULL,
+    `Status` BOOLEAN NULL,
+    `LstAccessTime` DATETIME(3) NULL,
+    `ConfirmToken` VARCHAR(64) NULL,
+    `ResetToken` VARCHAR(64) NULL,
+
+    UNIQUE INDEX `User_Email_key`(`Email`),
+    INDEX `User_Email_idx`(`Email`),
+    INDEX `User_Id_idx`(`Id`),
+    INDEX `User_RoleId_fkey`(`RoleId`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Contact` ADD CONSTRAINT `Contact_ContactTypeId_fkey` FOREIGN KEY (`ContactTypeId`) REFERENCES `Setting`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Post` ADD CONSTRAINT `Post_UserId_fkey` FOREIGN KEY (`UserId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Post` ADD CONSTRAINT `Post_CategoryId_fkey` FOREIGN KEY (`CategoryId`) REFERENCES `Setting`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 INSERT INTO `IMS`.`Setting` (`Type`, `Value`)
 VALUES ('ROLE', 'Admin'),

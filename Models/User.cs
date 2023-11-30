@@ -23,6 +23,7 @@ namespace IMS.Models
         public DateTime? LstAccessTime { get; set; }
         public string? ConfirmToken { get; set; }
         public string? ResetToken { get; set; }
+
         public virtual Setting Role { get; set; } = null!;
         public virtual ICollection<Post> Posts { get; set; }
     }

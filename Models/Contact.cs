@@ -10,9 +10,10 @@ namespace IMS.Models
         public string? Phone { get; set; }
         public string Name { get; set; } = null!;
         public string Message { get; set; } = null!;
-
-        public bool? IsValid { get; set; } 
+        public bool? IsValid { get; set; }
         public DateTime CreatedAt { get; set; }
+        public int? ContactTypeId { get; set; }
 
+        public virtual Setting? ContactType { get; set; }
     }
 }

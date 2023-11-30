@@ -7,6 +7,8 @@ namespace IMS.Models
     {
         public Setting()
         {
+            Contacts = new HashSet<Contact>();
+            Posts = new HashSet<Post>();
             Users = new HashSet<User>();
         }
 
@@ -14,6 +16,8 @@ namespace IMS.Models
         public string Type { get; set; } = null!;
         public string Value { get; set; } = null!;
 
+        public virtual ICollection<Contact> Contacts { get; set; }
+        public virtual ICollection<Post> Posts { get; set; }
         public virtual ICollection<User> Users { get; set; }
     }
 }
