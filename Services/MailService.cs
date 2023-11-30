@@ -6,7 +6,7 @@ namespace IMS.Services
     public class MailService : IMailService
     {
         private readonly IConfiguration Configuration;
-
+        private readonly IHashService HashService;
         private readonly string host;
         private readonly int port;
         private readonly bool useSsl;
@@ -14,10 +14,10 @@ namespace IMS.Services
         private readonly string password;
         private readonly string url;
 
-        public MailService(IConfiguration configuration)
+        public MailService(IConfiguration configuration,IHashService service)
         {
             Configuration = configuration;
-
+            HashService = service;
             host = Configuration["MailSetting:Host"];
             port = int.Parse(Configuration["MailSetting:Port"]);
             useSsl = bool.Parse(Configuration["MailSetting:UseSsl"]);
@@ -25,6 +25,8 @@ namespace IMS.Services
             password = Configuration["MailSetting:Password"];
             url = Configuration["MailSetting:Url"];
         }
+        
+
 
 
         public void SendMailConfirm(string emailReceiver, string hash)
@@ -41,6 +43,7 @@ namespace IMS.Services
             client.Send(message);
             client.Disconnect(true);
         }
+        
 
         public void SendResetPassword(string emailReceiver, string hash)
         {
@@ -55,6 +58,32 @@ namespace IMS.Services
             client.Authenticate(emailSender, password);
             client.Send(message);
             client.Disconnect(true);
+        }
+        public string SendRandomPassword(string emailReceiver)
+        {
+            
+            var randomPassword = HashService.RandomStringGenerator(10);
+
+            
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Admin", "tunahe140525@fpt.edu.vn"));
+            message.To.Add(new MailboxAddress(emailReceiver, emailReceiver));
+            message.Subject = "Password to log in";
+            message.Body = new TextPart("plain")
+            {
+                Text = "Here is your password: " + randomPassword
+            };
+
+            using var client = new SmtpClient();
+            client.Connect(host, port, useSsl);
+            client.Authenticate(emailSender, password);
+            client.Send(message);
+            client.Disconnect(true);
+
+            
+            var passwordHash = HashService.HashPassword(randomPassword);
+            return passwordHash;
+           
         }
 
         public string? GetDomain(string email)
