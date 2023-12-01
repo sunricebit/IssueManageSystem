@@ -49,7 +49,7 @@ namespace IMS.Controllers
             MailInfo mailInfo = JsonSerializer.Deserialize<MailInfo>(mailContent)!;
             string email = mailInfo.email;
 
-            var user = _context.Users.FirstOrDefault(user => user.Email == email);
+            var user = _context.Users.Include(user => user.Role).FirstOrDefault(user => user.Email == email);
             if (user == null)
             {
                 var role = _context.Settings.FirstOrDefault(s => s.Type == "ROLE" && s.Value == "Student");
@@ -58,10 +58,11 @@ namespace IMS.Controllers
                     return View();
                 };
 
+                string password = hashService.RandomStringGenerator(8);
                 user = new User
                 {
                     Email = email,
-                    Password = hashService.HashPassword(hashService.RandomStringGenerator(8)),
+                    Password = hashService.HashPassword(password),
                     Name = mailService.GetAddress(email)!,
                     Status = true,
                     RoleId = role.Id,
@@ -69,6 +70,7 @@ namespace IMS.Controllers
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
+                mailService.SendPassword(email, password);
             }
 
             HttpContext.Session.SetUser(user);
@@ -252,5 +254,10 @@ namespace IMS.Controllers
             return RedirectToAction("SignIn");
         }
 
-    }
+        [Route("changepassword")]
+        public  IActionResult ChangePassword()
+        {
+            return View();
+        }
+        }
 }

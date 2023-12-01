@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<IMSContext>(options => new IMSContext());
@@ -42,6 +40,11 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
-
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Landing}/{action=Index}/{id?}");
+});
 app.Run();
 

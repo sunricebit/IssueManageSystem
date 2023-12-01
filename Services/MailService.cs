@@ -115,8 +115,8 @@ namespace IMS.Services
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Admin", emailSender));
             message.To.Add(new MailboxAddress(email, email));
-            message.Subject = "Email Confirmation";
-            message.Body = new TextPart("plain") { Text = "Your password is: " + password };
+            message.Subject = "Account Activated";
+            message.Body = new TextPart("plain") { Text = "Your email is: " + email + "\n" + "Your password :" + password};
 
             using var client = new SmtpClient();
             client.Connect(host, port, useSsl);

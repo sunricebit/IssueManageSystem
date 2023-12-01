@@ -20,7 +20,7 @@ namespace IMS.Models
         public virtual DbSet<Post> Posts { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
-
+          
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -35,6 +35,8 @@ namespace IMS.Models
             modelBuilder.Entity<Contact>(entity =>
             {
                 entity.ToTable("Contact", "IMS");
+
+                entity.HasIndex(e => e.ContactTypeId, "Contact_ContactTypeId_fkey");
 
                 entity.HasIndex(e => e.Id, "Contact_Id_idx");
 
@@ -53,11 +55,21 @@ namespace IMS.Models
                 entity.Property(e => e.Name).HasMaxLength(50);
 
                 entity.Property(e => e.Phone).HasMaxLength(15);
+
+                entity.Property(e => e.Reason).HasMaxLength(400);
+
+                entity.HasOne(d => d.ContactType)
+                    .WithMany(p => p.Contacts)
+                    .HasForeignKey(d => d.ContactTypeId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("Contact_ContactTypeId_fkey");
             });
 
             modelBuilder.Entity<Post>(entity =>
             {
                 entity.ToTable("Post", "IMS");
+
+                entity.HasIndex(e => e.CategoryId, "Post_CategoryId_fkey");
 
                 entity.HasIndex(e => e.UserId, "Post_UserId_fkey");
 
@@ -72,6 +84,12 @@ namespace IMS.Models
                 entity.Property(e => e.Title).HasColumnType("text");
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
+
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.Posts)
+                    .HasForeignKey(d => d.CategoryId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("Post_CategoryId_fkey");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Posts)
@@ -90,6 +108,8 @@ namespace IMS.Models
 
                 entity.HasIndex(e => new { e.Type, e.Value }, "Setting_Type_Value_key")
                     .IsUnique();
+
+                entity.Property(e => e.Description).HasMaxLength(400);
 
                 entity.Property(e => e.Type).HasMaxLength(20);
 
@@ -117,7 +137,7 @@ namespace IMS.Models
 
                 entity.Property(e => e.Email).HasMaxLength(100);
 
-                entity.Property(e => e.LstAccessTime).HasColumnType("datetime");
+                entity.Property(e => e.LstAccessTime).HasColumnType("datetime(3)");
 
                 entity.Property(e => e.Name).HasMaxLength(50);
 
