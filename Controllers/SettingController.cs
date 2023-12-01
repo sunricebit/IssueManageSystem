@@ -13,11 +13,14 @@ namespace IMS.Controllers
         }
 
         [Route("List")]
-        public IActionResult ViewList(int? pageNumber, int? pageSize)
+        public IActionResult ViewList(int? pageNumber)
         {
-            int tempPageNumber = pageNumber ?? 2;
-            int tempPageSize = pageSize ?? 2;
-            ViewBag.SettingList = _settingService.GetSettingPaginate(tempPageNumber, tempPageSize);
+            int tempPageNumber = pageNumber ?? 1;
+            int tempPageSize = 10;
+            Paginate<Setting> paginate = new Paginate<Setting>(_settingService.GetSettings(), tempPageNumber, tempPageSize);
+            ViewBag.SettingList = paginate.GetListPaginate();
+            ViewBag.Action = "ViewList";
+            ViewBag.Pagination = paginate.GetPagination();
             return View();
         }
     }

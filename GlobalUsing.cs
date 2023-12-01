@@ -5,5 +5,6 @@ global using IMS.Common;
 global using IMS.ViewModels;
 global using System.ComponentModel.DataAnnotations;
 global using IMS.Extensions;
+global using IMS.ViewModels.Paginate;
 
 

@@ -1,8 +1,6 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
     ViewData["Title"] = "User List";
+    Pagination pagination = ViewBag.Pagination;
 }
 
 <div class="container-fluid px-4">
@@ -47,8 +45,7 @@
                     <p>No settings available.</p>
                 }
             }
+            @Html.Partial("_PaginationPartial", pagination)
         </div>
-        
     </div>
 </div>
-<script src="~/js/datatables-sort.js" asp-append-version="true"></script>
