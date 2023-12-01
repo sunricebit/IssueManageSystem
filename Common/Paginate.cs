@@ -4,31 +4,32 @@ namespace IMS.Common
 {
     public class Paginate<T>
     {
-        IEnumerable<T> listObject;
+        private readonly IMSContext _context = new IMSContext();
+
         int pageNumber;
         int pageSize;
         int numberOfPage;
         
-        public Paginate(IEnumerable<T> objects, int pageNumber, int pageSize)
+        public Paginate(int pageNumber, int pageSize)
         {
-            this.listObject = objects;
             this.pageNumber = pageNumber;
             this.pageSize = pageSize;
-            if (this.listObject.Count() % pageSize > 0)
+        }
+
+        public IEnumerable<T> GetListPaginate<T>() where T : class
+        {
+            int countObject = _context.Set<T>().Count();
+            if (countObject % pageSize > 0)
             {
-                this.numberOfPage = this.listObject.Count() / pageSize + 1;
+                this.numberOfPage = _context.Set<T>().Count() / pageSize + 1;
             }
             else
             {
-                this.numberOfPage = this.listObject.Count() / pageSize;
+                this.numberOfPage = countObject / pageSize;
             }
-        }
-
-        public IEnumerable<T> GetListPaginate()
-        {
             int startIndex = (pageNumber - 1) * pageSize;
-            int endIndex = pageNumber == numberOfPage ? listObject.Count() - 1 : pageNumber * pageSize - 1;
-            return this.listObject.ToList().GetRange(startIndex, endIndex - startIndex + 1);
+            int endIndex = pageNumber == numberOfPage ? countObject - 1 : pageNumber * pageSize - 1;
+            return _context.Set<T>().ToList().GetRange(startIndex, endIndex - startIndex + 1);
         }
 
         public Pagination GetPagination()

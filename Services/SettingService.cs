@@ -1,5 +1,4 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using X.PagedList;
 
 namespace IMS.Services
 {
@@ -63,7 +62,7 @@ namespace IMS.Services
         {
             try
             {
-                return _context.Settings.ToPagedList(pageNumber, pageSize);
+                return _context.Settings;
             }
             catch (Exception e)
             {

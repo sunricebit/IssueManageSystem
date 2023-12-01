@@ -17,8 +17,10 @@ namespace IMS.Controllers
         {
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
-            Paginate<Setting> paginate = new Paginate<Setting>(_settingService.GetSettings(), tempPageNumber, tempPageSize);
-            ViewBag.SettingList = paginate.GetListPaginate();
+            Paginate<Setting> paginate = new Paginate<Setting>(tempPageNumber, tempPageSize); 
+            // Paginate<T> paginate = new Paginate<T>(tempPageNumber, tempPageSize);
+            ViewBag.SettingList = paginate.GetListPaginate<Setting>();
+            // ViewBag.SettingList = paginate.GetListPaginate<T>();
             ViewBag.Action = "ViewList";
             ViewBag.Pagination = paginate.GetPagination();
             return View();
