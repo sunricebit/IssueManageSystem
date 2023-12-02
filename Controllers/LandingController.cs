@@ -27,14 +27,13 @@ namespace IMS.Controllers
                     Name = name,
                     Email = email,
                     Phone = phone,
-                    Message = message,
+                    //Message = message,
                 };
                 context.Contacts.Add(contact);
                 context.SaveChanges();
                 return View(nameof(Index));
             }
                
-            return View();
         }
 
     }

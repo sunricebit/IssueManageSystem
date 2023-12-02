@@ -17,6 +17,7 @@ namespace IMS.Models
         public string Value { get; set; } = null!;
         public string? Description { get; set; }
 
+        public virtual Permission? Permission { get; set; }
         public virtual ICollection<Contact> Contacts { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
         public virtual ICollection<User> Users { get; set; }

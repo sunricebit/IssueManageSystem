@@ -7,7 +7,14 @@ namespace IMS.Models
     {
         public User()
         {
+            Classes = new HashSet<Class>();
+            Contacts = new HashSet<Contact>();
+            IssueAssignees = new HashSet<Issue>();
+            IssueAuthors = new HashSet<Issue>();
             Posts = new HashSet<Post>();
+            Projects = new HashSet<Project>();
+            ClassesNavigation = new HashSet<Class>();
+            ProjectsNavigation = new HashSet<Project>();
         }
 
         public int Id { get; set; }
@@ -25,6 +32,14 @@ namespace IMS.Models
         public string? ResetToken { get; set; }
 
         public virtual Setting Role { get; set; } = null!;
+        public virtual ICollection<Class> Classes { get; set; }
+        public virtual ICollection<Contact> Contacts { get; set; }
+        public virtual ICollection<Issue> IssueAssignees { get; set; }
+        public virtual ICollection<Issue> IssueAuthors { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
+        public virtual ICollection<Project> Projects { get; set; }
+
+        public virtual ICollection<Class> ClassesNavigation { get; set; }
+        public virtual ICollection<Project> ProjectsNavigation { get; set; }
     }
 }
