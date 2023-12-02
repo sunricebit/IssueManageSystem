@@ -8,7 +8,8 @@
             User UpdateUser(User user);
             void DeleteUser(int id);
             IEnumerable<User> SearchUsers(string searchTerm);
-            IEnumerable<User> FilterUsers(Dictionary<string, object> filters);
+        User GetUserByEmail(string email);
+        int GetRoleId(string role);
             IEnumerable<Setting> GetRole();
             IEnumerable<User> FilterByRole(int roleid);
             IEnumerable<User> FilterByStatus(bool status);

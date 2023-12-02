@@ -32,28 +32,29 @@ namespace IMS.Controllers
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
             Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
-           
-            ViewBag.UserList = paginate.GetListPaginate<User>();
+            ViewBag.CreateSuccessMessage = TempData["CreateSuccessMessage"] as string;
+            var users = userService.GetAllUsers();
+            ViewBag.UserList = paginate.GetListPaginate<User>(users);
             ViewBag.Action = "UserList";
             var role = userService.GetRole();
             ViewBag.Roles = role;
             ViewBag.Pagination = paginate.GetPagination();
 
-            var users = userService.GetAllUsers();
-            return View(users);
+            
+            return View();
         }
         [HttpGet("Search")]
         public IActionResult Search(int? pageNumber, string keyword)
         {
-            int tempPageNumber = pageNumber ?? 1;
-            int tempPageSize = 10;
-            Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
-            var role = userService.GetRole();
-            ViewBag.Roles = role;
-            ViewBag.Pagination = paginate.GetPagination();
-            var users = userService.SearchUsers(keyword);
-
-            return View("Index",users);
+                int tempPageNumber = pageNumber ?? 1;
+                int tempPageSize = 10;
+                Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
+                var role = userService.GetRole();
+                ViewBag.Roles = role;
+                ViewBag.Pagination = paginate.GetPagination();
+                var users = userService.SearchUsers(keyword);
+            ViewBag.UserList = paginate.GetListPaginate<User>(users);
+            return View("Index");
         }
         [HttpGet("FilterRole")]
         public IActionResult FilterByRole(int? pageNumber,int roleid)
@@ -66,8 +67,8 @@ namespace IMS.Controllers
             ViewBag.Pagination = paginate.GetPagination();
            
             var users = userService.FilterByRole(roleid);
-
-            return View("Index", users);
+            ViewBag.UserList = paginate.GetListPaginate<User>(users);
+            return View("Index");
 
         }
         [HttpGet("FilterStatus")]
@@ -89,8 +90,8 @@ namespace IMS.Controllers
                status2 = false;
             }
             var users = userService.FilterByStatus(status2);
-
-            return View("Index", users);
+            ViewBag.UserList = paginate.GetListPaginate<User>(users);
+            return View("Index");
 
         }
 
@@ -129,10 +130,13 @@ namespace IMS.Controllers
 
             if (!ModelState.IsValid)
             {
-
+                if (user.Avatar == null)
+                {
+                    user.Avatar = "https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fdefault_avatar.jpg?alt=media&token=c9ec5062-d46b-4009-a04a-4fbeb5532005";
+                }
                 user.Password = _mailService.SendRandomPassword(user.Email);
                 userService.AddUser(user);
-                TempData["Message"] = "User created successfully";
+                TempData["CreateSuccessMessage"] = "Người dùng đã được thêm thành công.";
                 return RedirectToAction("Index","User");
             }
 
@@ -154,32 +158,51 @@ namespace IMS.Controllers
                 {
                     var worksheet = workbook.Worksheet(1);
 
-                    
+
                     for (int i = 2; i <= worksheet.RowsUsed().Count(); i++)
                     {
-                       
+
                         var id = worksheet.Cell(i, 1).Value.ToString();
-                        var name = worksheet.Cell(i, 2).Value.ToString();
-                        var Role = worksheet.Cell(i, 2).Value.ToString();
-                        var Phone = worksheet.Cell(i, 2).Value.ToString();
-                        var Address = worksheet.Cell(i, 2).Value.ToString();
-                        
+                        var email = worksheet.Cell(i, 2).Value.ToString();
+                        var name = worksheet.Cell(i, 3).Value.ToString();
+                        var Role = worksheet.Cell(i, 4).Value.ToString();
+                        var Phone = worksheet.Cell(i, 5).Value.ToString();
+                        var Address = worksheet.Cell(i, 6).Value.ToString();
+                        var existingUser = userService.GetUserByEmail(email);
                         if (id == "Id") continue;
-
-                        var user = new User()
+                        if (existingUser != null)
                         {
-                            Id = int.Parse(id),
-                            Name = name,
-                            Phone = Phone,
-                            Address = Address
-                        };
+                            existingUser.Id = int.Parse(id);
+                            existingUser.Name = name;
+                            var roleid = userService.GetRoleId(Role);
+                            existingUser.RoleId = roleid;
+                            existingUser.Phone = Phone;
+                            existingUser.Address = Address;
 
-                        userService.AddUser(user);
+                            userService.UpdateUser(existingUser);
+                        }
+                        else
+                        {
+                            var user = new User()
+                            {
+                                Id = int.Parse(id),
+                                Email = email,
+                                Name = name,
+                                Phone = Phone,
+                                Address = Address,
+                                RoleId = userService.GetRoleId(Role),
+                                Password = _hashService.HashPassword("123456789"),
+                                Gender = true
+                            };
+
+
+                            userService.AddUser(user);
+                        }
                     }
                 }
             }
 
-            return Redirect("Index");
+            return RedirectToAction("Index");
         }
         [HttpGet("Export")]
         public IActionResult Export()
@@ -194,6 +217,7 @@ namespace IMS.Controllers
             data.Columns.AddRange(new DataColumn[]
             {
                 new DataColumn("Id"),
+                new DataColumn("Email"),
                 new DataColumn("Name"),
                 new DataColumn("Role"),
                 new DataColumn("Phone"),
@@ -202,7 +226,7 @@ namespace IMS.Controllers
             });
             foreach ( var user in users)
             {
-                data.Rows.Add(user.Id,user.Name,user.Role.Value,user.Phone,user.Address,user.Status);
+                data.Rows.Add(user.Id,user.Email,user.Name,user.Role.Value,user.Phone,user.Address,user.Status);
             }
             using (XLWorkbook wb = new XLWorkbook())
             {
@@ -217,34 +241,20 @@ namespace IMS.Controllers
             }
         }
 
-     
-
-        [HttpGet("edit/{id}")]
-        public IActionResult Edit(int id)
+        [HttpPost()]
+        
+        public IActionResult Update(User user)
         {
-            var user = userService.GetUser(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
-        }
-
-        [HttpPost("edit/{id}")]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(User user)
-        {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 userService.UpdateUser(user);
                 return RedirectToAction("Index");
             }
 
-            return View(user);
+            return View("Index");
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpPost("Delete")]
         public IActionResult Delete(int id)
         {
             userService.DeleteUser(id);

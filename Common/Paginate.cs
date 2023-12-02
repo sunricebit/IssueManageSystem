@@ -16,9 +16,9 @@ namespace IMS.Common
                 this.pageSize = pageSize;
             }
 
-            public IEnumerable<T> GetListPaginate<T>() where T : class
+            public IEnumerable<T> GetListPaginate<T>(IEnumerable<T> source) where T : class
             {
-                int countObject = _context.Set<T>().Count();
+                int countObject = source.Count();
                 if (countObject % pageSize > 0)
                 {
                     this.numberOfPage = _context.Set<T>().Count() / pageSize + 1;
@@ -27,7 +27,7 @@ namespace IMS.Common
                 {
                     this.numberOfPage = countObject / pageSize;
                 }
-                return _context.Set<T>().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+                return source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
             }
 
             public Pagination GetPagination()

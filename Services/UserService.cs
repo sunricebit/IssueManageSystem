@@ -15,6 +15,14 @@ namespace IMS.Services
         {
             return _context.Settings.Where(u => u.Type == "ROLE").ToList();
         }
+        public User GetUserByEmail(string email)
+        {
+            return _context.Users.FirstOrDefault(u => u.Email == email);
+        }
+        public int GetRoleId(string role)
+        {
+            return _context.Settings.FirstOrDefault(u => u.Value == role).Id;
+        }
         public IEnumerable<User> FilterByRole(int roleid)
         {
             return _context.Users.Where( u=> u.RoleId == roleid).ToList();
@@ -66,17 +74,7 @@ namespace IMS.Services
                     || u.Email.Contains(searchTerm) || u.Phone.Contains(searchTerm));
         }
 
-        public IEnumerable<User> FilterUsers(Dictionary<string, object> filters)
-        {
-            var query = _context.Users.AsQueryable();
-
-            foreach (var filter in filters)
-            {
-                query = query.Where(entry => entry.GetType().GetProperty(filter.Key).GetValue(entry).Equals(filter.Value));
-            }
-
-            return query.ToList();
-        }
+       
       
     }
 }

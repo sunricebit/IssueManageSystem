@@ -9,104 +9,121 @@
 
 <body>
     
-        <div id="layoutSidenav_content">
         <main>
-            <div class="container-fluid px-4">
-                <h1>User Details</h1>
+    <div class="container-fluid px-4">
+        <h1>User Details</h1>
 
-               
+        <div class="card mb-4">
+            <div class="card-body">
+                <hr>
+                <div class="row">
 
-                <div class="card mb-4">
-                    <div class="card-body">
-                       
-                        <hr>
-                        <div class="row">
-                            <div class="col-md-2">
+                    <div class="col-md-10 offset-md-2">
+                        <form method="post" asp-action="Update" enctype="multipart/form-data">
+                            
+                            <input type="hidden" asp-for="Id" value="@Model.Id" />
+                                <div class="col-md-2">
+                                    <img src="@Model.Avatar" alt="User Avatar" class="img-fluid rounded-circle" />
+                                </div>
+                            <dl class="row">
+                                <dt class="col-sm-3">
+                                    <i class="bi bi-envelope"></i> Email
+                                </dt>
+                                <dd class="col-sm-9">
+                                    <input type="text" name="email" class="form-control" value="@Model.Email" />
+                                </dd>
+
+                                <dt class="col-sm-3">
+                                    <i class="bi bi-person"></i> Name
+                                </dt>
+                                <dd class="col-sm-9">
+                                    <input type="text" name="name" class="form-control" value="@Model.Name" />
+                                </dd>
+                                <dt class="col-sm-3">
+                                    <i class="bi bi-person"></i> Address
+                                </dt>
+                                <dd class="col-sm-9">
+                                    <input type="text" name="address" class="form-control" value="@Model.Address" />
+                                </dd>
+                                <dt class="col-sm-3">
+                                    <i class="bi bi-person"></i> Phone
+                                </dt>
+                                <dd class="col-sm-9">
+                                    <input type="text" name="phone" class="form-control" value="@Model.Phone" />
+                                </dd>
+                                <dt class="col-sm-3">
+                                    <i class="bi bi-person-badge"></i> Role
+                                </dt>
+                                <dd class="col-sm-9">
+                                    
+                                    <select name="role" class="form-control">
+                                            @foreach (var role in ViewBag.Roles)
+                                        {
+                                            <option value="@role.Id" >@role.Value</option>
+                                        }
+                                    </select>
+                                </dd>
+
                                 
-                                <img src="@Model.Avatar" alt="User Avatar" class="img-fluid rounded-circle" />
-                            </div>
-                            <div class="col-md-10">
-                                <dl class="row">
 
-                                    <dt class="col-sm-3">
-                                        <i class="bi bi-envelope"></i> Email
-                                    </dt>
-                                    <dd class="col-sm-9">
-                                        <span contenteditable="true">@Model.Email</span>
-                                    </dd>
+                                <dt class="col-sm-3">
+                                    <i class="bi bi-toggle2-off"></i> Status
+                                </dt>
+                                    <input type="hidden" name="Status" id="newStatus" value="@Model.Status" />
 
-                                    <dt class="col-sm-3">
-                                        <i class="bi bi-person"></i> Name
-                                    </dt>
-                                    <dd class="col-sm-9">
-                                        <span contenteditable="true">@Model.Name</span>
-                                    </dd>
+                                <dd class="col-sm-9">
+                                    @if (Model.Status == true)
+                                    {
+                                            <button type="button" class="btn btn-success btn-sm" onclick="changeStatus(false)">
+                                            Active
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                            <button type="button" class="btn btn-secondary btn-sm" onclick="changeStatus(true)">
+                                            Inactive
+                                        </button>
+                                    }
+                                </dd>
+                            </dl>
 
-                                    <dt class="col-sm-3">
-                                        <i class="bi bi-person-badge"></i> Role
-                                    </dt>
-                                    <dd class="col-sm-9">
-                                        <span contenteditable="true">@Model.Role.Value</span>
-                                    </dd>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </form>
 
-                                    <dt class="col-sm-3">
-                                        <i class="bi bi-gender"></i> Gender
-                                    </dt>
-                                    <dd class="col-sm-9">
-                                        @if (@Model.Gender == true)
-                                        {
-                                            <span contenteditable="true">Male</span>
-                                        }
-                                        else
-                                        {
-                                            <span contenteditable="true">Female</span>
-                                        }
-                                    </dd>
-
-                                    <dt class="col-sm-3">
-                                        <i class="bi bi-telephone"></i> Phone
-                                    </dt>
-                                    <dd class="col-sm-9">
-                                        <span contenteditable="true">@Model.Phone</span>
-                                    </dd>
-
-                                    <dt class="col-sm-3">
-                                        <i class="bi bi-house"></i> Address
-                                    </dt>
-                                    <dd class="col-sm-9">
-                                        <span contenteditable="true">@Model.Address</span>
-                                    </dd>
-
-                                    <dt class="col-sm-3">
-                                        <i class="bi bi-toggle2-off"></i> Status
-                                    </dt>
-                                    <dd class="col-sm-9">
-                                        <span contenteditable="true">@Model.Status</span>
-                                    </dd>
-                                </dl>
-
-                                <button class="btn btn-primary">Save</button>
-                                <a href="/User" class="btn btn-secondary">Back to Users</a>
-                            </div>
-                        </div>
+                            <a href="/User" class="btn btn-primary">Back to Users</a>
                     </div>
+
+                    
+                    
                 </div>
             </div>
-        </main>
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
         </div>
+    </div>
+</main>
+
+    <script type="text/javascript">
+        function changeStatus(newStatus) {
+            document.getElementById('newStatus').value = newStatus;
+            
+            var activeBtn = document.querySelector('.btn-success');
+            var inactiveBtn = document.querySelector('.btn-secondary');
+            if (newStatus) {
+                activeBtn.classList.remove('btn-secondary');
+                activeBtn.classList.add('btn-success');
+                inactiveBtn.classList.remove('btn-success');
+                inactiveBtn.classList.add('btn-secondary');
+            } else {
+                activeBtn.classList.remove('btn-success');
+                activeBtn.classList.add('btn-secondary');
+                inactiveBtn.classList.remove('btn-secondary');
+                inactiveBtn.classList.add('btn-success');
+            }
+        }
+    </script>
+        
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="~/js/scripts.js"></script>
+
 </body>
 </html>
+
