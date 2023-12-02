@@ -1,4 +1,6 @@
-﻿@{
+﻿@model Contact;
+@{
+    var contact = ViewData["contact"] as List<Contact>;
     Layout = "~/Views/Shared/_LayoutLandingPage.cshtml";
 }
 
@@ -9,7 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Agency - Start Bootstrap Theme</title>
+        <title></title>
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="~/css/landing.css" />
         <!-- Font Awesome icons (free version)-->
@@ -24,7 +26,7 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
             <div class="container">
-                <a class="navbar-brand" href="#page-top"><img src="~/assets/img/navbar-logo.svg" alt="..." /></a>
+                <a class="navbar-brand" href="#page-top">IMS</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                     Menu
                     <i class="fas fa-bars ms-1"></i>
@@ -32,7 +34,8 @@
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
                         <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">BlogList</a></li>
                         <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                         <li class="nav-item"><a class="nav-link" href="auth/sign-in">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="auth/sign-up">Register</a></li>
@@ -62,9 +65,9 @@
                             <i class="fas fa-shopping-cart fa-stack-1x fa-inverse"></i>
                         </span>
                     <h4 class="my-3">Recevie and follow Issues</h4>
-                        <p class="text-muted">
+                        @*<p class="text-muted">
                             One of the most important tasks of a Issues Management System is to capture detailed information about the issues facing the organization. This system helps users register an issue, provide a detailed description of it, and attach related information such as images, documents, and notes.
-                            </p>
+                            </p>*@
                     </div>
                     <div class="col-md-4">
                         <span class="fa-stack fa-4x">
@@ -72,9 +75,9 @@
                             <i class="fas fa-laptop fa-stack-1x fa-inverse"></i>
                         </span>
                     <h4 class="my-3">Monitor and Manage the Resolution Process</h4>
-                        <p class="text-muted">
+                       @* <p class="text-muted">
                         An Issues Management System helps you track and manage the progress of an issue from the time it is registered until it is resolved and closed.
-                    </p>
+                    </p>*@
                     </div>
                     <div class="col-md-4">
                         <span class="fa-stack fa-4x">
@@ -82,9 +85,9 @@
                             <i class="fas fa-lock fa-stack-1x fa-inverse"></i>
                         </span>
                     <h4 class="my-3">Reporting and Statistics</h4>
-                        <p class="text-muted">
+                        @*<p class="text-muted">
                         Another important function of an Issues Management System is to generate reports and statistics related to the status of issues and incidents. These reports provide an overview of the number and type of issues, priority, resolution time, and other important trends.
-                    </p>
+                    </p>*@
                     </div>
                 </div>
             </div>
@@ -92,21 +95,24 @@
         <!-- Portfolio Grid-->
         
         <!-- About-->
-        <section class="page-section" id="about">
+        <section class="page-section" id="team">
             <div class="container">
                 <div class="text-center">
-                    <h2 class="section-heading text-uppercase">About</h2>
-                    <h3 class="section-subheading text-muted">An issue management system is a flexible software solution that helps organizations effectively record, track, and resolve business issues. With the ability to prioritize, assign responsibility, and provide comprehensive reporting, this system helps optimize the problem management process, reduce risk, and ensure organizational stability.</h3>
+                    <h2 class="section-heading text-uppercase">Team</h2>
+                    @*<h3 class="section-subheading text-muted">An issue management system is a flexible software solution that helps organizations effectively record, track, and resolve business issues. With the ability to prioritize, assign responsibility, and provide comprehensive reporting, this system helps optimize the problem management process, reduce risk, and ensure organizational stability.</h3>*@
                 </div>
                 <ul class="timeline">
                     <li>
                         <div class="timeline-image"><img class="rounded-circle img-fluid" src="~/assets/img/about/1.jpg" alt="..." /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
-                                @*<h4>2009-2011</h4>*@
                                 <h4 class="subheading">Ngo Anh Tu</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt ut voluptatum eius sapiente, totam reiciendis temporibus qui quibusdam, recusandae sit vero unde, sed, incidunt et ea quo dolore laudantium consectetur!</p></div>
+                            <div class="timeline-body">
+                                <p class="text-muted">FPT University</p>
+                                <p class="text-muted">MSSV: HE140525</p>
+                                <p class="text-muted">Leader of team</p>
+                                </div>
                         </div>
                     </li>
                     <li class="timeline-inverted">
@@ -116,7 +122,11 @@
                                 @*<h4>March 2011</h4>*@
                                 <h4 class="subheading">Dinh The Nam</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt ut voluptatum eius sapiente, totam reiciendis temporibus qui quibusdam, recusandae sit vero unde, sed, incidunt et ea quo dolore laudantium consectetur!</p></div>
+                            <div class="timeline-body">
+                            <p class="text-muted">FPT University</p>
+                                <p class="text-muted">MSSV: HE163751</p>
+                                <p class="text-muted">Team member</p>
+                                </div>
                         </div>
                     </li>
                     <li>
@@ -126,7 +136,11 @@
                                 @*<h4>December 2015</h4>*@
                                 <h4 class="subheading">Vu Duc Duy</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt ut voluptatum eius sapiente, totam reiciendis temporibus qui quibusdam, recusandae sit vero unde, sed, incidunt et ea quo dolore laudantium consectetur!</p></div>
+                        <div class="timeline-body">
+                            <p class="text-muted">FPT University</p>
+                            <p class="text-muted">MSSV: HE163866</p>
+                            <p class="text-muted">Team member</p>
+                        </div>
                         </div>
                     </li>
                     <li class="timeline-inverted">
@@ -136,17 +150,24 @@
                                 @*<h4>July 2020</h4>*@
                                 <h4 class="subheading">Mai Hoang Anh</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt ut voluptatum eius sapiente, totam reiciendis temporibus qui quibusdam, recusandae sit vero unde, sed, incidunt et ea quo dolore laudantium consectetur!</p></div>
+                        <div class="timeline-body">
+                            <p class="text-muted">FPT University</p>
+                            <p class="text-muted">MSSV: HE153561</p>
+                            <p class="text-muted">Team member</p>
+                        </div>
                         </div>
                     </li>
                     <li>
                         <div class="timeline-image"><img class="rounded-circle img-fluid" src="~/assets/img/about/3.jpg" alt="..." /></div>
                         <div class="timeline-panel">
                             <div class="timeline-heading">
-                                @*<h4>December 2015</h4>*@
                                 <h4 class="subheading">Nguyen Thi Quynh Nhu</h4>
                             </div>
-                            <div class="timeline-body"><p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt ut voluptatum eius sapiente, totam reiciendis temporibus qui quibusdam, recusandae sit vero unde, sed, incidunt et ea quo dolore laudantium consectetur!</p></div>
+                        <div class="timeline-body">
+                            <p class="text-muted">FPT University</p>
+                            <p class="text-muted">MSSV: HE153699</p>
+                            <p class="text-muted">Team member</p>
+                        </div>
                         </div>
                     </li>
                 </ul>
@@ -156,103 +177,152 @@
         <!-- Clients-->
         <div class="py-5">
             <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-3 col-sm-6 my-3">
-                        <a href="#!"><img class="img-fluid img-brand d-block mx-auto" src="~/assets/img/logos/microsoft.svg" alt="..." aria-label="Microsoft Logo" /></a>
-                    </div>
-                    <div class="col-md-3 col-sm-6 my-3">
-                        <a href="#!"><img class="img-fluid img-brand d-block mx-auto" src="~/assets/img/logos/google.svg" alt="..." aria-label="Google Logo" /></a>
-                    </div>
-                    <div class="col-md-3 col-sm-6 my-3">
-                        <a href="#!"><img class="img-fluid img-brand d-block mx-auto" src="~/assets/img/logos/facebook.svg" alt="..." aria-label="Facebook Logo" /></a>
-                    </div>
-                    <div class="col-md-3 col-sm-6 my-3">
-                        <a href="#!"><img class="img-fluid img-brand d-block mx-auto" src="~/assets/img/logos/ibm.svg" alt="..." aria-label="IBM Logo" /></a>
-                    </div>
-                </div>
+               
             </div>
         </div>
         <!-- Contact-->
-        <section class="page-section" id="contact">
-            <div class="container">
-                <div class="text-center">
-                    <h2 class="section-heading text-uppercase">Contact Us</h2>
-                    @*<h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>*@
-                </div>
-                <!-- * * * * * * * * * * * * * * *-->
-                <!-- * * SB Forms Contact Form * *-->
-                <!-- * * * * * * * * * * * * * * *-->
-                <!-- This form is pre-integrated with SB Forms.-->
-                <!-- To make this form functional, sign up at-->
-                <!-- https://startbootstrap.com/solution/contact-forms-->
-                <!-- to get an API token!-->
-            <form id="contactForm" method="post" action="sendcontact">
-                    <div class="row align-items-stretch mb-5">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <!-- Name input-->
-                                <input class="form-control" id="name" type="text" placeholder="Your Name *" data-sb-validations="required" name="name" />
-                                <div class="invalid-feedback" data-sb-feedback="name:required">A name is required.</div>
-                            </div>
-                            <div class="form-group">
-                                <!-- Email address input-->
-                                <input class="form-control" id="email" type="email" placeholder="Your Email *" data-sb-validations="required,email" name="email"/>
-                                <div class="invalid-feedback" data-sb-feedback="email:required">An email is required.</div>
-                                <div class="invalid-feedback" data-sb-feedback="email:email">Email is not valid.</div>
-                            </div>
-                            <div class="form-group mb-md-0">
-                                <!-- Phone number input-->
-                                <input class="form-control" id="phone" type="tel" placeholder="Your Phone *" data-sb-validations="required" name="phone"/>
-                                <div class="invalid-feedback" data-sb-feedback="phone:required">A phone number is required.</div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group form-group-textarea mb-md-0">
-                                <!-- Message input-->
-                                <textarea class="form-control" id="message" placeholder="Your Message *" data-sb-validations="required" name="message"></textarea>
-                                <div class="invalid-feedback" data-sb-feedback="message:required">A message is required.</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Submit success message-->
-                    <!---->
-                    <!-- This is what your users will see when the form-->
-                    <!-- has successfully submitted-->
-                <div class="d-none" id="submitSuccessMessage">
-                        <div class="text-center text-white mb-3">
-                            <div class="fw-bolder">Form submission successful!</div>
-                            To activate this form, sign up at
-                            <br />
-                            <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
-                        </div>
-                    </div>
-                    <!-- Submit error message-->
-                    <!---->
-                    <!-- This is what your users will see when there is-->
-                    <!-- an error submitting the form-->
-                    <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error sending message!</div></div>
-                    <!-- Submit Button-->
-                    <div class="text-center"><button class="btn btn-primary btn-xl text-uppercase" id="submitButton" type="submit">Send Message</button></div>
-                </form>
+    <section class="page-section" id="contact">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-heading text-uppercase">Contact Us</h2>
+                <p style="color:rgba(var(--bs-danger-rgb));">@ViewBag.ErrorMessage</p>
             </div>
-        </section>
-        <!-- Footer-->
+            <!-- https://startbootstrap.com/solution/contact-forms-->
+            <!-- to get an API token!-->
+            <form id="contactForm" method="post" action="sendcontact">
+                <div class="row align-items-stretch mb-5">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <!-- Name input-->
+                            <input class="form-control" asp-for="Name" type="text" placeholder="Your Name *" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <!-- Email address input-->
+                            <input class="form-control" asp-for="Email" type="email" placeholder="Your Email *" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+
+                        </div>
+                        <div class="form-group">
+                            <!-- Email address input-->
+                            <input class="form-control" asp-for="Phone" type="tel" placeholder="Your Phone" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+
+                        </div>
+                        <div class="form-group">
+                            <!-- Email address input-->
+                            <input class="form-control" asp-for="Reason" type="text" placeholder="Your Reason *" />
+                            <span asp-validation-for="Reason" class="text-danger"></span>
+
+                        </div>
+                        <div class="form-group mb-md-0" >
+                            <!-- Phone number input-->
+                            <select name="Type" id="Type" class="form-control" style="height: 65px; color:#ced4da;font-weight:bold;font-size:large;">
+                                <option value="Contact type *" class="form-control">Contact type *</option>
+                                @if (ViewBag.Types != null)
+                                {
+                                    @foreach (var type in ViewBag.Types)
+                                    {
+                                        <option value="@type.Value" class="form-control">@type.Value</option>
+
+                                    }
+                                }
+                            </select>
+                            <p style="color:rgba(var(--bs-danger-rgb));">@ViewBag.Error</p>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group form-group-textarea mb-md-0">
+                            <!-- Message input-->
+                            @*<textarea class="form-control" id="message" placeholder="Your Message *" name="message"></textarea>*@
+                            <textarea class="form-control" asp-for="Message" placeholder="Your Message *"></textarea>
+                            <span asp-validation-for="Message" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Submit success message-->
+                <!---->
+                <!-- This is what your users will see when the form-->
+                <!-- has successfully submitted-->
+                <div class="d-none" id="submitSuccessMessage">
+                    <div class="text-center text-white mb-3">
+                        <div class="fw-bolder">Form submission successful!</div>
+                        To activate this form, sign up at
+                        <br />
+                        <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
+                    </div>
+                </div>
+                <!-- Submit error message-->
+                <!---->
+                <!-- This is what your users will see when there is-->
+                <!-- an error submitting the form-->
+                <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error sending message!</div></div>
+                <!-- Submit Button-->
+                <div class="text-center"><button class="btn btn-primary btn-xl text-uppercase" id="submitButton" type="submit">Send Message</button></div>
+            </form>
+        </div>
+    </section>
+
+
+               <!-- Footer-->
         <footer class="footer py-4">
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-lg-4 text-lg-start">Copyright &copy; Your Website 2023</div>
-                    <div class="col-lg-4 my-3 my-lg-0">
-                        <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a class="btn btn-dark btn-social mx-2" href="#!" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                    <div class="col-lg-4 text-lg-end">
-                        <a class="link-dark text-decoration-none me-3" href="#!">Privacy Policy</a>
-                        <a class="link-dark text-decoration-none" href="#!">Terms of Use</a>
-                    </div>
+                   
                 </div>
             </div>
         </footer>
+
+        <!-- Button trigger modal -->
+@*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+  Launch static backdrop modal
+</button>
+*@
+<!-- Modal -->
+    @if (ViewBag.Success == "Send contact success!")
+        {
+            <div class="modal" tabindex="-1" id="popupSendContact" style="background-color:#2220208c">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Send contact</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup()"></button>
+                        </div>
+                        <div class="modal-body">
+                            Send contact successful!
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+       
+
+<script>
+        var successValue = '@ViewBag.Success'; // Lấy giá trị từ ViewBag.Success
+        if (successValue === 'error') {
+            var currentUrl = window.location.href;
+
+            // Thêm kí tự vào đường dẫn
+            var newUrl = currentUrl + "#contact";
+
+            // Chuyển hướng đến đường dẫn mới
+            window.location.href = newUrl;
+        }
+     var popup = document.getElementById('popupSendContact');
+     popup.style.display = 'block';
+
+    function closePopup() {
+        var popup = document.getElementById('popupSendContact');
+            popup.style.display = 'none';
+        }
+
+       
+</script>
+     
            <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
