@@ -9,6 +9,8 @@
             void DeleteUser(int id);
             IEnumerable<User> SearchUsers(string searchTerm);
             IEnumerable<User> FilterUsers(Dictionary<string, object> filters);
-        IEnumerable<Setting> GetRole();
+            IEnumerable<Setting> GetRole();
+            IEnumerable<User> FilterByRole(int roleid);
+            IEnumerable<User> FilterByStatus(bool status);
         }
 }

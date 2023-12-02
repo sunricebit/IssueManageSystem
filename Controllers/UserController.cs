@@ -1,8 +1,10 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Wordprocessing;
 using IMS.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Configuration;
 using System.Data;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace IMS.Controllers
 {
@@ -40,6 +42,58 @@ namespace IMS.Controllers
             var users = userService.GetAllUsers();
             return View(users);
         }
+        [HttpGet("Search")]
+        public IActionResult Search(int? pageNumber, string keyword)
+        {
+            int tempPageNumber = pageNumber ?? 1;
+            int tempPageSize = 10;
+            Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
+            var role = userService.GetRole();
+            ViewBag.Roles = role;
+            ViewBag.Pagination = paginate.GetPagination();
+            var users = userService.SearchUsers(keyword);
+
+            return View("Index",users);
+        }
+        [HttpGet("FilterRole")]
+        public IActionResult FilterByRole(int? pageNumber,int roleid)
+        {
+            int tempPageNumber = pageNumber ?? 1;
+            int tempPageSize = 10;
+            Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
+            var role = userService.GetRole();
+            ViewBag.Roles = role;
+            ViewBag.Pagination = paginate.GetPagination();
+           
+            var users = userService.FilterByRole(roleid);
+
+            return View("Index", users);
+
+        }
+        [HttpGet("FilterStatus")]
+        public IActionResult FilterByStatus(int? pageNumber, string status)
+        {
+            int tempPageNumber = pageNumber ?? 1;
+            int tempPageSize = 10;
+            Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
+            var role = userService.GetRole();
+            ViewBag.Roles = role;
+            bool status2;
+            ViewBag.Pagination = paginate.GetPagination();
+            if (status == "Active")
+            {
+                status2 = true;
+            }
+            else
+            {
+               status2 = false;
+            }
+            var users = userService.FilterByStatus(status2);
+
+            return View("Index", users);
+
+        }
+
         [HttpGet("Details/{id}")]
         public IActionResult Details(int id)
         {
@@ -197,19 +251,7 @@ namespace IMS.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpGet("search")]
-        public IActionResult Search(string term)
-        {
-            var users = userService.SearchUsers(term);
-            return View(users);
-        }
 
-        [HttpGet("filter")]
-        public IActionResult Filter(Dictionary<string, object> filters)
-        {
-            var users = userService.FilterUsers(filters);
-            return View(users);
-        }
     }
 
 }

@@ -48,29 +48,32 @@
                 
                 <div class="col-md-4 mb-3">
                     <label for="roleFilter" class="form-label">Filter by Role:</label>
-                    <select id="roleFilter" class="form-select">
-                        <option value="">All Roles</option>
+                    <select id="roleFilter" class="form-select" onchange="filterUsersByRole(this.value)">
+                        <option value="">Select Role</option>
                         
                             @foreach (var role in ViewBag.Roles)
                             {
                                 <option value="@role.Id">@role.Value</option>
                             }
-                       
+                        <option value="">All Roles</option>
                      
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="StatusFilter" class="form-label">Filter by Status:</label>
-                    <select id="StatusFilter" class="form-select">
-                        <option value="">All Status</option>
+                    <select id="StatusFilter" class="form-select" onchange="filterUsersByStatus(this.value)">
+                        <option value="">Select Status</option>
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
-                        
+                        <option value="">All Status</option>
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
                     <label for="searchInput" class="form-label">Search:</label>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+                    <form asp-action="Search" method="get">
+                        <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Search...">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </form>
                 </div>
 
                 <table style="border-width: 1px;  border-color: #e0e0e0" class="table  table-bordered " id="sorttable-table">
@@ -152,6 +155,25 @@
         </div>
     </div>
 </div>
+<script>
+    function filterUsersByRole(roleId) {
+       
+
+        if (roleId === "") {
+            window.location.href = '/User';
+        } else {
+            window.location.href = `/User/FilterRole?roleid=${roleId}`;
+        }
+    }
+    
+        function filterUsersByStatus(status) {
+        if (status === "") {
+            window.location.href = '/User';
+        } else {
+            window.location.href = `/User/FilterStatus?status=${status}`;
+        }}
+
+</script>
 @* @section Scripts {
         <script>
             function CreateUser() {

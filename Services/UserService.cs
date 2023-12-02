@@ -15,6 +15,14 @@ namespace IMS.Services
         {
             return _context.Settings.Where(u => u.Type == "ROLE").ToList();
         }
+        public IEnumerable<User> FilterByRole(int roleid)
+        {
+            return _context.Users.Where( u=> u.RoleId == roleid).ToList();
+        }
+        public IEnumerable<User> FilterByStatus(bool status) 
+        {
+            return _context.Users.Where( u=> u.Status == status).ToList();
+        }
 
         public User GetUser(int id)
         {
