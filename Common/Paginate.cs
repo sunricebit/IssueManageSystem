@@ -27,9 +27,7 @@ namespace IMS.Common
             {
                 this.numberOfPage = countObject / pageSize;
             }
-            int startIndex = (pageNumber - 1) * pageSize;
-            int endIndex = pageNumber == numberOfPage ? countObject - 1 : pageNumber * pageSize - 1;
-            return _context.Set<T>().ToList().GetRange(startIndex, endIndex - startIndex + 1);
+            return _context.Set<T>().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
         }
 
         public Pagination GetPagination()
