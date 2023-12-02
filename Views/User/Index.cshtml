@@ -50,8 +50,12 @@
                     <label for="roleFilter" class="form-label">Filter by Role:</label>
                     <select id="roleFilter" class="form-select">
                         <option value="">All Roles</option>
-                        <option value="Admin">Admin</option>
-                        <option value="User">User</option>
+                        
+                            @foreach (var role in ViewBag.Roles)
+                            {
+                                <option value="@role.Id">@role.Value</option>
+                            }
+                       
                      
                     </select>
                 </div>
@@ -130,7 +134,7 @@
                     }
                 </tbody>
             </table>
-               @* @Html.Partial("_PaginationPartial", pagination)*@
+                @Html.Partial("_PaginationPartial", pagination)
         </div>
     </div>
 </div>

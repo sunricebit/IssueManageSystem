@@ -55,7 +55,7 @@ namespace IMS.Services
         {
             return _context.Users
                 .Where(u => u.Name.Contains(searchTerm)
-                    || u.Email.Contains(searchTerm));
+                    || u.Email.Contains(searchTerm) || u.Phone.Contains(searchTerm));
         }
 
         public IEnumerable<User> FilterUsers(Dictionary<string, object> filters)
@@ -69,5 +69,6 @@ namespace IMS.Services
 
             return query.ToList();
         }
+      
     }
 }

@@ -33,6 +33,8 @@ namespace IMS.Controllers
            
             ViewBag.UserList = paginate.GetListPaginate<User>();
             ViewBag.Action = "UserList";
+            var role = userService.GetRole();
+            ViewBag.Roles = role;
             ViewBag.Pagination = paginate.GetPagination();
 
             var users = userService.GetAllUsers();
@@ -42,6 +44,8 @@ namespace IMS.Controllers
         public IActionResult Details(int id)
         {
             var user = userService.GetUser(id);
+            var role = userService.GetRole();
+            ViewBag.Roles = role;
 
             if (user == null)
             {
@@ -60,6 +64,15 @@ namespace IMS.Controllers
         [HttpPost("Create")]
         public IActionResult Create(User user)
         {
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                ModelState.AddModelError("Email", "Email is required.");
+            }
+            if (string.IsNullOrWhiteSpace(user.Name))
+            {
+                ModelState.AddModelError("Name", "Name is required.");
+            }
+
             if (!ModelState.IsValid)
             {
 
