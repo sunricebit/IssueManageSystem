@@ -1,10 +1,12 @@
-﻿@model IEnumerable<User>
+﻿@using IMS.ViewModels.Paginate;
+@model IEnumerable<User>
 
 @*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+   
 *@
 @{
     ViewData["Title"] = "User List";
+    Pagination pagination = ViewBag.Pagination;
 }
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center">
@@ -21,7 +23,7 @@
             </div>
 
             <div class="col-md-auto">
-                <a id="exportButton" class="btn btn-outline-primary" asp-controller="User" asp-action="Export">
+                <a class="btn btn-outline-primary" asp-controller="User" asp-action="Export">
                     <i class="fas fa-download"></i> Export
                 </a>
             </div>
@@ -33,18 +35,9 @@
             </div>
         </div>
 
+
     </div>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-        <li class="breadcrumb-item active">User List</li>
-    </ol>
-    <div class="card mb-4">
-        <div class="card-body">
-           Hiển thị thông tin người dùng
-            <a target="_blank" href="https://datatables.net/">official DataTables documentation</a>
-            .
-        </div>
-    </div>
+    
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-table me-1"></i>
@@ -59,7 +52,7 @@
                         <option value="">All Roles</option>
                         <option value="Admin">Admin</option>
                         <option value="User">User</option>
-                        <!-- Add more role options as needed -->
+                     
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -68,7 +61,7 @@
                         <option value="">All Status</option>
                         <option value="Active">Active</option>
                         <option value="Inactive">Inactive</option>
-                        <!-- Add more role options as needed -->
+                        
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
@@ -76,7 +69,7 @@
                     <input type="text" id="searchInput" class="form-control" placeholder="Search...">
                 </div>
 
-                <table class="table  table-bordered " id="sorttable-table">
+                <table style="border-width: 1px;  border-color: #e0e0e0" class="table  table-bordered " id="sorttable-table">
                     <thead class="thead-dark">
                     <tr>
                         <th onclick="sortTable(0)">Name</th>
@@ -90,18 +83,7 @@
                         
                     </tr>
                 </thead>
-                    <tfoot class="tfoot-dark">
-                    <tr>
-                        <th>Name</th>
-                        <th>Avatar</th>
-                        <th>Role</th>
-                        <th>Phone</th>
-                        <th>Address</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                        
-                    </tr>
-                </tfoot>
+                    
                 <tbody>
                     @foreach (var user in Model)
                     {
@@ -138,9 +120,7 @@
                                         <a asp-action="Details" asp-route-id="@user.Id" asp-controller="User" class="btn btn-info">
                                             <i class="fas fa-eye"></i> Details
                                         </a>
-                                        <a asp-action="Edit" asp-route-id="@user.Id" asp-controller="User" class="btn btn-success">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </a>
+                                        
                                         <button asp-action="Delete" asp-route-id="@user.Id" asp-controller="User" class="btn btn-danger">
                                             <i class="fas fa-trash"></i> Delete
                                         </button>
@@ -150,6 +130,7 @@
                     }
                 </tbody>
             </table>
+               @* @Html.Partial("_PaginationPartial", pagination)*@
         </div>
     </div>
 </div>

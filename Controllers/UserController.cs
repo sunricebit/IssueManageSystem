@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using IMS.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Configuration;
 using System.Data;
@@ -24,8 +25,16 @@ namespace IMS.Controllers
             _hashService = hashService;
         }
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(int? pageNumber)
         {
+            int tempPageNumber = pageNumber ?? 1;
+            int tempPageSize = 10;
+            Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
+           
+            ViewBag.UserList = paginate.GetListPaginate<User>();
+            ViewBag.Action = "UserList";
+            ViewBag.Pagination = paginate.GetPagination();
+
             var users = userService.GetAllUsers();
             return View(users);
         }

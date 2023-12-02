@@ -30,7 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
-    <Folder Include="ViewModels\" />
     <Folder Include="ViewModels\Auth\" />
     <Folder Include="Views\Home\" />
     <Folder Include="Views\Auth\" />
