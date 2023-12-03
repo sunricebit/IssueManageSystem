@@ -255,9 +255,9 @@ namespace IMS.Controllers
         }
 
         [Route("changepassword")]
-        public  IActionResult ChangePassword()
+        public IActionResult ChangePassword()
         {
             return View();
         }
-        }
+    }
 }
