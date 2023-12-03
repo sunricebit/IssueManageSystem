@@ -111,15 +111,28 @@ namespace IMS.Controllers
             {
                 return NotFound();
             }
+            UserViewModel userViewModel = new UserViewModel()
+                {
+                Id = user.Id,
+                RoleId = user.RoleId,
+                Name = user.Name,
+                Email = user.Email,
+                Password = user.Password,
+                Address = user.Address,
+                Gender = user.Gender,
+                Avatar = user.Avatar,
+                Status = user.Status
 
-            return View(user);
+            };
+
+            return View(userViewModel);
         }
         [HttpGet("Create")]
         public IActionResult Create()
         {
             var role = userService.GetRole();
             ViewBag.Roles = role;
-            return View(new Models.User());
+            return View(new UserViewModel());
         }
         [HttpPost("Create")]
         public async Task<IActionResult> Create(UserViewModel? userView, IFormFile avatarFile)

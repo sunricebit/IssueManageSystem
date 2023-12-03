@@ -1,4 +1,4 @@
-﻿@model User
+﻿@model IMS.ViewModels.User.UserViewModel
 @*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -8,99 +8,115 @@
 <html lang="en">
 
 <body>
-    
-        <main>
-    <div class="container-fluid px-4">
-        <h1>User Details</h1>
 
-        <div class="card mb-4">
-            <div class="card-body">
-                <hr>
-                <div class="row">
+    <main>
+        <div class="container-fluid px-4">
+            <h1>User Details</h1>
 
-                    <div class="col-md-10 offset-md-2">
-                        <form method="post" asp-action="Update" enctype="multipart/form-data">
-                            
-                            <input type="hidden" asp-for="Id" value="@Model.Id" />
-                                <div class="col-md-2">
-                                    <img src="@Model.Avatar" alt="User Avatar" class="img-fluid rounded-circle" />
+            <div class="card mb-4">
+                <div class="card-body">
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="d-flex align-items-center justify-content-center mb-4">
+                                <img id="selectedAvatar" src="@Model.Avatar" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" alt="User Avatar" />
+
+                                <div class="btn btn-primary btn-rounded ml-3">
+                                    <label class="form-label text-white m-0" for="avatarFile">Choose avatar</label>
+                                    <input type="file" class="form-control d-none" id="avatarFile" name="avatarFile" onchange="displaySelectedImage(event, 'selectedAvatar')" />
                                 </div>
-                            <dl class="row">
-                                <dt class="col-sm-3">
-                                    <i class="bi bi-envelope"></i> Email
-                                </dt>
-                                <dd class="col-sm-9">
-                                    <input type="text" name="email" class="form-control" value="@Model.Email" />
-                                </dd>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <form method="post" asp-action="Update" enctype="multipart/form-data">
 
-                                <dt class="col-sm-3">
-                                    <i class="bi bi-person"></i> Name
-                                </dt>
-                                <dd class="col-sm-9">
-                                    <input type="text" name="name" class="form-control" value="@Model.Name" />
-                                </dd>
-                                <dt class="col-sm-3">
-                                    <i class="bi bi-person"></i> Address
-                                </dt>
-                                <dd class="col-sm-9">
-                                    <input type="text" name="address" class="form-control" value="@Model.Address" />
-                                </dd>
-                                <dt class="col-sm-3">
-                                    <i class="bi bi-person"></i> Phone
-                                </dt>
-                                <dd class="col-sm-9">
-                                    <input type="text" name="phone" class="form-control" value="@Model.Phone" />
-                                </dd>
-                                <dt class="col-sm-3">
-                                    <i class="bi bi-person-badge"></i> Role
-                                </dt>
-                                <dd class="col-sm-9">
-                                    
-                                    <select name="role" class="form-control">
+                                <input type="hidden" asp-for="Id" value="@Model.Id" />
+
+                                <dl class="row">
+                                    <dt class="col-sm-3">
+                                        <i class="bi bi-envelope"></i> Email
+                                    </dt>
+                                    <dd class="col-sm-9">
+                                        <input type="text" name="email" class="form-control" value="@Model.Email" />
+                                    </dd>
+
+                                    <dt class="col-sm-3">
+                                        <i class="bi bi-person"></i> Name
+                                    </dt>
+                                    <dd class="col-sm-9">
+                                        <input type="text" name="name" class="form-control" value="@Model.Name" />
+                                    </dd>
+
+                                    <dt class="col-sm-3">
+                                        <i class="bi bi-person"></i> Address
+                                    </dt>
+                                    <dd class="col-sm-9">
+                                        <input type="text" name="address" class="form-control" value="@Model.Address" />
+                                    </dd>
+
+                                    <dt class="col-sm-3">
+                                        <i class="bi bi-person"></i> Phone
+                                    </dt>
+                                    <dd class="col-sm-9">
+                                        <input type="text" name="phone" class="form-control" value="@Model.Phone" />
+                                    </dd>
+
+                                    <dt class="col-sm-3">
+                                        <i class="bi bi-person"></i> Gender
+                                    </dt>
+                                    <dd class="col-sm-9">
+                                        <div class="form-check form-check-inline">
+                                            <input type="radio" name="gender" class="form-check-input" value="Male" @(Model.Gender == true ? "checked" : "") />
+                                            <label class="form-check-label" for="male">Male</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input type="radio" name="gender" class="form-check-input" value="Female" @(Model.Gender == false ? "checked" : "") />
+                                            <label class="form-check-label" for="female">Female</label>
+                                        </div>
+                                    </dd>
+
+                                    <dt class="col-sm-3">
+                                        <i class="bi bi-person-badge"></i> Role
+                                    </dt>
+                                    <dd class="col-sm-9">
+                                        <select name="role" class="form-control">
                                             @foreach (var role in ViewBag.Roles)
-                                        {
-                                            <option value="@role.Id" >@role.Value</option>
-                                        }
-                                    </select>
-                                </dd>
+                                            {
+                                                <option value="@role.Id">@role.Value</option>
+                                            }
+                                        </select>
+                                    </dd>
 
-                                
+                                    <dt class="col-sm-3">
+                                        <i class="bi bi-toggle2-off"></i> Status
+                                    </dt>
+                                    <dd class="col-sm-9">
+                                        <div class="form-check form-switch">
+                                            <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" @(Model.Status.HasValue && Model.Status.Value ? "checked" : "") onchange="changeStatus()" />
+                                            
+                                        </div>
+                                    </dd>
+                                </dl>
 
-                                <dt class="col-sm-3">
-                                    <i class="bi bi-toggle2-off"></i> Status
-                                </dt>
-                                    <input type="hidden" name="Status" id="newStatus" value="@Model.Status" />
-
-                                <dd class="col-sm-9">
-                                    @if (Model.Status == true)
-                                    {
-                                            <button type="button" class="btn btn-success btn-sm" onclick="changeStatus(false)">
-                                            Active
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                            <button type="button" class="btn btn-secondary btn-sm" onclick="changeStatus(true)">
-                                            Inactive
-                                        </button>
-                                    }
-                                </dd>
-                            </dl>
-
-                            <button type="submit" class="btn btn-primary">Save</button>
-                        </form>
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </form>
 
                             <a href="/User" class="btn btn-primary">Back to Users</a>
+                        </div>
                     </div>
-
-                    
-                    
                 </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
+    <script>
+        function changeStatus() {
+            var statusToggle = document.getElementById('statusToggle');
+            var statusLabel = document.querySelector('.form-check-label');
+            statusToggle.checked = !statusToggle.checked;
+            statusLabel.innerHTML = statusToggle.checked ? '<span class="btn btn-success btn-sm">Active</span>' : '<span class="btn btn-secondary btn-sm">Inactive</span>';
+        }
+    </script>
     <script type="text/javascript">
         function changeStatus(newStatus) {
             document.getElementById('newStatus').value = newStatus;
@@ -120,7 +136,23 @@
             }
         }
     </script>
-        
+    <script>
+        function displaySelectedImage(event, elementId) {
+            const selectedImage = document.getElementById(elementId);
+            const fileInput = event.target;
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    selectedImage.src = e.target.result;
+                };
+
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+    </script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="~/js/scripts.js"></script>
 
