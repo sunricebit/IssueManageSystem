@@ -20,12 +20,11 @@ namespace IMS.Models
         public virtual DbSet<Class> Classes { get; set; } = null!;
         public virtual DbSet<Contact> Contacts { get; set; } = null!;
         public virtual DbSet<Issue> Issues { get; set; } = null!;
-        public virtual DbSet<IssueSetting> IssueSettings { get; set; } = null!;
+        public virtual DbSet<Issuesetting> Issuesettings { get; set; } = null!;
         public virtual DbSet<Message> Messages { get; set; } = null!;
         public virtual DbSet<Milestone> Milestones { get; set; } = null!;
         public virtual DbSet<Permission> Permissions { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
-        public virtual DbSet<PrismaMigration> PrismaMigrations { get; set; } = null!;
         public virtual DbSet<Project> Projects { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
         public virtual DbSet<Subject> Subjects { get; set; } = null!;
@@ -44,7 +43,7 @@ namespace IMS.Models
         {
             modelBuilder.Entity<Assignment>(entity =>
             {
-                entity.ToTable("Assignment", "IMS");
+                entity.ToTable("assignment");
 
                 entity.HasIndex(e => e.Id, "Assignment_Id_idx");
 
@@ -65,7 +64,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<Class>(entity =>
             {
-                entity.ToTable("Class", "IMS");
+                entity.ToTable("class");
 
                 entity.HasIndex(e => e.Id, "Class_Id_idx");
 
@@ -92,14 +91,14 @@ namespace IMS.Models
                 entity.HasMany(d => d.Students)
                     .WithMany(p => p.ClassesNavigation)
                     .UsingEntity<Dictionary<string, object>>(
-                        "ClassStudent",
+                        "Classstudent",
                         l => l.HasOne<User>().WithMany().HasForeignKey("StudentId").OnDelete(DeleteBehavior.Restrict).HasConstraintName("ClassStudent_StudentId_fkey"),
                         r => r.HasOne<Class>().WithMany().HasForeignKey("ClassId").OnDelete(DeleteBehavior.Restrict).HasConstraintName("ClassStudent_ClassId_fkey"),
                         j =>
                         {
                             j.HasKey("ClassId", "StudentId").HasName("PRIMARY");
 
-                            j.ToTable("ClassStudent", "IMS");
+                            j.ToTable("classstudent");
 
                             j.HasIndex(new[] { "ClassId", "StudentId" }, "ClassStudent_ClassId_StudentId_idx");
 
@@ -109,13 +108,13 @@ namespace IMS.Models
 
             modelBuilder.Entity<Contact>(entity =>
             {
-                entity.ToTable("Contact", "IMS");
-
-                entity.HasIndex(e => e.CarerId, "Contact_CarerId_fkey");
+                entity.ToTable("contact");
 
                 entity.HasIndex(e => e.ContactTypeId, "Contact_ContactTypeId_fkey");
 
                 entity.HasIndex(e => e.Id, "Contact_Id_idx");
+
+                entity.HasIndex(e => e.CarerId, "Contact_UserId_fkey");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime(3)")
@@ -134,7 +133,7 @@ namespace IMS.Models
                 entity.HasOne(d => d.Carer)
                     .WithMany(p => p.Contacts)
                     .HasForeignKey(d => d.CarerId)
-                    .OnDelete(DeleteBehavior.Restrict)
+                    .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("Contact_CarerId_fkey");
 
                 entity.HasOne(d => d.ContactType)
@@ -146,7 +145,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<Issue>(entity =>
             {
-                entity.ToTable("Issue", "IMS");
+                entity.ToTable("issue");
 
                 entity.HasIndex(e => e.AssigneeId, "Issue_AssigneeId_fkey");
 
@@ -187,9 +186,9 @@ namespace IMS.Models
                     .HasConstraintName("Issue_ProjectId_fkey");
             });
 
-            modelBuilder.Entity<IssueSetting>(entity =>
+            modelBuilder.Entity<Issuesetting>(entity =>
             {
-                entity.ToTable("IssueSetting", "IMS");
+                entity.ToTable("issuesetting");
 
                 entity.HasIndex(e => e.ClassId, "IssueSetting_ClassId_fkey");
 
@@ -206,19 +205,19 @@ namespace IMS.Models
                     .HasDefaultValueSql("'1'");
 
                 entity.HasOne(d => d.Class)
-                    .WithMany(p => p.IssueSettings)
+                    .WithMany(p => p.Issuesettings)
                     .HasForeignKey(d => d.ClassId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("IssueSetting_ClassId_fkey");
 
                 entity.HasOne(d => d.Issue)
-                    .WithMany(p => p.IssueSettings)
+                    .WithMany(p => p.Issuesettings)
                     .HasForeignKey(d => d.IssueId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("IssueSetting_IssueId_fkey");
 
                 entity.HasOne(d => d.Project)
-                    .WithMany(p => p.IssueSettings)
+                    .WithMany(p => p.Issuesettings)
                     .HasForeignKey(d => d.ProjectId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("IssueSetting_ProjectId_fkey");
@@ -226,7 +225,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<Message>(entity =>
             {
-                entity.ToTable("Message", "IMS");
+                entity.ToTable("message");
 
                 entity.HasIndex(e => e.ContactId, "Message_ContactId_fkey");
 
@@ -243,7 +242,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<Milestone>(entity =>
             {
-                entity.ToTable("Milestone", "IMS");
+                entity.ToTable("milestone");
 
                 entity.HasIndex(e => e.AssignmentId, "Milestone_AssignmentId_fkey");
 
@@ -274,7 +273,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<Permission>(entity =>
             {
-                entity.ToTable("Permission", "IMS");
+                entity.ToTable("permission");
 
                 entity.HasIndex(e => new { e.RoleId, e.Page }, "Permission_RoleId_Page_idx");
 
@@ -295,13 +294,13 @@ namespace IMS.Models
 
             modelBuilder.Entity<Post>(entity =>
             {
-                entity.ToTable("Post", "IMS");
+                entity.ToTable("post");
 
                 entity.HasIndex(e => e.CategoryId, "Post_CategoryId_fkey");
 
                 entity.HasIndex(e => e.Id, "Post_Id_idx");
 
-                entity.HasIndex(e => e.UserId, "Post_UserId_fkey");
+                entity.HasIndex(e => e.AuthorId, "Post_UserId_fkey");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime(3)")
@@ -315,58 +314,22 @@ namespace IMS.Models
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
 
+                entity.HasOne(d => d.Author)
+                    .WithMany(p => p.Posts)
+                    .HasForeignKey(d => d.AuthorId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Post_AuthorId_fkey");
+
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.Posts)
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("Post_CategoryId_fkey");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.Posts)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("Post_UserId_fkey");
-            });
-
-            modelBuilder.Entity<PrismaMigration>(entity =>
-            {
-                entity.ToTable("_prisma_migrations", "IMS");
-
-                entity.Property(e => e.Id)
-                    .HasMaxLength(36)
-                    .HasColumnName("id");
-
-                entity.Property(e => e.AppliedStepsCount).HasColumnName("applied_steps_count");
-
-                entity.Property(e => e.Checksum)
-                    .HasMaxLength(64)
-                    .HasColumnName("checksum");
-
-                entity.Property(e => e.FinishedAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("finished_at");
-
-                entity.Property(e => e.Logs)
-                    .HasColumnType("text")
-                    .HasColumnName("logs");
-
-                entity.Property(e => e.MigrationName)
-                    .HasMaxLength(255)
-                    .HasColumnName("migration_name");
-
-                entity.Property(e => e.RolledBackAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("rolled_back_at");
-
-                entity.Property(e => e.StartedAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("started_at")
-                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
             });
 
             modelBuilder.Entity<Project>(entity =>
             {
-                entity.ToTable("Project", "IMS");
+                entity.ToTable("project");
 
                 entity.HasIndex(e => e.ClassId, "Project_ClassId_fkey");
 
@@ -397,14 +360,14 @@ namespace IMS.Models
                 entity.HasMany(d => d.Students)
                     .WithMany(p => p.ProjectsNavigation)
                     .UsingEntity<Dictionary<string, object>>(
-                        "ProjectStudent",
+                        "Projectstudent",
                         l => l.HasOne<User>().WithMany().HasForeignKey("StudentId").OnDelete(DeleteBehavior.Restrict).HasConstraintName("ProjectStudent_StudentId_fkey"),
                         r => r.HasOne<Project>().WithMany().HasForeignKey("ProjectId").OnDelete(DeleteBehavior.Restrict).HasConstraintName("ProjectStudent_ProjectId_fkey"),
                         j =>
                         {
                             j.HasKey("ProjectId", "StudentId").HasName("PRIMARY");
 
-                            j.ToTable("ProjectStudent", "IMS");
+                            j.ToTable("projectstudent");
 
                             j.HasIndex(new[] { "ProjectId", "StudentId" }, "ProjectStudent_ProjectId_StudentId_idx");
 
@@ -414,7 +377,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<Setting>(entity =>
             {
-                entity.ToTable("Setting", "IMS");
+                entity.ToTable("setting");
 
                 entity.HasIndex(e => e.Id, "Setting_Id_idx");
 
@@ -432,7 +395,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<Subject>(entity =>
             {
-                entity.ToTable("Subject", "IMS");
+                entity.ToTable("subject");
 
                 entity.HasIndex(e => e.Id, "Subject_Id_idx");
 
@@ -449,7 +412,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.ToTable("User", "IMS");
+                entity.ToTable("user");
 
                 entity.HasIndex(e => e.Email, "User_Email_idx");
 

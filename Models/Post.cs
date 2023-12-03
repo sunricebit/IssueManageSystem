@@ -12,10 +12,10 @@ namespace IMS.Models
         public DateTime? UpdatedAt { get; set; }
         public bool IsPublic { get; set; }
         public string? ImageUrl { get; set; }
-        public int UserId { get; set; }
+        public int AuthorId { get; set; }
         public int? CategoryId { get; set; }
 
+        public virtual User Author { get; set; } = null!;
         public virtual Setting? Category { get; set; }
-        public virtual User User { get; set; } = null!;
     }
 }

@@ -7,8 +7,8 @@ namespace IMS.Models
     {
         public Project()
         {
-            IssueSettings = new HashSet<IssueSetting>();
             Issues = new HashSet<Issue>();
+            Issuesettings = new HashSet<Issuesetting>();
             Students = new HashSet<User>();
         }
 
@@ -22,8 +22,8 @@ namespace IMS.Models
 
         public virtual Class? Class { get; set; }
         public virtual User? Leader { get; set; }
-        public virtual ICollection<IssueSetting> IssueSettings { get; set; }
         public virtual ICollection<Issue> Issues { get; set; }
+        public virtual ICollection<Issuesetting> Issuesettings { get; set; }
 
         public virtual ICollection<User> Students { get; set; }
     }

@@ -31,7 +31,6 @@
     <None Remove="Extensions\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ViewModels\Auth\" />
     <Folder Include="Views\Home\" />
     <Folder Include="wwwroot\assets\" />
     <Folder Include="Views\Auth\" />

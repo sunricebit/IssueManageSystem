@@ -41,7 +41,7 @@ CREATE TABLE `Contact` (
     `Phone` VARCHAR(15) NULL,
     `IsValid` BOOLEAN NOT NULL DEFAULT true,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `CarerId` INTEGER NOT NULL,
+    `CarerId` INTEGER  NULL,
     `ContactTypeId` INTEGER NOT NULL,
 
     INDEX `Contact_Id_idx`(`Id`),

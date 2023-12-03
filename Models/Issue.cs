@@ -7,7 +7,7 @@ namespace IMS.Models
     {
         public Issue()
         {
-            IssueSettings = new HashSet<IssueSetting>();
+            Issuesettings = new HashSet<Issuesetting>();
         }
 
         public int Id { get; set; }
@@ -22,6 +22,6 @@ namespace IMS.Models
         public virtual User Author { get; set; } = null!;
         public virtual Milestone? Milestone { get; set; }
         public virtual Project? Project { get; set; }
-        public virtual ICollection<IssueSetting> IssueSettings { get; set; }
+        public virtual ICollection<Issuesetting> Issuesettings { get; set; }
     }
 }

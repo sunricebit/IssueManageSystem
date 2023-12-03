@@ -16,10 +16,10 @@ namespace IMS.Models
         public string? Phone { get; set; }
         public bool? IsValid { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int CarerId { get; set; }
+        public int? CarerId { get; set; }
         public int ContactTypeId { get; set; }
 
-        public virtual User Carer { get; set; } = null!;
+        public virtual User? Carer { get; set; }
         public virtual Setting ContactType { get; set; } = null!;
         public virtual ICollection<Message> Messages { get; set; }
     }
