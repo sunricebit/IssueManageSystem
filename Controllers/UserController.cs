@@ -4,9 +4,11 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Firebase.Auth;
 using Firebase.Storage;
 using IMS.Models;
+using IMS.ViewModels.User;
 using Microsoft.AspNetCore.Mvc;
 using System.Configuration;
 using System.Data;
+using System.IO;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace IMS.Controllers
@@ -16,8 +18,8 @@ namespace IMS.Controllers
     {
         private static string ApiKey = "AIzaSyBjstBnMJX7h_NlJ5-vqcQE0V-Ldaztnk8";
         private static string Bucket = "imsmanagement-35781.appspot.com";
-        private static string AuthEmail = "dinhthenam10102@gmail.com";
-        private static string AuthPassword = "mid04052002";
+        private static string AuthEmail = "abc@gmail.com";
+        private static string AuthPassword = "123456";
         private readonly IUserService userService;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _env;
         private readonly IMailService _mailService;
@@ -35,7 +37,7 @@ namespace IMS.Controllers
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
             Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
-            ViewBag.CreateSuccessMessage = TempData["CreateSuccessMessage"] as string;
+            //     ViewBag.CreateSuccessMessage = TempData["CreateSuccessMessage"] as string;
             var users = userService.GetAllUsers();
             ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
             ViewBag.Action = "UserList";
@@ -43,24 +45,11 @@ namespace IMS.Controllers
             ViewBag.Roles = role;
             ViewBag.Pagination = paginate.GetPagination();
 
-            
+
             return View();
         }
         [HttpGet("Search")]
         public IActionResult Search(int? pageNumber, string keyword)
-        {
-                int tempPageNumber = pageNumber ?? 1;
-                int tempPageSize = 10;
-                Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
-                var role = userService.GetRole();
-                ViewBag.Roles = role;
-                ViewBag.Pagination = paginate.GetPagination();
-                var users = userService.SearchUsers(keyword);
-            ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
-            return View("Index");
-        }
-        [HttpGet("FilterRole")]
-        public IActionResult FilterByRole(int? pageNumber,int roleid)
         {
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
@@ -68,7 +57,20 @@ namespace IMS.Controllers
             var role = userService.GetRole();
             ViewBag.Roles = role;
             ViewBag.Pagination = paginate.GetPagination();
-           
+            var users = userService.SearchUsers(keyword);
+            ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
+            return View("Index");
+        }
+        [HttpGet("FilterRole")]
+        public IActionResult FilterByRole(int? pageNumber, int roleid)
+        {
+            int tempPageNumber = pageNumber ?? 1;
+            int tempPageSize = 10;
+            Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
+            var role = userService.GetRole();
+            ViewBag.Roles = role;
+            ViewBag.Pagination = paginate.GetPagination();
+
             var users = userService.FilterByRole(roleid);
             ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
             return View("Index");
@@ -90,7 +92,7 @@ namespace IMS.Controllers
             }
             else
             {
-               status2 = false;
+                status2 = false;
             }
             var users = userService.FilterByStatus(status2);
             ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
@@ -116,13 +118,13 @@ namespace IMS.Controllers
         public IActionResult Create()
         {
             var role = userService.GetRole();
-            ViewBag.Roles = role; 
+            ViewBag.Roles = role;
             return View(new Models.User());
         }
         [HttpPost("Create")]
-        public async Task<IActionResult> Create(Models.User user, IFormFile avatarFile)
+        public async Task<IActionResult> Create(UserViewModel? userView, IFormFile avatarFile)
         {
-            
+
             if (avatarFile != null && avatarFile.Length > 0)
             {
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
@@ -130,43 +132,45 @@ namespace IMS.Controllers
 
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    avatarFile.CopyTo(fileStream);
-                    await Task.Run(() => Upload(fileStream, fileName));
-                }
-                
-                user.Avatar = fileName; 
-            } 
 
-                if (!ModelState.IsValid)
-            {
-                if (string.IsNullOrWhiteSpace(user.Email))
-                {
-                    ModelState.AddModelError("Email", "Email is required.");
+                    avatarFile.CopyTo(fileStream);
+
                 }
-                if (string.IsNullOrWhiteSpace(user.Name))
-                {
-                    ModelState.AddModelError("Name", "Name is required.");
-                }
-                if (user.Avatar == null)
-                {
-                    user.Avatar = "https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fdefault_avatar.jpg?alt=media&token=c9ec5062-d46b-4009-a04a-4fbeb5532005";
-                }
-                user.Status = true;
-                user.Password = _mailService.SendRandomPassword(user.Email);
-                userService.AddUser(user);
-                TempData["CreateSuccessMessage"] = "Người dùng đã được thêm thành công.";
-                return RedirectToAction("Index","User");
+                var fileStream2 = new FileStream(filePath, FileMode.Open);
+                await Task.Run(() => Upload(fileStream2, avatarFile.FileName));
+
+                userView.Avatar = filePath;
             }
 
-           
+            
+
+            if (userView.Avatar == null)
+            {
+                userView.Avatar = "https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fdefault_avatar.jpg?alt=media&token=c9ec5062-d46b-4009-a04a-4fbeb5532005";
+            }
+            userView.Status = true;
+            userView.Password = _mailService.SendRandomPassword(userView.Email);
+            Models.User user = new Models.User()
+            {
+                RoleId = userView.RoleId,
+                Name = userView.Name,
+                Email = userView.Email,
+                Password = userView.Password,
+                Address = userView.Address,
+                Gender = userView.Gender,
+                Avatar = userView.Avatar,
+                Status = userView.Status
+            };
+            userService.AddUser(user);
+
             var roles = userService.GetRole();
             ViewBag.Roles = roles;
 
             return View(user);
         }
-        public async void Upload (FileStream stream, string filename)
+        public async void Upload(FileStream stream, string filename)
         {
-            var auth = new FirebaseAuthProvider( new FirebaseConfig(ApiKey));
+            var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
             var a = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
             var cancellation = new CancellationTokenSource();
             var task = new FirebaseStorage(
@@ -182,16 +186,18 @@ namespace IMS.Controllers
             try
             {
                 string link = await task;
-                
+
+
             }
             catch (Exception ex)
             {
 
                 Console.WriteLine("Exception was thrown : {0}", ex);
             }
-            
-
         }
+
+
+
         [HttpPost("Import")]
         public IActionResult Import(IFormFile file)
         {
@@ -199,7 +205,7 @@ namespace IMS.Controllers
             {
                 file.CopyTo(stream);
 
-                
+
                 using (var workbook = new XLWorkbook(stream))
                 {
                     var worksheet = workbook.Worksheet(1);
@@ -270,9 +276,9 @@ namespace IMS.Controllers
                 new DataColumn("Address"),
                 new DataColumn("Status")
             });
-            foreach ( var user in users)
+            foreach (var user in users)
             {
-                data.Rows.Add(user.Id,user.Email,user.Name,user.Role.Value,user.Phone,user.Address,user.Status);
+                data.Rows.Add(user.Id, user.Email, user.Name, user.Role.Value, user.Phone, user.Address, user.Status);
             }
             using (XLWorkbook wb = new XLWorkbook())
             {
@@ -288,16 +294,24 @@ namespace IMS.Controllers
         }
 
         [HttpPost]
-        
-        public IActionResult Update(Models.User user)
-        {
-            if (!ModelState.IsValid)
-            {
-                userService.UpdateUser(user);
-                return RedirectToAction("Index");
-            }
 
-            return View("Index");
+        public IActionResult Update(UserViewModel? userView)
+        {
+         
+            Models.User user = userService.GetUser(userView.Id);
+            user.Email = userView.Email;
+            user.Name = userView.Name;
+            user.Phone = userView.Phone;
+            user.Address = userView.Address;
+            user.Status = userView.Status;
+            user.Avatar = userView.Avatar;
+          //  user.Gender = userView.Gender;
+
+            userService.UpdateUser(user);
+            //   ViewBag.SuccessMessage = "Update user success!";
+
+           
+            return RedirectToAction("Index");
         }
 
         [HttpPost("Delete")]

@@ -81,9 +81,10 @@
                     <tr>
                         <th onclick="sortTable(0)">Name</th>
                         <th>Avatar</th>
-                        <th onclick ="sortTable(1)">Role</th>
+                            <th onclick="sortTable(1)">Email</th>
+                        <th onclick ="sortTable(2)">Role</th>
                         <th>Phone</th>
-                        <th onclick="sortTable(2)">Address</th>
+                        <th onclick="sortTable(3)">Address</th>
                         <th>Status</th>
                         <th class="sortable">Action</th>
                         
@@ -99,6 +100,7 @@
                             <td>
                                 <img src="@user.Avatar" alt="Avatar" width="50" height="50" />
                             </td>
+                            <td>@user.Email</td>
                             <td>@user.Role.Value</td>
                             <td>@user.Phone</td>
                             <td>@user.Address</td>

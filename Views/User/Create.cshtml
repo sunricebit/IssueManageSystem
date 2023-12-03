@@ -7,7 +7,7 @@
 @model User
 <h2 class="mb-4">Create User</h2>
 
-<form asp-action="Create" method="post">
+<form asp-action="Create" method="post" enctype="multipart/form-data">
     <input type="hidden" name="_token" value="@ViewBag.Token" />
 
     <div class="row">
