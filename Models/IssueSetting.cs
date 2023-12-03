@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace IMS.Models
 {
-    public partial class Issuesetting
+    public partial class IssueSetting
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
