@@ -17,19 +17,21 @@
                 <div class="card-body">
                     <hr>
                     <div class="row">
-                        <div class="col-md-4">
-                            <div class="d-flex align-items-center justify-content-center mb-4">
-                                <img id="selectedAvatar" src="@Model.Avatar" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" alt="User Avatar" />
-
-                                <div class="btn btn-primary btn-rounded ml-3">
-                                    <label class="form-label text-white m-0" for="avatarFile">Choose avatar</label>
-                                    <input type="file" class="form-control d-none" id="avatarFile" name="avatarFile" onchange="displaySelectedImage(event, 'selectedAvatar')" />
-                                </div>
-                            </div>
-                        </div>
+                        
                         <div class="col-md-8">
                             <form method="post" asp-action="Update" enctype="multipart/form-data">
 
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center justify-content-center mb-4">
+                                        <img id="selectedAvatar" src="@Model.Avatar" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" alt="User Avatar" />
+
+                                        <div class="btn btn-primary btn-rounded ml-3">
+                                            <label class="form-label text-white m-0" for="avatarFile">Choose avatar</label>
+                                            <input type="file" class="form-control d-none" id="avatarFile" name="avatarFile" onchange="displaySelectedImage(event, 'selectedAvatar')" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="avatarUrl" name="avatarUrl" value="@Model.Avatar" />
                                 <input type="hidden" asp-for="Id" value="@Model.Id" />
 
                                 <dl class="row">

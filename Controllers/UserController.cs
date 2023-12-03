@@ -309,9 +309,26 @@ namespace IMS.Controllers
 
         [HttpPost]
 
-        public IActionResult Update(UserViewModel? userView)
+        public async Task<IActionResult> Update(UserViewModel? userView, IFormFile avatarFile)
         {
-         
+            if (avatarFile != null && avatarFile.Length > 0)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Avatars", fileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+
+                    avatarFile.CopyTo(fileStream);
+
+                }
+                var fileStream2 = new FileStream(filePath, FileMode.Open);
+                var downloadLink = await Upload(fileStream2, avatarFile.FileName);
+
+                userView.Avatar = downloadLink;
+            }
+
+
             Models.User user = userService.GetUser(userView.Id);
             user.Email = userView.Email;
             user.Name = userView.Name;
@@ -319,8 +336,8 @@ namespace IMS.Controllers
             user.Address = userView.Address;
             user.Status = userView.Status;
             user.Avatar = userView.Avatar;
-          //  user.Gender = userView.Gender;
-
+            user.Gender = userView.Gender;
+            
             userService.UpdateUser(user);
             //   ViewBag.SuccessMessage = "Update user success!";
 
