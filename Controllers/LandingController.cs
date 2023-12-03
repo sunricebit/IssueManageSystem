@@ -1,81 +1,80 @@
-﻿using DocumentFormat.OpenXml.InkML;
-using IMS.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+
 namespace IMS.Controllers
 {
     public class LandingController : Controller
     {
+        private readonly IMSContext context;
+
+        public LandingController(IMSContext context)
+        {
+            this.context = context;
+        }
         [Route("/landing")]
         public async Task<IActionResult> Index()
         {
-            using (IMSContext context = new IMSContext())
-            {
+            //using (IMSContext context = new IMSContext())
+            //{
                var type= context.Settings.ToList();
-                ViewBag.Types = type;
+                //ViewBag.Types = type;
+                ViewBag.Setting = new SelectList(context.Settings, "Id", "Value");
                 return View();
-            }
+            //}
         }
 
-
-        [HttpPost("sendcontact")]
-        public async Task<IActionResult> SendContact(Contact _contact, string Type)
+        [Route("/landing")]
+        [HttpPost]
+        public async Task<IActionResult> Index(IMS.ViewModels.Auth.Contact _contact)
         {
-            try {
-                if (Type == "Contact type *")
+                ViewBag.Setting = new SelectList(context.Settings, "Id", "Value");
+            
+            try
+            {
+                if (_contact.Id == 0)
+                {
+                    ViewBag.Success = "error";
+                    ViewBag.Error = "Please choose a Contact type";
+                    return View(nameof(Index));
+                }
+                if (ModelState.IsValid)
                 {
                     using (IMSContext context = new IMSContext())
                     {
-                        var types = context.Settings.ToList();
-                        ViewBag.Types = types;
-                        ViewBag.Success = "error";
-                        ViewBag.Error = "Please choose a Contact Type.";
+                        var contact = new Contact
+                        {
+                            Name = _contact.Name,
+                            Email = _contact.Email,
+                            Phone = _contact.Phone,
+                            ContactTypeId = _contact.Id,
+                        };
+                        context.Contacts.Add(contact);
+                        context.SaveChanges();// Lưu để có ContactId
+                        var message = new Message
+                        {
+                            ContactId = contact.Id,
+                            Content = _contact.Content,
+                        };
+                        context.Messages.Add(message);
+                        context.SaveChanges();
+                        ViewBag.Success = "Send contact success!";
+                        ModelState.Clear();
                         return View(nameof(Index));
                     }
                 }
                 else
                 {
-                    if (ModelState.IsValid)
-                    {
-                        using (IMSContext context = new IMSContext())
-                        {
-                            Console.WriteLine(Type);
-                            var types = context.Settings.ToList();
-                            ViewBag.Types = types;
-                            var type = context.Settings.SingleOrDefault(t => t.Value == Type);
-
-                            var contact = new Contact
-                            {
-                                Name = _contact.Name,
-                                Email = _contact.Email,
-                                Phone = _contact.Phone,
-                                Reason = _contact.Reason,
-                                Message = _contact.Message,
-                                ContactTypeId = type?.Id,
-                            };
-                            context.Contacts.Add(contact);
-                            context.SaveChanges();
-                            ViewBag.Success = "Send contact success!";
-                            return View(nameof(Index));
-                        }
-                    }
-                    else
-                    {
-                        using (IMSContext context = new IMSContext())
-                        {
-                            var types = context.Settings.ToList();
-                            ViewBag.Types = types;
-                            ViewBag.Success = "error";
-                            return View(nameof(Index));
-                        }
-
-                    }
+                    ViewBag.Success = "error";
+                    return View(nameof(Index));
                 }
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = "Error:" +ex.Message;
+                ViewBag.ErrorMessage = "Error:" + ex.Message;
                 return View();
             }
+           
         }
 
     }

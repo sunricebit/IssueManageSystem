@@ -1,7 +1,8 @@
-﻿@model Contact;
+﻿@model IMS.ViewModels.Auth.Contact;
 @{
-    var contact = ViewData["contact"] as List<Contact>;
     Layout = "~/Views/Shared/_LayoutLandingPage.cshtml";
+    var contact = ViewData["contact"] as List<Contact>;
+    SelectList types = ViewBag.Setting;
 }
 
 <!DOCTYPE html>
@@ -22,6 +23,7 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="~/css/landing.css" rel="stylesheet" />
     </head>
+
     <body id="page-top">
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
@@ -189,78 +191,55 @@
             </div>
             <!-- https://startbootstrap.com/solution/contact-forms-->
             <!-- to get an API token!-->
-            <form id="contactForm" method="post" action="sendcontact">
+            
+            @using (Html.BeginForm("Index", "Landing", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
                 <div class="row align-items-stretch mb-5">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <!-- Name input-->
-                            <input class="form-control" asp-for="Name" type="text" placeholder="Your Name *" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
+                            @Html.LabelFor(m => m.Name)
+                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control", style="height: 65px;font-weight:bold;font-size:large;",placeholder="Your Name*" })
+                            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
                         </div>
-                        <div class="form-group">
-                            <!-- Email address input-->
-                            <input class="form-control" asp-for="Email" type="email" placeholder="Your Email *" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
 
-                        </div>
                         <div class="form-group">
-                            <!-- Email address input-->
-                            <input class="form-control" asp-for="Phone" type="tel" placeholder="Your Phone" />
-                            <span asp-validation-for="Phone" class="text-danger"></span>
-
+                            @Html.LabelFor(m => m.Email)
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control", style="height: 65px;font-weight:bold;font-size:large;",placeholder="Your Email*" })
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
                         </div>
+
                         <div class="form-group">
-                            <!-- Email address input-->
-                            <input class="form-control" asp-for="Reason" type="text" placeholder="Your Reason *" />
-                            <span asp-validation-for="Reason" class="text-danger"></span>
-
+                            @Html.LabelFor(m => m.Phone)
+                            @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", style="height: 65px;font-weight:bold;font-size:large;",placeholder="Your Phone" })
+                            @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger" })
                         </div>
-                        <div class="form-group mb-md-0" >
-                            <!-- Phone number input-->
-                            <select name="Type" id="Type" class="form-control" style="height: 65px; color:#ced4da;font-weight:bold;font-size:large;">
+
+                        <div class="form-group mb-md-0">
+                            @Html.LabelFor(m => m.Id, "Contact Type")
+                            <select asp-for="Id" cdlass="form-control" asp-items="ViewBag.Setting"
+                                class="form-control" 
+                                style="height: 65px;font-weight:bold;font-size:large;color: #6c757d">
                                 <option value="Contact type *" class="form-control">Contact type *</option>
-                                @if (ViewBag.Types != null)
-                                {
-                                    @foreach (var type in ViewBag.Types)
-                                    {
-                                        <option value="@type.Value" class="form-control">@type.Value</option>
-
-                                    }
-                                }
-                            </select>
-                            <p style="color:rgba(var(--bs-danger-rgb));">@ViewBag.Error</p>
+                        </select>
+                            <span  style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error">@ViewBag.Error</span>
+                            @*@Html.ValidationMessageFor(m => m.Id, "", new { @class = "text-danger" })*@
                         </div>
-
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group form-group-textarea mb-md-0">
-                            <!-- Message input-->
-                            @*<textarea class="form-control" id="message" placeholder="Your Message *" name="message"></textarea>*@
-                            <textarea class="form-control" asp-for="Message" placeholder="Your Message *"></textarea>
-                            <span asp-validation-for="Message" class="text-danger"></span>
+                      
+                        <div class="form-group form-group-textarea mb-md-0" style="height:100%">
+                            @Html.LabelFor(m => m.Content)
+                            @Html.TextAreaFor(m => m.Content, new { @class = "form-control",placeholder="Your Message *" ,style="height: 100%;font-weight:bold;font-size:large;" })
+                            @Html.ValidationMessageFor(m => m.Content, "", new { @class = "text-danger" })
+                           
                         </div>
                     </div>
                 </div>
-                <!-- Submit success message-->
-                <!---->
-                <!-- This is what your users will see when the form-->
-                <!-- has successfully submitted-->
-                <div class="d-none" id="submitSuccessMessage">
-                    <div class="text-center text-white mb-3">
-                        <div class="fw-bolder">Form submission successful!</div>
-                        To activate this form, sign up at
-                        <br />
-                        <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
-                    </div>
-                </div>
-                <!-- Submit error message-->
-                <!---->
-                <!-- This is what your users will see when there is-->
-                <!-- an error submitting the form-->
-                <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error sending message!</div></div>
-                <!-- Submit Button-->
+
                 <div class="text-center"><button class="btn btn-primary btn-xl text-uppercase" id="submitButton" type="submit">Send Message</button></div>
-            </form>
+
+            }
         </div>
     </section>
 
