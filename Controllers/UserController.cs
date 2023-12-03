@@ -1,5 +1,8 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.VariantTypes;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Firebase.Auth;
+using Firebase.Storage;
 using IMS.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Configuration;
@@ -31,10 +34,10 @@ namespace IMS.Controllers
         {
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
-            Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
+            Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
             ViewBag.CreateSuccessMessage = TempData["CreateSuccessMessage"] as string;
             var users = userService.GetAllUsers();
-            ViewBag.UserList = paginate.GetListPaginate<User>(users);
+            ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
             ViewBag.Action = "UserList";
             var role = userService.GetRole();
             ViewBag.Roles = role;
@@ -48,12 +51,12 @@ namespace IMS.Controllers
         {
                 int tempPageNumber = pageNumber ?? 1;
                 int tempPageSize = 10;
-                Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
+                Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
                 var role = userService.GetRole();
                 ViewBag.Roles = role;
                 ViewBag.Pagination = paginate.GetPagination();
                 var users = userService.SearchUsers(keyword);
-            ViewBag.UserList = paginate.GetListPaginate<User>(users);
+            ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
             return View("Index");
         }
         [HttpGet("FilterRole")]
@@ -61,13 +64,13 @@ namespace IMS.Controllers
         {
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
-            Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
+            Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
             var role = userService.GetRole();
             ViewBag.Roles = role;
             ViewBag.Pagination = paginate.GetPagination();
            
             var users = userService.FilterByRole(roleid);
-            ViewBag.UserList = paginate.GetListPaginate<User>(users);
+            ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
             return View("Index");
 
         }
@@ -76,7 +79,7 @@ namespace IMS.Controllers
         {
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
-            Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
+            Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
             var role = userService.GetRole();
             ViewBag.Roles = role;
             bool status2;
@@ -90,7 +93,7 @@ namespace IMS.Controllers
                status2 = false;
             }
             var users = userService.FilterByStatus(status2);
-            ViewBag.UserList = paginate.GetListPaginate<User>(users);
+            ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
             return View("Index");
 
         }
@@ -114,26 +117,41 @@ namespace IMS.Controllers
         {
             var role = userService.GetRole();
             ViewBag.Roles = role; 
-            return View(new User());
+            return View(new Models.User());
         }
         [HttpPost("Create")]
-        public IActionResult Create(User user)
+        public async Task<IActionResult> Create(Models.User user, IFormFile avatarFile)
         {
-            if (string.IsNullOrWhiteSpace(user.Email))
+            
+            if (avatarFile != null && avatarFile.Length > 0)
             {
-                ModelState.AddModelError("Email", "Email is required.");
-            }
-            if (string.IsNullOrWhiteSpace(user.Name))
-            {
-                ModelState.AddModelError("Name", "Name is required.");
-            }
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Avatars", fileName);
 
-            if (!ModelState.IsValid)
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    avatarFile.CopyTo(fileStream);
+                    await Task.Run(() => Upload(fileStream, fileName));
+                }
+                
+                user.Avatar = fileName; 
+            } 
+
+                if (!ModelState.IsValid)
             {
+                if (string.IsNullOrWhiteSpace(user.Email))
+                {
+                    ModelState.AddModelError("Email", "Email is required.");
+                }
+                if (string.IsNullOrWhiteSpace(user.Name))
+                {
+                    ModelState.AddModelError("Name", "Name is required.");
+                }
                 if (user.Avatar == null)
                 {
                     user.Avatar = "https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fdefault_avatar.jpg?alt=media&token=c9ec5062-d46b-4009-a04a-4fbeb5532005";
                 }
+                user.Status = true;
                 user.Password = _mailService.SendRandomPassword(user.Email);
                 userService.AddUser(user);
                 TempData["CreateSuccessMessage"] = "Người dùng đã được thêm thành công.";
@@ -145,6 +163,34 @@ namespace IMS.Controllers
             ViewBag.Roles = roles;
 
             return View(user);
+        }
+        public async void Upload (FileStream stream, string filename)
+        {
+            var auth = new FirebaseAuthProvider( new FirebaseConfig(ApiKey));
+            var a = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
+            var cancellation = new CancellationTokenSource();
+            var task = new FirebaseStorage(
+                Bucket,
+                new FirebaseStorageOptions
+                {
+                    AuthTokenAsyncFactory = () => Task.FromResult(a.FirebaseToken),
+                    ThrowOnCancel = true
+                }
+                ).Child("User")
+                 .Child(filename)
+                 .PutAsync(stream, cancellation.Token);
+            try
+            {
+                string link = await task;
+                
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine("Exception was thrown : {0}", ex);
+            }
+            
+
         }
         [HttpPost("Import")]
         public IActionResult Import(IFormFile file)
@@ -183,7 +229,7 @@ namespace IMS.Controllers
                         }
                         else
                         {
-                            var user = new User()
+                            var user = new Models.User()
                             {
                                 Id = int.Parse(id),
                                 Email = email,
@@ -211,7 +257,7 @@ namespace IMS.Controllers
             var filename = "user.xlsx";
             return GenerateExcel(filename, user);
         }
-        private FileResult GenerateExcel(string filename, IEnumerable<User> users)
+        private FileResult GenerateExcel(string filename, IEnumerable<Models.User> users)
         {
             DataTable data = new DataTable("User");
             data.Columns.AddRange(new DataColumn[]
@@ -241,9 +287,9 @@ namespace IMS.Controllers
             }
         }
 
-        [HttpPost()]
+        [HttpPost]
         
-        public IActionResult Update(User user)
+        public IActionResult Update(Models.User user)
         {
             if (!ModelState.IsValid)
             {
