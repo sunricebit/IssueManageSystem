@@ -102,7 +102,7 @@ VALUES ('ROLE', 'Admin'),
 
 
 INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)
-VALUES ('admin@gmail.com', '$2a$11$C0XheCBSOFNJThlyh.1YuOfznCCkteW8NJsXFbTSawA9DhcE2UwlK',4,'Administrator', 1);
+VALUES ('admin@gmail.com', '$2a$11$C0XheCBSOFNJThlyh.1YuOfznCCkteW8NJsXFbTSawA9DhcE2UwlK',1,'Administrator', 1);
 
 
 INSERT INTO `IMS`.`User` (`Email`, `Password`, `RoleId`, `Name`, `Status`)

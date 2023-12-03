@@ -1,12 +1,11 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-
-namespace IMS.Services
+﻿namespace IMS.DAO
 {
-    public class SettingService : ISettingService
+    public class SettingDAO
     {
+
         private readonly IMSContext _context;
 
-        public SettingService(IMSContext context)
+        public SettingDAO(IMSContext context)
         {
             _context = context;
         }
@@ -28,7 +27,7 @@ namespace IMS.Services
         {
             try
             {
-                Setting? checkSetting = _context.Settings.FirstOrDefault(s => setting.Type.Equals(s.Type) 
+                Setting? checkSetting = _context.Settings.FirstOrDefault(s => setting.Type.Equals(s.Type)
                                                                                 && setting.Value.Equals(s.Value));
                 if (checkSetting == null)
                 {
@@ -45,24 +44,34 @@ namespace IMS.Services
             }
         }
 
+        public bool CheckSettingCanUpdate(Setting setting)
+        {
+            try
+            {
+                Setting? checkSetting = _context.Settings.FirstOrDefault(s => setting.Type.Equals(s.Type)
+                                                                                && setting.Value.Equals(s.Value));
+                if (checkSetting == null)
+                {
+                    return true;
+                }
+                if (checkSetting.Id == setting.Id)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         public Setting GetSettingById(int id)
         {
             try
             {
                 Setting setting = _context.Settings.FirstOrDefault(s => s.Id == id);
                 return setting;
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }    
-        }
-
-        public IEnumerable<Setting> GetSettingPaginate(int pageNumber, int pageSize)
-        {
-            try
-            {
-                return _context.Settings;
             }
             catch (Exception e)
             {
