@@ -150,9 +150,9 @@ namespace IMS.Controllers
 
                 }
                 var fileStream2 = new FileStream(filePath, FileMode.Open);
-                await Task.Run(() => Upload(fileStream2, avatarFile.FileName));
+                var downloadLink = await Upload(fileStream2, avatarFile.FileName);
 
-                userView.Avatar = filePath;
+                userView.Avatar = downloadLink;
             }
 
             
@@ -179,9 +179,9 @@ namespace IMS.Controllers
             var roles = userService.GetRole();
             ViewBag.Roles = roles;
 
-            return View(user);
+            return RedirectToAction("Index");
         }
-        public async void Upload(FileStream stream, string filename)
+        public async Task<string> Upload(FileStream stream, string filename)
         {
             var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
             var a = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
@@ -199,13 +199,14 @@ namespace IMS.Controllers
             try
             {
                 string link = await task;
-
+                return link;
 
             }
             catch (Exception ex)
             {
 
                 Console.WriteLine("Exception was thrown : {0}", ex);
+                return null;
             }
         }
 
