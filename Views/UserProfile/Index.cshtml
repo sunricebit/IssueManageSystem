@@ -152,7 +152,7 @@ else
     <div style="background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%); height:fit-content; border-radius:5px; display:flex;justify-content:center;width:fit-content;padding:5px">
         <button style="color:white; text-decoration:none;background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%); border:none"
                 onclick="openPopup('popupEditDetails')">
-            Edit Profile
+            Edit profile
         </button>
     </div>
    
@@ -243,7 +243,7 @@ else
 
                     <label for="file">Choose Avatar:</label>
                     <input type="file" name="file" id="file" required />
-                    <input type="submit" value="Upload" style="background-color: #43A047;border-radius: 3px;" />
+                    <input type="submit" value="Create" style="background-color: #43A047;border-radius: 3px;" />
                 }
             </div>
         </div>
@@ -339,14 +339,14 @@ else
         var nameValue = nameInput.val();
 
         // Biểu thức chính quy để kiểm tra số điện thoạ i (chỉ cho phép chữ số)
-        var phoneRegex = /^[0-9]+$/;
+        var phoneRegex = /^0[0-9]{9}$/;
 
         // Kiểm tra
 
         if (!phoneRegex.test(phoneValue)&& phoneValue!="") {
             // Hiển thị thông báo lỗi và đặt lỗi cho trường input
             //phoneInput.addClass("input-validation-error");
-            phoneError.text("Please enter a valid numeric phone number.");
+            phoneError.text("Invalid phone number, phone number has 10 digits and starts with 0.");
         } 
         else if (nameValue==""){
             nameError.text("Please enter a name.");
