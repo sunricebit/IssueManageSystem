@@ -197,26 +197,22 @@
                 @Html.AntiForgeryToken()
                 <div class="row align-items-stretch mb-5">
                     <div class="col-md-6">
-                        <div class="form-group">
-                            @Html.LabelFor(m => m.Name)
+                        <div class="form-group mb-4">
                             @Html.TextBoxFor(m => m.Name, new { @class = "form-control", style="height: 65px;font-weight:bold;font-size:large;",placeholder="Your Name*" })
                             @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
                         </div>
 
-                        <div class="form-group">
-                            @Html.LabelFor(m => m.Email)
+                        <div class="form-group mb-4">
                             @Html.TextBoxFor(m => m.Email, new { @class = "form-control", style="height: 65px;font-weight:bold;font-size:large;",placeholder="Your Email*" })
                             @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
                         </div>
 
-                        <div class="form-group">
-                            @Html.LabelFor(m => m.Phone)
+                        <div class="form-group mb-4">
                             @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", style="height: 65px;font-weight:bold;font-size:large;",placeholder="Your Phone" })
                             @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger" })
                         </div>
 
-                        <div class="form-group mb-md-0">
-                            @Html.LabelFor(m => m.Id, "Contact Type")
+                        <div class="form-group mb-md-0 mb-4">
                             <select asp-for="Id" cdlass="form-control" asp-items="ViewBag.Setting"
                                 class="form-control" 
                                 style="height: 65px;font-weight:bold;font-size:large;color: #6c757d">
@@ -229,7 +225,6 @@
                     <div class="col-md-6">
                       
                         <div class="form-group form-group-textarea mb-md-0" style="height:100%">
-                            @Html.LabelFor(m => m.Content)
                             @Html.TextAreaFor(m => m.Content, new { @class = "form-control",placeholder="Your Message *" ,style="height: 100%;font-weight:bold;font-size:large;" })
                             @Html.ValidationMessageFor(m => m.Content, "", new { @class = "text-danger" })
                            
