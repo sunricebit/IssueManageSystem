@@ -17,16 +17,17 @@ namespace IMS.Models
         }
 
         public virtual DbSet<Contact> Contacts { get; set; } = null!;
+        public virtual DbSet<ContactHandling> ContactHandlings { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
-          
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseMySQL("server=localhost;uid=root;pwd=123456;database=IMS");
+                optionsBuilder.UseMySQL("Server=localhost;Database=IMS;Uid=root;Pwd=123456");
             }
         }
 
@@ -34,7 +35,7 @@ namespace IMS.Models
         {
             modelBuilder.Entity<Contact>(entity =>
             {
-                entity.ToTable("Contact", "IMS");
+                entity.ToTable("contact");
 
                 entity.HasIndex(e => e.ContactTypeId, "Contact_ContactTypeId_fkey");
 
@@ -65,9 +66,34 @@ namespace IMS.Models
                     .HasConstraintName("Contact_ContactTypeId_fkey");
             });
 
+            modelBuilder.Entity<ContactHandling>(entity =>
+            {
+                entity.ToTable("contact_handling");
+
+                entity.HasIndex(e => e.ContactId, "Contact_FK_ID_idx");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.ContactId).HasColumnName("contactID");
+
+                entity.Property(e => e.CreatedDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("createdDate");
+
+                entity.Property(e => e.Description).HasColumnName("description");
+
+                entity.Property(e => e.Note).HasColumnName("note");
+
+                entity.HasOne(d => d.Contact)
+                    .WithMany(p => p.ContactHandlings)
+                    .HasForeignKey(d => d.ContactId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("Contact_FK_ID");
+            });
+
             modelBuilder.Entity<Post>(entity =>
             {
-                entity.ToTable("Post", "IMS");
+                entity.ToTable("post");
 
                 entity.HasIndex(e => e.CategoryId, "Post_CategoryId_fkey");
 
@@ -100,7 +126,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<Setting>(entity =>
             {
-                entity.ToTable("Setting", "IMS");
+                entity.ToTable("setting");
 
                 entity.HasIndex(e => e.Id, "Setting_Id_idx");
 
@@ -118,7 +144,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.ToTable("User", "IMS");
+                entity.ToTable("user");
 
                 entity.HasIndex(e => e.Email, "User_Email_idx");
 

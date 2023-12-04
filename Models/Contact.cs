@@ -5,6 +5,11 @@ namespace IMS.Models
 {
     public partial class Contact
     {
+        public Contact()
+        {
+            ContactHandlings = new HashSet<ContactHandling>();
+        }
+
         public int Id { get; set; }
         public string Email { get; set; } = null!;
         public string? Phone { get; set; }
@@ -16,5 +21,6 @@ namespace IMS.Models
         public int? ContactTypeId { get; set; }
 
         public virtual Setting? ContactType { get; set; }
+        public virtual ICollection<ContactHandling> ContactHandlings { get; set; }
     }
 }
