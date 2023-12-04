@@ -23,7 +23,7 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="~/css/landing.css" rel="stylesheet" />
     </head>
-
+   
     <body id="page-top">
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
@@ -35,10 +35,10 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#team">Team</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">BlogList</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" id="abc" href="#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" id="Team" href="#team">Team</a></li>
+                    <li class="nav-item"><a class="nav-link" id="BlogList" href="#">BlogList</a></li>
+                    <li class="nav-item"><a class="nav-link" id="Contact" href="#contact">Contact</a></li>
                         <li class="nav-item"><a class="nav-link" href="auth/sign-in">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="auth/sign-up">Register</a></li>
                     </ul>
@@ -299,7 +299,8 @@
             popup.style.display = 'none';
         }
 
-       
+        var element = document.getElementById("abc");
+        element.classList.add("active");
 </script>
      
            <!-- Bootstrap core JS-->

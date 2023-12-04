@@ -25,6 +25,7 @@ namespace IMS.Models
         public virtual DbSet<Milestone> Milestones { get; set; } = null!;
         public virtual DbSet<Permission> Permissions { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
+        public virtual DbSet<PrismaMigration> PrismaMigrations { get; set; } = null!;
         public virtual DbSet<Project> Projects { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
         public virtual DbSet<Subject> Subjects { get; set; } = null!;
@@ -233,6 +234,10 @@ namespace IMS.Models
 
                 entity.Property(e => e.Content).HasMaxLength(100);
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
+
                 entity.HasOne(d => d.Contact)
                     .WithMany(p => p.Messages)
                     .HasForeignKey(d => d.ContactId)
@@ -244,9 +249,11 @@ namespace IMS.Models
             {
                 entity.ToTable("Milestone", "IMS");
 
-                entity.HasIndex(e => e.AssignmentId, "Milestone_AssignmentId_idx");
+                entity.HasIndex(e => e.AssignmentId, "Milestone_AssignmentId_fkey");
 
                 entity.HasIndex(e => e.ClassId, "Milestone_ClassId_fkey");
+
+                entity.HasIndex(e => e.Id, "Milestone_Id_idx");
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
@@ -327,6 +334,42 @@ namespace IMS.Models
                     .HasConstraintName("Post_CategoryId_fkey");
             });
 
+            modelBuilder.Entity<PrismaMigration>(entity =>
+            {
+                entity.ToTable("_prisma_migrations", "IMS");
+
+                entity.Property(e => e.Id)
+                    .HasMaxLength(36)
+                    .HasColumnName("id");
+
+                entity.Property(e => e.AppliedStepsCount).HasColumnName("applied_steps_count");
+
+                entity.Property(e => e.Checksum)
+                    .HasMaxLength(64)
+                    .HasColumnName("checksum");
+
+                entity.Property(e => e.FinishedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasColumnName("finished_at");
+
+                entity.Property(e => e.Logs)
+                    .HasColumnType("text")
+                    .HasColumnName("logs");
+
+                entity.Property(e => e.MigrationName)
+                    .HasMaxLength(255)
+                    .HasColumnName("migration_name");
+
+                entity.Property(e => e.RolledBackAt)
+                    .HasColumnType("datetime(3)")
+                    .HasColumnName("rolled_back_at");
+
+                entity.Property(e => e.StartedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasColumnName("started_at")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
+            });
+
             modelBuilder.Entity<Project>(entity =>
             {
                 entity.ToTable("Project", "IMS");
@@ -378,8 +421,6 @@ namespace IMS.Models
             modelBuilder.Entity<Setting>(entity =>
             {
                 entity.ToTable("Setting", "IMS");
-
-                entity.HasIndex(e => e.Id, "Setting_Id_idx");
 
                 entity.HasIndex(e => new { e.Type, e.Value }, "Setting_Type_Value_idx");
 

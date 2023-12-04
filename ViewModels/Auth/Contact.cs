@@ -13,7 +13,7 @@ namespace IMS.ViewModels.Auth
         public string Name { get; set; }
 
         [Display(Name = "Phone")]
-        [RegularExpression(@"^0[0-9]{9}$", ErrorMessage = "Invalid phone number.")]
+        [RegularExpression(@"^0[0-9]{9}$", ErrorMessage = "Invalid phone number, phone number has 10 digits and starts with 0.")]
         public string? Phone { get; set; }
 
         [Display(Name = "Contact")]
@@ -21,6 +21,7 @@ namespace IMS.ViewModels.Auth
 
         [Display(Name = "Content")]
         [Required(ErrorMessage = "Please enter your message.")]
+             [StringLength(500, ErrorMessage = "Message must not exceed 500 characters.")]
         public string? Content { get; set; }
     }
 }
