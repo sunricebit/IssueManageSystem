@@ -108,7 +108,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<Contact>(entity =>
             {
-                entity.ToTable("contact");
+                entity.ToTable("Contact", "IMS");
 
                 entity.HasIndex(e => e.CarerId, "Contact_CarerId_fkey");
 
@@ -290,34 +290,11 @@ namespace IMS.Models
                     .HasConstraintName("Permission_RoleId_fkey");
             });
 
-            modelBuilder.Entity<ContactHandling>(entity =>
-            {
-                entity.ToTable("contact_handling");
-
-                entity.HasIndex(e => e.ContactId, "Contact_FK_ID_idx");
-
-                entity.Property(e => e.Id).HasColumnName("id");
-
-                entity.Property(e => e.ContactId).HasColumnName("contactID");
-
-                entity.Property(e => e.CreatedDate)
-                    .HasColumnType("datetime")
-                    .HasColumnName("createdDate");
-
-                entity.Property(e => e.Description).HasColumnName("description");
-
-                entity.Property(e => e.Note).HasColumnName("note");
-
-                entity.HasOne(d => d.Contact)
-                    .WithMany(p => p.ContactHandlings)
-                    .HasForeignKey(d => d.ContactId)
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .HasConstraintName("Contact_FK_ID");
-            });
+        
 
             modelBuilder.Entity<Post>(entity =>
             {
-                entity.ToTable("post");
+                entity.ToTable("Post", "IMS");
 
                 entity.HasIndex(e => e.AuthorId, "Post_AuthorId_fkey");
 
@@ -400,7 +377,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<Setting>(entity =>
             {
-                entity.ToTable("setting");
+                entity.ToTable("Setting", "IMS");
 
                 entity.HasIndex(e => e.Id, "Setting_Id_idx");
 
@@ -435,7 +412,7 @@ namespace IMS.Models
 
             modelBuilder.Entity<User>(entity =>
             {
-                entity.ToTable("user");
+                entity.ToTable("User", "IMS");
 
                 entity.HasIndex(e => e.Email, "User_Email_key")
                     .IsUnique();
