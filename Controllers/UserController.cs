@@ -333,6 +333,7 @@ namespace IMS.Controllers
             Models.User user = userService.GetUser(userView.Id);
             user.Email = userView.Email;
             user.Name = userView.Name;
+            user.RoleId = userView.RoleId;
             user.Phone = userView.Phone;
             user.Address = userView.Address;
             user.Status = userView.Status;
