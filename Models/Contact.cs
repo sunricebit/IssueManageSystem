@@ -7,20 +7,20 @@ namespace IMS.Models
     {
         public Contact()
         {
-            ContactHandlings = new HashSet<ContactHandling>();
+            Messages = new HashSet<Message>();
         }
 
         public int Id { get; set; }
         public string Email { get; set; } = null!;
-        public string? Phone { get; set; }
         public string Name { get; set; } = null!;
-        public string Message { get; set; } = null!;
+        public string? Phone { get; set; }
         public bool? IsValid { get; set; }
-        public string? Reason { get; set; }
         public DateTime CreatedAt { get; set; }
-        public int? ContactTypeId { get; set; }
+        public int? CarerId { get; set; }
+        public int ContactTypeId { get; set; }
 
-        public virtual Setting? ContactType { get; set; }
-        public virtual ICollection<ContactHandling> ContactHandlings { get; set; }
+        public virtual User? Carer { get; set; }
+        public virtual Setting ContactType { get; set; } = null!;
+        public virtual ICollection<Message> Messages { get; set; }
     }
 }

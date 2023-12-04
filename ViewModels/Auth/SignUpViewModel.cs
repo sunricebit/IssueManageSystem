@@ -26,7 +26,7 @@ namespace IMS.ViewModels.Auth
         public string Name { get; set; }
 
         [Display(Name = "Phone")]
-        [RegularExpression(@"^\d{10}$", ErrorMessage = "Invalid phone number")]
+        [RegularExpression(@"^0[0-9]{9}$", ErrorMessage = "Invalid phone number.")]
         public string? Phone { get; set; }
     }
 }

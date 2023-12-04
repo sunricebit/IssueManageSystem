@@ -1,5 +1,98 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IMS.ViewModels.Validation.SettingViewModel
 @{
+    ViewData["Title"] = "Setting Detail";
+    string confirmMessage = "Are you want to update this setting ?";
 }
+<div class="container mt-5">
+    <h2>Update Setting</h2>
+
+    <!-- Form để Update Setting -->
+    <form asp-action="SettingUpdate" method="post" class="needs-validation"  novalidate id="formSubmit">
+        <!-- Validation Summary -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success">
+                <ul>
+                    <li>@ViewBag.SuccessMessage</li>
+                </ul>
+            </div>
+        }
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger">
+                <ul>
+                    <li>@ViewBag.ErrorMessage</li>
+                </ul>
+            </div>
+        }
+        <!-- ID -->
+        <div class="form-group">
+            <label for="Id">ID:</label>
+            <input type="text" class="form-control" id="Id" name="Id" asp-for="Id" value="@Model.Id" readonly>
+        </div>
+
+        <!-- Type -->
+        @if (Model.Type == "ROLE")
+        {
+            <div class="form-group">
+                <label for="Type">Type*:</label>
+                <select class="form-control" id="Type" name="Type" asp-for="Type" required readonly>
+                    <option value="ROLE" selected="@(Model.Type == "ROLE")">Role Names</option>
+                </select>
+                <div class="invalid-feedback">Please select a Type.</div>
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label for="Type">Type*:</label>
+                <select class="form-control" id="Type" name="Type" asp-for="Type" required>
+                    <option value="PAGE_LINK" selected="@(Model.Type == "PAGE_LINK")">Page Links</option>
+                    <option value="ROLE" selected="@(Model.Type == "ROLE")">Role Names</option>
+                    <option value="CONTACT_TYPE" selected="@(Model.Type == "CONTACT_TYPE")">Contact Type</option>
+                    <option value="POST_CATEGORY" selected="@(Model.Type == "POST_CATEGORY")">Post Category</option>
+                </select>
+                <div class="invalid-feedback">Please select a Type.</div>
+            </div>
+        }
+
+        <!-- Value -->
+        @if (Model.Type == "ROLE")
+        {
+            <div class="form-group">
+                <label for="Value">Value*:</label>
+                <input type="text" class="form-control" id="Value" name="Value" asp-for="Value" required value="@Model.Value" readonly>
+                <div class="invalid-feedback">Please enter the Value.</div>
+            </div>
+        }
+        else
+        {
+            <div class="form-group" >
+                <label for="Value">Value*:</label>
+                <input type="text" class="form-control" id="Value" name="Value" asp-for="Value" required value="@Model.Value">
+                <div class="invalid-feedback">Please enter the Value.</div>
+            </div>
+        }
+        
+        <!-- Description -->
+        <div class="form-group">
+            <label for="Description">Description:</label>
+            <textarea class="form-control" id="Description" name="Description" asp-for="Description" value="@Model.Description"></textarea>
+        </div>
+        <br />
+        <!-- Button submit -->
+        <button type="submit" class="btn btn-primary" id="btnSubmit">Update Setting</button>
+    </form>
+</div>
+@Html.Partial("_ConfirmPartial", confirmMessage)

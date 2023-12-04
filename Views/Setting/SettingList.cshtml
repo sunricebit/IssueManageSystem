@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Setting List";
+    Pagination pagination = ViewBag.Pagination;
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="mt-4">Settings List</h1>
+        <div>
+            <a class="btn btn-primary" asp-controller="Setting" asp-action="AddSetting">
+                <i class="fas fa-plus"></i>
+                Add New Setting
+            </a>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Settings Table
+        </div>
+        <div class="card-body">
+            @{
+                if (ViewBag.SettingList != null)
+                {
+                    <table class="table table-bordered" id="sortable-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable(0)" class="sortable">Id</th>
+                                <th onclick="sortTable(1)" class="sortable">Type</th>
+                                <th onclick="sortTable(2)" class="sortable">Value</th>
+                                <th class="sortable">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var setting in ViewBag.SettingList)
+                            {
+                                <tr>
+                                    <td>@setting.Id</td>
+                                    <td>@setting.Type</td>
+                                    <td>@setting.Value</td>
+                                    <td>
+                                        <a asp-action="SettingDetail" asp-route-id="@setting.Id" asp-controller="Setting" class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No settings available.</p>
+                }
+            }
+            @Html.Partial("_PaginationPartial", pagination)
+        </div>
+    </div>
+</div>

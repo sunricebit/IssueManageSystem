@@ -1,0 +1,69 @@
+﻿@model IMS.ViewModels.Validation.SettingViewModel
+@{
+    ViewData["Title"] = "Add Setting";
+    string confirmMessage = "Are you want to add this setting ?";
+}
+<div class="container mt-5">
+    <h2>Add Setting</h2>
+
+    <!-- Form để thêm Setting -->
+    <form asp-action="AddSetting" method="post" class="needs-validation" novalidate id="formSubmit">
+        <!-- Validation Summary -->
+        @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success">
+                <ul>
+                <li>@ViewBag.SuccessMessage</li>
+            </ul>
+        </div>
+        }
+        @if (ViewBag.ErrorMessage != null){
+            <div class="alert alert-danger">
+                <ul>
+                    <li>@ViewBag.ErrorMessage</li>
+                </ul>
+            </div>
+        }
+
+        <!-- Type -->
+        <div class="form-group">
+            <label for="Type">Type*:</label>
+            <select class="form-control" id="Type" name="Type" asp-for="Type" required>
+                <option value="PAGE_LINK">Page Links</option>
+                <option value = "ROLE">Role Names</option>
+                <option value="CONTACT_TYPE">Contact Type</option>
+                <option value="POST_CATEGORY">Post Category</option>
+            </select>
+            <div class="invalid-feedback">Please select a Type.</div>
+        </div>
+
+        <!-- Value -->
+        <div class="form-group">
+            <label for="Value">Value:</label>
+            <input type="text" class="form-control" id="Value" name="Value" asp-for="Value" required>
+            <div class="invalid-feedback">Please enter the Value.</div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+            <label for="Description">Description:</label>
+            <textarea class="form-control" id="Description" name="Description" asp-for="Description"></textarea>
+        </div>
+        <br />
+        <!-- Button submit -->
+        <button type="submit" class="btn btn-primary" id="btnSubmit">Add Setting</button>
+    </form>
+</div>
+@Html.Partial("_ConfirmPartial", confirmMessage)
