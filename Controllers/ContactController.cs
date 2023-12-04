@@ -72,8 +72,9 @@ namespace IMS.Controllers
         [Route("/send-email")]
         public IActionResult sendMail(int id)
         {
-            ContactHandling contactHandling = _context.ContactHandlings.SingleOrDefault(n => n.Id == id);
-            _mailService.SendMailContact(contactHandling.Contact.Email,contactHandling.Note);
+           // ContactHandling contactHandling = _context.ContactHandlings.SingleOrDefault(n => n.Id == id);
+           // _mailService.SendMailContact(contactHandling.Contact.Email,contactHandling.Note);
+
             return RedirectToAction("Details", "Contact", new { id = contactHandling.ContactId });
         }
 
