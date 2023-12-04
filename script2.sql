@@ -134,6 +134,7 @@ CREATE TABLE `Message` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Content` VARCHAR(100) NOT NULL,
     `ContactId` INTEGER NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `Message_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
@@ -149,7 +150,7 @@ CREATE TABLE `Milestone` (
     `ClassId` INTEGER NULL,
     `AssignmentId` INTEGER NULL,
 
-    INDEX `Milestone_AssignmentId_idx`(`AssignmentId`),
+    INDEX `Milestone_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
