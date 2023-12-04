@@ -18,10 +18,9 @@ namespace IMS.Models
 
         public virtual DbSet<Contact> Contacts { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
-        public virtual DbSet<PrismaMigration> PrismaMigrations { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
-
+          
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -36,8 +35,9 @@ namespace IMS.Models
             {
                 entity.ToTable("Contact", "IMS");
 
-                entity.HasIndex(e => e.Email, "Contact_Email_key")
-                    .IsUnique();
+                entity.HasIndex(e => e.ContactTypeId, "Contact_ContactTypeId_fkey");
+
+                entity.HasIndex(e => e.Id, "Contact_Id_idx");
 
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime(3)")
@@ -55,12 +55,20 @@ namespace IMS.Models
 
                 entity.Property(e => e.Phone).HasMaxLength(15);
 
-                entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
+                entity.Property(e => e.Reason).HasMaxLength(400);
+
+                entity.HasOne(d => d.ContactType)
+                    .WithMany(p => p.Contacts)
+                    .HasForeignKey(d => d.ContactTypeId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("Contact_ContactTypeId_fkey");
             });
 
             modelBuilder.Entity<Post>(entity =>
             {
                 entity.ToTable("Post", "IMS");
+
+                entity.HasIndex(e => e.CategoryId, "Post_CategoryId_fkey");
 
                 entity.HasIndex(e => e.UserId, "Post_UserId_fkey");
 
@@ -76,47 +84,17 @@ namespace IMS.Models
 
                 entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
 
+                entity.HasOne(d => d.Category)
+                    .WithMany(p => p.Posts)
+                    .HasForeignKey(d => d.CategoryId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("Post_CategoryId_fkey");
+
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Posts)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("Post_UserId_fkey");
-            });
-
-            modelBuilder.Entity<PrismaMigration>(entity =>
-            {
-                entity.ToTable("_prisma_migrations", "IMS");
-
-                entity.Property(e => e.Id)
-                    .HasMaxLength(36)
-                    .HasColumnName("id");
-
-                entity.Property(e => e.AppliedStepsCount).HasColumnName("applied_steps_count");
-
-                entity.Property(e => e.Checksum)
-                    .HasMaxLength(64)
-                    .HasColumnName("checksum");
-
-                entity.Property(e => e.FinishedAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("finished_at");
-
-                entity.Property(e => e.Logs)
-                    .HasColumnType("text")
-                    .HasColumnName("logs");
-
-                entity.Property(e => e.MigrationName)
-                    .HasMaxLength(255)
-                    .HasColumnName("migration_name");
-
-                entity.Property(e => e.RolledBackAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("rolled_back_at");
-
-                entity.Property(e => e.StartedAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("started_at")
-                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
             });
 
             modelBuilder.Entity<Setting>(entity =>
@@ -129,6 +107,8 @@ namespace IMS.Models
 
                 entity.HasIndex(e => new { e.Type, e.Value }, "Setting_Type_Value_key")
                     .IsUnique();
+
+                entity.Property(e => e.Description).HasMaxLength(400);
 
                 entity.Property(e => e.Type).HasMaxLength(20);
 
@@ -155,6 +135,8 @@ namespace IMS.Models
                 entity.Property(e => e.ConfirmToken).HasMaxLength(64);
 
                 entity.Property(e => e.Email).HasMaxLength(100);
+
+                entity.Property(e => e.LstAccessTime).HasColumnType("datetime(3)");
 
                 entity.Property(e => e.Name).HasMaxLength(50);
 

@@ -1,3 +1,4 @@
+﻿
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
@@ -10,6 +11,7 @@
     <PackageReference Include="ClosedXML" Version="0.102.1" />
     <PackageReference Include="Firebase.Auth" Version="1.0.0" />
     <PackageReference Include="FirebaseStorage.net" Version="1.0.3" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="NGitLab" Version="6.43.1" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
@@ -34,8 +36,10 @@
     <Folder Include="Services\" />
     <Folder Include="ViewModels\Auth\" />
     <Folder Include="Views\Home\" />
-    <Folder Include="Views\Auth\" />
     <Folder Include="wwwroot\assets\" />
+    <Folder Include="Views\Auth\" />
     <Folder Include="Extensions\" />
+    <Folder Include="wwwroot\img\" />
+    <Folder Include="wwwroot\Avatars\" />
   </ItemGroup>
 </Project>

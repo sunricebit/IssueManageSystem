@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<IMSContext>(options => new IMSContext());
 builder.Services.AddSingleton<IHashService, HashService>();
 builder.Services.AddSingleton<IMailService, MailService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<SettingDAO>();
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = "SessionCookie";
@@ -39,6 +40,11 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
-
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Landing}/{action=Index}/{id?}");
+});
 app.Run();
 

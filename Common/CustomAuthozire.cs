@@ -18,11 +18,7 @@ namespace IMS.Common
             User? user = context.HttpContext.Session.GetUser();
             if (user == null)
             {
-                context.Result = new RedirectToRouteResult(new RouteValueDictionary(new
-                {
-                    controller = "Auth",
-                    action = "SignIn"
-                }));
+                context.Result = new RedirectToRouteResult("Auth", "SignIn", null);
                 return;
             }
 
