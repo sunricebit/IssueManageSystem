@@ -163,7 +163,8 @@ namespace IMS.Controllers
                 userView.Avatar = "https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fdefault_avatar.jpg?alt=media&token=c9ec5062-d46b-4009-a04a-4fbeb5532005";
             }
             userView.Status = true;
-            userView.Password = _mailService.SendRandomPassword(userView.Email);
+            userView.Password = _hashService.HashPassword("123456789");
+           // userView.Password = _mailService.SendRandomPassword(userView.Email);
             Models.User user = new Models.User()
             {
                 RoleId = userView.RoleId,
@@ -312,6 +313,7 @@ namespace IMS.Controllers
 
         public async Task<IActionResult> Update(UserViewModel? userView, IFormFile avatarFile)
         {
+            
             if (avatarFile != null && avatarFile.Length > 0)
             {
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
@@ -329,6 +331,7 @@ namespace IMS.Controllers
                 userView.Avatar = downloadLink;
             }
 
+          
 
             Models.User user = userService.GetUser(userView.Id);
             user.Email = userView.Email;
