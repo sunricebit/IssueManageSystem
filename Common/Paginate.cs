@@ -1,19 +1,15 @@
-﻿using System.Linq;
+﻿using Microsoft.EntityFrameworkCore.Query.Internal;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace IMS.Common
 {
-    
     public class Paginate<T>
     {
         private readonly IMSContext _context = new IMSContext();
         private int pageNumber;
         private int pageSize;
         private int numberOfPage;
-
-            int pageNumber;
-            int pageSize;
-            int numberOfPage;
 
         public Paginate(int pageNumber, int pageSize)
         {
@@ -54,27 +50,62 @@ namespace IMS.Common
                     if (propertyInfo != null)
                     {
                         var property = Expression.Property(parameter, filter.Key);
-                        var value = Expression.Constant(filter.Value);
-                        var equality = Expression.Equal(property, value);
-                        var lambda = Expression.Lambda<Func<T, bool>>(equality, parameter);
 
-                        filterExpressions.Add(lambda);
+                        if (propertyInfo.PropertyType.IsGenericType &&
+                            propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                        {
+                            // Xử lý kiểu nullable
+                            var hasValueProperty = Expression.Property(property, "HasValue");
+                            var equality = Expression.Equal(hasValueProperty, Expression.Constant(true));
+
+                            // Tạo một biểu thức kiểm tra giá trị nếu filter.Value không phải là null
+                            var filterValue = Expression.Constant(filter.Value);
+                            var valueProperty = Expression.Property(property, "Value");
+                            var valueEquality = Expression.Equal(valueProperty, filterValue);
+
+                            // Kết hợp cả hai điều kiện với AND
+                            var combinedEquality = Expression.AndAlso(equality, valueEquality);
+
+                            var lambda = Expression.Lambda<Func<T, bool>>(combinedEquality, parameter);
+
+                            filterExpressions.Add(lambda);
+                        }
+                        else
+                        {
+                            // Xử lý kiểu không nullable
+                            var value = Expression.Constant(filter.Value);
+                            var equality = Expression.Equal(property, value);
+                            var lambda = Expression.Lambda<Func<T, bool>>(equality, parameter);
+
+                            filterExpressions.Add(lambda);
+                        }
+
+                        if (query == null)
+                        {
+                            query = filterExpressions.Count == 0 ? null :
+                            _context.Set<T>().Where((Expression<Func<T, bool>>)filterExpressions.Aggregate(Expression.AndAlso));
+                        }
+                        else
+                        {
+                            query = filterExpressions.Count == 0 ? null :
+                            query.Where((Expression<Func<T, bool>>)filterExpressions.Aggregate(Expression.AndAlso));
+                        }
+
+                        filterExpressions.Clear();
                     }
                 }
-
-                query = filterExpressions.Count == 0 ? null :
-                    _context.Set<T>().Where((Expression<Func<T, bool>>)filterExpressions.Aggregate(Expression.AndAlso));
             }
 
             var searchExpressions = new List<Expression>();
             if (searches != null && searches.Any())
             {
                 var parameter = Expression.Parameter(typeof(T), "x");
+                List<IQueryable<T>> queryList = new List<IQueryable<T>>();
 
                 foreach (var search in searches)
                 {
                     var propertyInfo = typeof(T).GetProperty(search.Key);
-
+                    IQueryable<T> subQuery;
                     if (propertyInfo != null)
                     {
                         var property = Expression.Property(parameter, propertyInfo);
@@ -84,19 +115,31 @@ namespace IMS.Common
                         var lambda = Expression.Lambda<Func<T, bool>>(containsExpression, parameter);
 
                         searchExpressions.Add(lambda);
+
+                        if (query == null)
+                        {
+                            subQuery = searchExpressions.Count == 0 ? null :
+                                _context.Set<T>().Where((Expression<Func<T, bool>>)searchExpressions.Aggregate(Expression.AndAlso));
+                        }
+                        else
+                        {
+                            subQuery = searchExpressions.Count == 0 ? query :
+                                query.Where((Expression<Func<T, bool>>)searchExpressions.Aggregate(Expression.AndAlso));
+                        }
+                        queryList.Add(subQuery);
+                        searchExpressions.Clear();
                     }
                 }
 
-                if (query == null)
+                if (queryList.FirstOrDefault() != null)
                 {
-                    query = searchExpressions.Count == 0 ? null :
-                        _context.Set<T>().Where((Expression<Func<T, bool>>)searchExpressions.Aggregate(Expression.AndAlso));
+                    query = queryList.FirstOrDefault();
+                    foreach (var subQuery in queryList.Skip(1))
+                    {
+                        query = query.Union(query);
+                    }
                 }
-                else
-                {
-                    query = searchExpressions.Count == 0 ? query :
-                        query.Where((Expression<Func<T, bool>>)searchExpressions.Aggregate(Expression.AndAlso));
-                }
+
             }
 
             if (query == null)
@@ -185,5 +228,6 @@ namespace IMS.Common
         }
     }
 }
+
 
 

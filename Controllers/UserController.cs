@@ -32,73 +32,54 @@ namespace IMS.Controllers
             _hashService = hashService;
         }
         [HttpGet]
-        public IActionResult Index(int? pageNumber)
+        public IActionResult Index(int? pageNumber, bool? filterbyStatus, string? searchByValue, string? filterbyRole)
         {
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
             Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
-            //     ViewBag.CreateSuccessMessage = TempData["CreateSuccessMessage"] as string;
-            var users = userService.GetAllUsers();
-            ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
+            Dictionary<string, dynamic> filter = new Dictionary<string, dynamic>(), search = new Dictionary<string, dynamic>();
+
+
+            if (filterbyStatus != null && !filterbyStatus.Equals("All"))
+            {
+                filter.Add("Status", filterbyStatus);
+            }
+
+            if (!string.IsNullOrEmpty(filterbyRole) && !filterbyRole.Equals("ALL"))
+            {
+                filter.Add("RoleId", Int32.Parse(filterbyRole));
+            }
+
+            if (!string.IsNullOrEmpty(searchByValue))
+            {
+                search.Add("Name", searchByValue);
+                search.Add("Email", searchByValue);
+                search.Add("Phone", searchByValue);
+            }
+
+
+            ViewBag.StatusValue = filterbyStatus;
+            ViewBag.SearchValue = searchByValue;
+
+            List<Models.User> users = new List<Models.User>();
+            foreach (var user in paginate.GetListPaginate<Models.User>(filter, search))
+            {
+                users.Add(userService.GetUser(user.Id));
+            }
+
+            ViewBag.UserList = users;
             ViewBag.Action = "UserList";
+            ViewBag.Pagination = paginate.GetPagination();
+
             var role = userService.GetRole();
             ViewBag.Roles = role;
-            ViewBag.Pagination = paginate.GetPagination();
 
 
             return View();
         }
-        [HttpGet("Search")]
-        public IActionResult Search(int? pageNumber, string keyword)
-        {
-            int tempPageNumber = pageNumber ?? 1;
-            int tempPageSize = 10;
-            Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
-            var role = userService.GetRole();
-            ViewBag.Roles = role;
-            ViewBag.Pagination = paginate.GetPagination();
-            var users = userService.SearchUsers(keyword);
-            ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
-            return View("Index");
-        }
-        [HttpGet("FilterRole")]
-        public IActionResult FilterByRole(int? pageNumber, int roleid)
-        {
-            int tempPageNumber = pageNumber ?? 1;
-            int tempPageSize = 10;
-            Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
-            var role = userService.GetRole();
-            ViewBag.Roles = role;
-            ViewBag.Pagination = paginate.GetPagination();
 
-            var users = userService.FilterByRole(roleid);
-            ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
-            return View("Index");
 
-        }
-        [HttpGet("FilterStatus")]
-        public IActionResult FilterByStatus(int? pageNumber, string status)
-        {
-            int tempPageNumber = pageNumber ?? 1;
-            int tempPageSize = 10;
-            Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
-            var role = userService.GetRole();
-            ViewBag.Roles = role;
-            bool status2;
-            ViewBag.Pagination = paginate.GetPagination();
-            if (status == "Active")
-            {
-                status2 = true;
-            }
-            else
-            {
-                status2 = false;
-            }
-            var users = userService.FilterByStatus(status2);
-            ViewBag.UserList = paginate.GetListPaginate<Models.User>(users);
-            return View("Index");
 
-        }
 
         [HttpGet("Details/{id}")]
         public IActionResult Details(int id)
@@ -112,7 +93,7 @@ namespace IMS.Controllers
                 return NotFound();
             }
             UserViewModel userViewModel = new UserViewModel()
-                {
+            {
                 Id = user.Id,
                 RoleId = user.RoleId,
                 Name = user.Name,
@@ -156,7 +137,7 @@ namespace IMS.Controllers
                 userView.Avatar = downloadLink;
             }
 
-            
+
 
             if (userView.Avatar == null)
             {
@@ -164,7 +145,7 @@ namespace IMS.Controllers
             }
             userView.Status = true;
             userView.Password = _hashService.HashPassword("123456789");
-           // userView.Password = _mailService.SendRandomPassword(userView.Email);
+            // userView.Password = _mailService.SendRandomPassword(userView.Email);
             Models.User user = new Models.User()
             {
                 RoleId = userView.RoleId,
@@ -236,6 +217,7 @@ namespace IMS.Controllers
                         var Role = worksheet.Cell(i, 4).Value.ToString();
                         var Phone = worksheet.Cell(i, 5).Value.ToString();
                         var Address = worksheet.Cell(i, 6).Value.ToString();
+                        var Status = worksheet.Cell(i, 7).Value.ToString();
                         var existingUser = userService.GetUserByEmail(email);
                         if (id == "Id") continue;
                         if (existingUser != null)
@@ -246,7 +228,7 @@ namespace IMS.Controllers
                             existingUser.RoleId = roleid;
                             existingUser.Phone = Phone;
                             existingUser.Address = Address;
-
+                            existingUser.Status = bool.Parse(Status);
                             userService.UpdateUser(existingUser);
                         }
                         else
@@ -313,7 +295,7 @@ namespace IMS.Controllers
 
         public async Task<IActionResult> Update(UserViewModel? userView, IFormFile avatarFile)
         {
-            
+
             if (avatarFile != null && avatarFile.Length > 0)
             {
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
@@ -331,7 +313,7 @@ namespace IMS.Controllers
                 userView.Avatar = downloadLink;
             }
 
-          
+
 
             Models.User user = userService.GetUser(userView.Id);
             user.Email = userView.Email;
@@ -340,17 +322,17 @@ namespace IMS.Controllers
             user.Phone = userView.Phone;
             user.Address = userView.Address;
             user.Status = userView.Status;
-            
-           if (userView.Avatar!= null)
+
+            if (userView.Avatar != null)
             {
                 user.Avatar = userView.Avatar;
             }
             user.Gender = userView.Gender;
-            
+
             userService.UpdateUser(user);
             //   ViewBag.SuccessMessage = "Update user success!";
 
-           
+
             return RedirectToAction("Index");
         }
 
