@@ -121,7 +121,8 @@ namespace IMS.Controllers
                 Address = user.Address,
                 Gender = user.Gender,
                 Avatar = user.Avatar,
-                Status = user.Status
+                Status = user.Status,
+                Phone = user.Phone
 
             };
 
@@ -335,7 +336,11 @@ namespace IMS.Controllers
             user.Phone = userView.Phone;
             user.Address = userView.Address;
             user.Status = userView.Status;
-            user.Avatar = userView.Avatar;
+            
+           if (userView.Avatar!= null)
+            {
+                user.Avatar = userView.Avatar;
+            }
             user.Gender = userView.Gender;
             
             userService.UpdateUser(user);

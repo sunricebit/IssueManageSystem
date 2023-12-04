@@ -68,11 +68,11 @@
                                     </dt>
                                     <dd class="col-sm-9">
                                         <div class="form-check form-check-inline">
-                                            <input type="radio" name="gender" class="form-check-input" value="Male" @(Model.Gender == true ? "checked" : "") />
+                                            <input type="radio" name="gender" class="form-check-input" value="true" @(Model.Gender == true ? "checked" : "") />
                                             <label class="form-check-label" for="male">Male</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input type="radio" name="gender" class="form-check-input" value="Female" @(Model.Gender == false ? "checked" : "") />
+                                            <input type="radio" name="gender" class="form-check-input" value="false" @(Model.Gender == false ? "checked" : "") />
                                             <label class="form-check-label" for="female">Female</label>
                                         </div>
                                     </dd>
@@ -81,7 +81,7 @@
                                         <i class="bi bi-person-badge"></i> Role
                                     </dt>
                                     <dd class="col-sm-9">
-                                        <select name="role" class="form-control">
+                                        <select id="roleDropdown" name="role" class="form-control">
                                             @foreach (var role in ViewBag.Roles)
                                             {
                                                 <option value="@role.Id">@role.Value</option>
@@ -94,8 +94,8 @@
                                     </dt>
                                     <dd class="col-sm-9">
                                         <div class="form-check form-switch">
+                                            <input type="hidden" name="Status" value="false" />
                                             <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" @(Model.Status.HasValue && Model.Status.Value ? "checked" : "") onchange="changeStatus()" />
-                                            
                                         </div>
                                     </dd>
                                 </dl>
@@ -115,28 +115,30 @@
         function changeStatus() {
             var statusToggle = document.getElementById('statusToggle');
             var statusLabel = document.querySelector('.form-check-label');
-            statusToggle.checked = !statusToggle.checked;
-            statusLabel.innerHTML = statusToggle.checked ? '<span class="btn btn-success btn-sm">Active</span>' : '<span class="btn btn-secondary btn-sm">Inactive</span>';
+
+            
+            statusToggle.value = statusToggle.checked ? "true" : "false";
+
+           
+       
         }
     </script>
-    <script type="text/javascript">
-        function changeStatus(newStatus) {
-            document.getElementById('newStatus').value = newStatus;
-            
-            var activeBtn = document.querySelector('.btn-success');
-            var inactiveBtn = document.querySelector('.btn-secondary');
-            if (newStatus) {
-                activeBtn.classList.remove('btn-secondary');
-                activeBtn.classList.add('btn-success');
-                inactiveBtn.classList.remove('btn-success');
-                inactiveBtn.classList.add('btn-secondary');
-            } else {
-                activeBtn.classList.remove('btn-success');
-                activeBtn.classList.add('btn-secondary');
-                inactiveBtn.classList.remove('btn-secondary');
-                inactiveBtn.classList.add('btn-success');
-            }
+    <script>
+        function prepareFormForSubmission() {
+            var roleDropdown = document.getElementById('roleDropdown');
+            var selectedRoleId = roleDropdown.value;
+
+            var hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'selectedRoleId';
+            hiddenInput.value = selectedRoleId;
+
+            var form = document.forms[0];
+            form.appendChild(hiddenInput);
         }
+
+        // Call prepareFormForSubmission before submitting the form
+        document.forms[0].addEventListener('submit', prepareFormForSubmission);
     </script>
     <script>
         function displaySelectedImage(event, elementId) {
