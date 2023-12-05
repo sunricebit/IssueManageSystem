@@ -298,6 +298,8 @@ namespace IMS.Models
                     .HasConstraintName("Permission_RoleId_fkey");
             });
 
+        
+
             modelBuilder.Entity<Post>(entity =>
             {
                 entity.ToTable("Post", "IMS");
