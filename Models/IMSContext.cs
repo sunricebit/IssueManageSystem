@@ -36,7 +36,7 @@ namespace IMS.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseMySQL("server=localhost;uid=root;pwd=123456789;database=IMS");
+                optionsBuilder.UseMySQL("server=localhost;uid=root;pwd=123456;database=IMS");
             }
         }
 
@@ -280,19 +280,20 @@ namespace IMS.Models
             {
                 entity.ToTable("Permission", "IMS");
 
-                entity.HasIndex(e => new { e.RoleId, e.Page }, "Permission_RoleId_Page_idx");
+                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_Page_idx");
 
-                entity.HasIndex(e => new { e.RoleId, e.Page }, "Permission_RoleId_Page_key")
+                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_Page_key")
                     .IsUnique();
 
-                entity.HasIndex(e => e.RoleId, "Permission_RoleId_key")
-                    .IsUnique();
-
-                entity.Property(e => e.Page).HasMaxLength(191);
+                entity.HasOne(d => d.Page)
+                    .WithMany(p => p.PermissionPages)
+                    .HasForeignKey(d => d.PageId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Permission_PageId_fkey");
 
                 entity.HasOne(d => d.Role)
-                    .WithOne(p => p.Permission)
-                    .HasForeignKey<Permission>(d => d.RoleId)
+                    .WithMany(p => p.PermissionRoles)
+                    .HasForeignKey(d => d.RoleId)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("Permission_RoleId_fkey");
             });
@@ -419,6 +420,8 @@ namespace IMS.Models
             modelBuilder.Entity<Setting>(entity =>
             {
                 entity.ToTable("Setting", "IMS");
+
+                entity.HasIndex(e => e.Id, "Setting_Id_idx");
 
                 entity.HasIndex(e => new { e.Type, e.Value }, "Setting_Type_Value_idx");
 

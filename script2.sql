@@ -1,4 +1,4 @@
-﻿DROP SCHEMA IF EXISTS IMS;
+DROP SCHEMA IF EXISTS IMS;
 
 CREATE DATABASE IMS;
 
@@ -158,15 +158,14 @@ CREATE TABLE `Milestone` (
 CREATE TABLE `Permission` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `RoleId` INTEGER NOT NULL,
-    `Page` VARCHAR(191) NOT NULL,
+    `PageId` INTEGER NOT NULL,
     `CanCreate` BOOLEAN NOT NULL DEFAULT false,
     `CanRead` BOOLEAN NOT NULL DEFAULT false,
     `CanUpdate` BOOLEAN NOT NULL DEFAULT false,
     `CanDelete` BOOLEAN NOT NULL DEFAULT false,
 
-    UNIQUE INDEX `Permission_RoleId_key`(`RoleId`),
-    INDEX `Permission_RoleId_Page_idx`(`RoleId`, `Page`),
-    UNIQUE INDEX `Permission_RoleId_Page_key`(`RoleId`, `Page`),
+    INDEX `Permission_RoleId_Page_idx`(`RoleId`, `PageId`),
+    UNIQUE INDEX `Permission_RoleId_Page_key`(`RoleId`, `PageId`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -269,6 +268,9 @@ ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ClassId_fkey` FOREIGN KEY (`Cl
 ALTER TABLE `Permission` ADD CONSTRAINT `Permission_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Permission` ADD CONSTRAINT `Permission_PageId_fkey` FOREIGN KEY (`PageId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Project` ADD CONSTRAINT `Project_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -296,3 +298,9 @@ VALUES ('ROLE', 'Admin'),
        ('CONTACT_TYPE', 'Financial Aid and Scholarships'),
        ('CONTACT_TYPE', 'Faculty and Research'),
        ('CONTACT_TYPE', 'International Students');
+       
+insert into `IMS`.`Permission` (`RoleId`, `PageId` ,`CanRead`)
+value ('1','18',1),
+('2','18',1),
+('3','18',1),
+('4','18',1);
