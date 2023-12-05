@@ -30,7 +30,7 @@ namespace IMS.Controllers
             var totalPage = (int)Math.Ceiling((double)itemCount / pageSize);
             var data = _context.Contacts.Include(s=>s.ContactType).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
             ViewBag.totalPage = totalPage;
-            ViewBag.pageNum = pageIndex;         
+            ViewBag.pageNum = pageIndex;          
             return View(data);
         }
 
