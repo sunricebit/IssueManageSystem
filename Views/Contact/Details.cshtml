@@ -14,10 +14,10 @@
         <dd>@Model.Email</dd>
         <dt>Phone</dt>
         <dd>@Model.Phone</dd>
-        <dt>Message</dt>
-        <dd>@Model.Message</dd>
+        <dt>Created Date</dt>
+        <dd>@Model.CreatedAt.ToString("dd/MM/yyyy")</dd>
         <dd><a href="#" data-toggle="modal" data-target="#createContactNote">Create</a></dd>
-        @if(Model.ContactHandlings.Count > 0)
+        @if (Model.Messages.Count > 0)
         {
             <dt>History</dt>
             <dd>
@@ -25,18 +25,18 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Description</th>
+                            <th>Content</th>
                             <th>Date</th>
                             <th colspan="2">Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (ContactHandling item in Model.ContactHandlings)
+                        @foreach (Message item in Model.Messages)
                         {
                             <tr>
                                 <td>@item.Id</td>
-                                <td>@item.Description</td>
-                                <td>@item.CreatedDate.ToString("dd/MM/yyyy hh:mm")</td>
+                                <td>@item.Content</td>
+                                <td>@item.CreatedAt.ToString("dd/MM/yyyy hh:mm")</td>
                                 <td><a href="#" data-toggle="modal" data-target="#UpdateNote@(item.Id)">Update</a></td>
                                 <td><a href="/send-email?id=@(item.Id)">Send Email</a></td>
                             </tr>
@@ -54,7 +54,7 @@
                                                 <div class="form-group">
                                                     <input type="hidden" name="id" value="@item.Id" />
                                                     <label for="recipient-name" class="col-form-label">Note</label>
-                                                    <textarea name="note" required>@item.Note</textarea>
+                                                    <textarea name="note" required>@item.Content</textarea>
                                                     <br>
                                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                                     <button type="submit" class="btn btn-primary">Update Note</button>

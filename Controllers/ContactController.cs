@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using IMS.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMS.Controllers
@@ -40,14 +41,14 @@ namespace IMS.Controllers
         [Route("/detail")]
         public IActionResult Details(int id)
         {
-            Contact contact = _context.Contacts.Include(n => n.ContactHandlings).SingleOrDefault(n => n.Id == id);
+            Contact contact = _context.Contacts.Include(n => n.Messages).SingleOrDefault(n => n.Id == id);
             return View(contact);
         }
 
         [Route("/add-note")]
         public IActionResult AddNote(int contactID,string note)
         {
-            Contact contact = _context.Contacts.Include(n => n.ContactHandlings).SingleOrDefault(n => n.Id == contactID);
+            Contact contact = _context.Contacts.Include(n => n.Messages).SingleOrDefault(n => n.Id == contactID);
             ContactHandling contactHandling = new ContactHandling()
             {
                 Contact = contact,
@@ -63,8 +64,8 @@ namespace IMS.Controllers
         [Route("/update-note")]
         public IActionResult UpdateNote(int id, string note)
         {
-            ContactHandling contactHandling = _context.ContactHandlings.SingleOrDefault(n => n.Id == id);
-            contactHandling.Note = note;
+            Message contactHandling = _context.Messages.SingleOrDefault(n => n.Id == id);
+            contactHandling.Content = note;
             _context.SaveChanges();
             return RedirectToAction("Details", "Contact", new { id = contactHandling.ContactId });
         }
@@ -72,8 +73,8 @@ namespace IMS.Controllers
         [Route("/send-email")]
         public IActionResult sendMail(int id)
         {
-           // ContactHandling contactHandling = _context.ContactHandlings.SingleOrDefault(n => n.Id == id);
-           // _mailService.SendMailContact(contactHandling.Contact.Email,contactHandling.Note);
+            Message contactHandling = _context.Messages.Include(n => n.Contact).SingleOrDefault(n => n.Id == id);
+            _mailService.SendMailContact(contactHandling.Contact.Email,contactHandling.Content);
 
             return RedirectToAction("Details", "Contact", new { id = contactHandling.ContactId });
         }
