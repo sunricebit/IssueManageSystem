@@ -15,7 +15,7 @@ namespace IMS.Controllers
         }
 
         [Route("Manage")]
-        //[CustomAuthorize(permissionDAO)]
+        [CustomAuthorize]
         public IActionResult PermissionManage()
         {
             List<PermissionViewModel> permissionList = _permissionDAO.GetAllPermission();
@@ -29,6 +29,7 @@ namespace IMS.Controllers
         }
 
         [Route("Update"), HttpPost]
+        [CustomAuthorize]
         public IActionResult UpdatePermission([FromBody]List<PermissionViewModel> permissionViewModels)
         {
             _permissionDAO.UpdatePermission(permissionViewModels);
