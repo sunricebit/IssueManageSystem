@@ -12,3 +12,4 @@
         $('#confirmationModal').modal('hide');
     });
 });
+

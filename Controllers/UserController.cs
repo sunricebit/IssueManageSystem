@@ -1,7 +1,15 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.VariantTypes;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Firebase.Auth;
+using Firebase.Storage;
+using IMS.Models;
+using IMS.ViewModels.User;
 using Microsoft.AspNetCore.Mvc;
 using System.Configuration;
 using System.Data;
+using System.IO;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace IMS.Controllers
 {
@@ -10,8 +18,8 @@ namespace IMS.Controllers
     {
         private static string ApiKey = "AIzaSyBjstBnMJX7h_NlJ5-vqcQE0V-Ldaztnk8";
         private static string Bucket = "imsmanagement-35781.appspot.com";
-        private static string AuthEmail = "dinhthenam10102@gmail.com";
-        private static string AuthPassword = "mid04052002";
+        private static string AuthEmail = "abc@gmail.com";
+        private static string AuthPassword = "123456";
         private readonly IUserService userService;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _env;
         private readonly IMailService _mailService;
@@ -24,48 +32,169 @@ namespace IMS.Controllers
             _hashService = hashService;
         }
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Index(int? pageNumber, bool? filterbyStatus, string? searchByValue, string? filterbyRole)
         {
-            var users = userService.GetAllUsers();
-            return View(users);
+            int tempPageNumber = pageNumber ?? 1;
+            int tempPageSize = 10;
+            Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
+            Dictionary<string, dynamic> filter = new Dictionary<string, dynamic>(), search = new Dictionary<string, dynamic>();
+
+
+            if (filterbyStatus != null && !filterbyStatus.Equals("All"))
+            {
+                filter.Add("Status", filterbyStatus);
+            }
+
+            if (!string.IsNullOrEmpty(filterbyRole) && !filterbyRole.Equals("ALL"))
+            {
+                filter.Add("RoleId", Int32.Parse(filterbyRole));
+            }
+
+            if (!string.IsNullOrEmpty(searchByValue))
+            {
+                search.Add("Name", searchByValue);
+                search.Add("Email", searchByValue);
+                search.Add("Phone", searchByValue);
+            }
+
+
+            ViewBag.StatusValue = filterbyStatus;
+            ViewBag.SearchValue = searchByValue;
+
+            List<Models.User> users = new List<Models.User>();
+            foreach (var user in paginate.GetListPaginate<Models.User>(filter, search))
+            {
+                users.Add(userService.GetUser(user.Id));
+            }
+
+            ViewBag.UserList = users;
+            ViewBag.Action = "UserList";
+            ViewBag.Pagination = paginate.GetPagination();
+
+            var role = userService.GetRole();
+            ViewBag.Roles = role;
+
+
+            return View();
         }
+
+
+
+
         [HttpGet("Details/{id}")]
         public IActionResult Details(int id)
         {
             var user = userService.GetUser(id);
+            var role = userService.GetRole();
+            ViewBag.Roles = role;
 
             if (user == null)
             {
                 return NotFound();
             }
+            UserViewModel userViewModel = new UserViewModel()
+            {
+                Id = user.Id,
+                RoleId = user.RoleId,
+                Name = user.Name,
+                Email = user.Email,
+                Password = user.Password,
+                Address = user.Address,
+                Gender = user.Gender,
+                Avatar = user.Avatar,
+                Status = user.Status,
+                Phone = user.Phone
 
-            return View(user);
+            };
+
+            return View(userViewModel);
         }
         [HttpGet("Create")]
         public IActionResult Create()
         {
             var role = userService.GetRole();
-            ViewBag.Roles = role; 
-            return View(new User());
+            ViewBag.Roles = role;
+            return View(new UserViewModel());
         }
         [HttpPost("Create")]
-        public IActionResult Create(User user)
+        public async Task<IActionResult> Create(UserViewModel? userView, IFormFile avatarFile)
         {
-            if (!ModelState.IsValid)
-            {
 
-                user.Password = _mailService.SendRandomPassword(user.Email);
-                userService.AddUser(user);
-                TempData["Message"] = "User created successfully";
-                return RedirectToAction("Index","User");
+            if (avatarFile != null && avatarFile.Length > 0)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Avatars", fileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+
+                    avatarFile.CopyTo(fileStream);
+
+                }
+                var fileStream2 = new FileStream(filePath, FileMode.Open);
+                var downloadLink = await Upload(fileStream2, avatarFile.FileName);
+
+                userView.Avatar = downloadLink;
             }
 
-           
+
+
+            if (userView.Avatar == null)
+            {
+                userView.Avatar = "https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fdefault_avatar.jpg?alt=media&token=c9ec5062-d46b-4009-a04a-4fbeb5532005";
+            }
+            userView.Status = true;
+            userView.Password = _hashService.HashPassword("123456789");
+            // userView.Password = _mailService.SendRandomPassword(userView.Email);
+            Models.User user = new Models.User()
+            {
+                RoleId = userView.RoleId,
+                Name = userView.Name,
+                Email = userView.Email,
+                Password = userView.Password,
+                Address = userView.Address,
+                Gender = userView.Gender,
+                Avatar = userView.Avatar,
+                Status = userView.Status
+            };
+            userService.AddUser(user);
+
             var roles = userService.GetRole();
             ViewBag.Roles = roles;
 
-            return View(user);
+            return RedirectToAction("Index");
         }
+        public async Task<string> Upload(FileStream stream, string filename)
+        {
+            var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
+            var a = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
+            var cancellation = new CancellationTokenSource();
+            var task = new FirebaseStorage(
+                Bucket,
+                new FirebaseStorageOptions
+                {
+                    AuthTokenAsyncFactory = () => Task.FromResult(a.FirebaseToken),
+                    ThrowOnCancel = true
+                }
+                ).Child("User")
+                 .Child(filename)
+                 .PutAsync(stream, cancellation.Token);
+            try
+            {
+                string link = await task;
+                return link;
+
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine("Exception was thrown : {0}", ex);
+                return null;
+            }
+        }
+
+
+
         [HttpPost("Import")]
         public IActionResult Import(IFormFile file)
         {
@@ -73,37 +202,57 @@ namespace IMS.Controllers
             {
                 file.CopyTo(stream);
 
-                
+
                 using (var workbook = new XLWorkbook(stream))
                 {
                     var worksheet = workbook.Worksheet(1);
 
-                    
+
                     for (int i = 2; i <= worksheet.RowsUsed().Count(); i++)
                     {
-                       
+
                         var id = worksheet.Cell(i, 1).Value.ToString();
-                        var name = worksheet.Cell(i, 2).Value.ToString();
-                        var Role = worksheet.Cell(i, 2).Value.ToString();
-                        var Phone = worksheet.Cell(i, 2).Value.ToString();
-                        var Address = worksheet.Cell(i, 2).Value.ToString();
-                        
+                        var email = worksheet.Cell(i, 2).Value.ToString();
+                        var name = worksheet.Cell(i, 3).Value.ToString();
+                        var Role = worksheet.Cell(i, 4).Value.ToString();
+                        var Phone = worksheet.Cell(i, 5).Value.ToString();
+                        var Address = worksheet.Cell(i, 6).Value.ToString();
+                        var Status = worksheet.Cell(i, 7).Value.ToString();
+                        var existingUser = userService.GetUserByEmail(email);
                         if (id == "Id") continue;
-
-                        var user = new User()
+                        if (existingUser != null)
                         {
-                            Id = int.Parse(id),
-                            Name = name,
-                            Phone = Phone,
-                            Address = Address
-                        };
+                            existingUser.Id = int.Parse(id);
+                            existingUser.Name = name;
+                            var roleid = userService.GetRoleId(Role);
+                            existingUser.RoleId = roleid;
+                            existingUser.Phone = Phone;
+                            existingUser.Address = Address;
+                            existingUser.Status = bool.Parse(Status);
+                            userService.UpdateUser(existingUser);
+                        }
+                        else
+                        {
+                            var user = new Models.User()
+                            {
+                                Id = int.Parse(id),
+                                Email = email,
+                                Name = name,
+                                Phone = Phone,
+                                Address = Address,
+                                RoleId = userService.GetRoleId(Role),
+                                Password = _hashService.HashPassword("123456789"),
+                                Gender = true
+                            };
 
-                        userService.AddUser(user);
+
+                            userService.AddUser(user);
+                        }
                     }
                 }
             }
 
-            return Redirect("Index");
+            return RedirectToAction("Index");
         }
         [HttpGet("Export")]
         public IActionResult Export()
@@ -112,21 +261,22 @@ namespace IMS.Controllers
             var filename = "user.xlsx";
             return GenerateExcel(filename, user);
         }
-        private FileResult GenerateExcel(string filename, IEnumerable<User> users)
+        private FileResult GenerateExcel(string filename, IEnumerable<Models.User> users)
         {
             DataTable data = new DataTable("User");
             data.Columns.AddRange(new DataColumn[]
             {
                 new DataColumn("Id"),
+                new DataColumn("Email"),
                 new DataColumn("Name"),
                 new DataColumn("Role"),
                 new DataColumn("Phone"),
                 new DataColumn("Address"),
                 new DataColumn("Status")
             });
-            foreach ( var user in users)
+            foreach (var user in users)
             {
-                data.Rows.Add(user.Id,user.Name,user.Role.Value,user.Phone,user.Address,user.Status);
+                data.Rows.Add(user.Id, user.Email, user.Name, user.Role.Value, user.Phone, user.Address, user.Status);
             }
             using (XLWorkbook wb = new XLWorkbook())
             {
@@ -141,53 +291,59 @@ namespace IMS.Controllers
             }
         }
 
-     
+        [HttpPost]
 
-        [HttpGet("edit/{id}")]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Update(UserViewModel? userView, IFormFile avatarFile)
         {
-            var user = userService.GetUser(id);
-            if (user == null)
+
+            if (avatarFile != null && avatarFile.Length > 0)
             {
-                return NotFound();
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(avatarFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Avatars", fileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+
+                    avatarFile.CopyTo(fileStream);
+
+                }
+                var fileStream2 = new FileStream(filePath, FileMode.Open);
+                var downloadLink = await Upload(fileStream2, avatarFile.FileName);
+
+                userView.Avatar = downloadLink;
             }
 
-            return View(user);
-        }
 
-        [HttpPost("edit/{id}")]
-        [ValidateAntiForgeryToken]
-        public IActionResult Edit(User user)
-        {
-            if (ModelState.IsValid)
+
+            Models.User user = userService.GetUser(userView.Id);
+            user.Email = userView.Email;
+            user.Name = userView.Name;
+            user.RoleId = userView.RoleId;
+            user.Phone = userView.Phone;
+            user.Address = userView.Address;
+            user.Status = userView.Status;
+
+            if (userView.Avatar != null)
             {
-                userService.UpdateUser(user);
-                return RedirectToAction("Index");
+                user.Avatar = userView.Avatar;
             }
+            user.Gender = userView.Gender;
 
-            return View(user);
+            userService.UpdateUser(user);
+            //   ViewBag.SuccessMessage = "Update user success!";
+
+
+            return RedirectToAction("Index");
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpPost("Delete")]
         public IActionResult Delete(int id)
         {
             userService.DeleteUser(id);
             return RedirectToAction("Index");
         }
 
-        [HttpGet("search")]
-        public IActionResult Search(string term)
-        {
-            var users = userService.SearchUsers(term);
-            return View(users);
-        }
 
-        [HttpGet("filter")]
-        public IActionResult Filter(Dictionary<string, object> filters)
-        {
-            var users = userService.FilterUsers(filters);
-            return View(users);
-        }
     }
 
 }

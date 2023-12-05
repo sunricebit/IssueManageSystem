@@ -14,7 +14,6 @@ namespace IMS.Controllers
             _context = context;
         }
         [Route("/userprofile")]
-        [CustomAuthorize()]
         public IActionResult Index([FromQuery] string tab)
         {
             try
@@ -39,7 +38,6 @@ namespace IMS.Controllers
             }
             
         }
-        [CustomAuthorize()]
         public async Task<IActionResult> EditUserProfile()
         {
             try
