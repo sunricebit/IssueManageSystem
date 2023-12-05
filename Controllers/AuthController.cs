@@ -70,7 +70,7 @@ namespace IMS.Controllers
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                mailService.SendPassword(email, password);
+                //mailService.SendPassword(email, password);
             }
 
             HttpContext.Session.SetUser(user);
