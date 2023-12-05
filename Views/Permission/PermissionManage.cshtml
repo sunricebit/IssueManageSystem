@@ -13,6 +13,14 @@
             Permission Table
         </div>
         <div class="card-body">
+            @if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success">
+                    <ul>
+                        <li>@ViewBag.SuccessMessage</li>
+                    </ul>
+                </div>
+            }
             <table class="table table-bordered" id="permissionTable">
                 <thead>
                     <tr>
