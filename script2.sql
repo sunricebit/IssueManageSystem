@@ -282,7 +282,9 @@ ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FORE
 
 INSERT INTO `IMS`.`Setting` (`Type`, `Value`)
 VALUES ('ROLE', 'Admin'),
-       ('ROLE', 'Marketer'),
+       ('ROLE', 'Subject Manager'),
+       ('ROLE', 'Class Manager'),
+       ('ROLE', 'Marketer Manager'),
        ('ROLE', 'Teacher'),
        ('ROLE', 'Student'),
        ('POST_CATEGORY', 'Art and Culture'),
@@ -296,3 +298,10 @@ VALUES ('ROLE', 'Admin'),
        ('CONTACT_TYPE', 'Financial Aid and Scholarships'),
        ('CONTACT_TYPE', 'Faculty and Research'),
        ('CONTACT_TYPE', 'International Students');
+
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Phone`, `Status`) VALUES ('2', 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', '1', 'Subject Manager', '', '1');
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Phone`, `Status`) VALUES ('2', 'subject@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', '2', 'Subject Manager', '', '1');
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Phone`, `Status`) VALUES ('3', 'class@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', '3', 'Class Manager', '', '1');
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Phone`, `Status`) VALUES ('4', 'marketer@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', '4', 'Marketer Manager', '', '1');
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Phone`, `Status`) VALUES ('5', 'teacher@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', '5', 'Teacher Manager', '', '1');
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Phone`, `Status`) VALUES ('6', 'student@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', '6', 'Student', '', '1');
