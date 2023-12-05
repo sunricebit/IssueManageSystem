@@ -12,9 +12,9 @@
         <tr>
             <th scope="col">Id</th>
             <th scope="col">User Name</th>
-            <th scope="col">Message</th>
             <th scope="col">Is Valid</th>
             <th scope="col">Email</th>
+            <th scope="col">Contact Type</th>  
             <th scope="col">Phone</th>
             <th colspan="2">Action</th>
         </tr>
@@ -25,7 +25,7 @@
             <tr>
                 <th>@message.Id</th>
                 <td>@message.Name</td>
-                @*<td>@message.Message</td>*@
+               
                 <td>
                     @if (message.IsValid == true)
                     {
@@ -40,6 +40,7 @@
                         <p>No</p>
                     }
                 <td>@message.Email</td>
+                <td>@message.ContactType.Value</td>
                 <td>@message.Phone</td>
                 <td>
                     <a href="/detail?id=@(message.Id)">Details</a>

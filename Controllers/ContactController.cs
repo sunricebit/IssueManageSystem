@@ -24,7 +24,7 @@ namespace IMS.Controllers
         public IActionResult List(int? page)
         {
             int pageIndex = page != null ? page.Value : 1;
-            var contactMessages = _context.Contacts.ToList();
+            var contactMessages = _context.Contacts.Include(s=>s.ContactType).ToList();
             ViewBag.totalPage = contactMessages.Count % 5 == 0 ? (contactMessages.Count / 5) : (contactMessages.Count / 5 + 1);
             ViewBag.pageNum = pageIndex;         
             return View(contactMessages.Skip(pageIndex - 1).Take(5));
