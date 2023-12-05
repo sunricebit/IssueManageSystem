@@ -17,9 +17,8 @@ namespace IMS.Controllers
         {
             //using (IMSContext context = new IMSContext())
             //{
-               var type= context.Settings.ToList();
-                //ViewBag.Types = type;
-                ViewBag.Setting = new SelectList(context.Settings, "Id", "Value");
+               var type= context.Settings.Where(setting => setting.Type== "CONTACT_TYPE").ToList();
+                ViewBag.Setting = new SelectList(type, "Id", "Value");
                 return View();
             //}
         }
@@ -28,8 +27,8 @@ namespace IMS.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(IMS.ViewModels.Auth.Contact _contact)
         {
-                ViewBag.Setting = new SelectList(context.Settings, "Id", "Value");
-            
+            var type = context.Settings.Where(setting => setting.Type == "CONTACT_TYPE").ToList();
+            ViewBag.Setting = new SelectList(type, "Id", "Value");
             try
             {
                 if (_contact.Id == 0)
