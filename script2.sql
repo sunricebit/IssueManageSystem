@@ -468,3 +468,29 @@ insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (
 Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.', 3);
 insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (14, 'ASS2', 'Assignment 2', null, 4);
 insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (15, 'ASS3', 'Assignment 3', null, 5);
+
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (1, 'BSU397', 'Fusce consequat. Nulla nisl. Nunc nisl.', 1, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (2, 'LDT721', 'Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.
+
+Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.', 2, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (3, 'YPK507', null, 3, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (4, 'BLD988', null, 4, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (5, 'MVI063', null, 5, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (6, 'EPL988', null, 1, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (7, 'FNM375', null, 2, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (8, 'DWA190', 'Phasellus in felis. Donec semper sapien a libero. Nam dui.
+
+Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis. Ut at dolor quis odio consequat varius.
+
+Integer ac leo. Pellentesque ultrices mattis odio. Donec vitae nisi.', 3, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (9, 'ZOT661', null, 4, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (10, 'YIR967', null, 5, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (11, 'YKN655', null, 1, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (12, 'OQO359', 'Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.
+
+Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.', 2, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (13, 'DSB920', 'Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.', 3, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (14, 'UIH198', null, 4, 5);
+insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (15, 'ZCH285', 'Fusce consequat. Nulla nisl. Nunc nisl.
+
+Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 5, 5);
