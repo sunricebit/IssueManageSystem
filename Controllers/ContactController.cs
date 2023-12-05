@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Wordprocessing;
 using IMS.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,13 +22,16 @@ namespace IMS.Controllers
             return View();
         }
         [Route("Lists")]
-        public IActionResult List(int? page)
+        public IActionResult List(int? page)    
         {
-            int pageIndex = page != null ? page.Value : 1;
-            var contactMessages = _context.Contacts.Include(s=>s.ContactType).ToList();
-            ViewBag.totalPage = contactMessages.Count % 5 == 0 ? (contactMessages.Count / 5) : (contactMessages.Count / 5 + 1);
+            var pageSize = 10;
+            var pageIndex =  page ?? 1;
+            var itemCount = _context.Contacts.Count();
+            var totalPage = (int)Math.Ceiling((double)itemCount / pageSize);
+            var data = _context.Contacts.Include(s=>s.ContactType).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToList();
+            ViewBag.totalPage = totalPage;
             ViewBag.pageNum = pageIndex;         
-            return View(contactMessages.Skip(pageIndex - 1).Take(5));
+            return View(data);
         }
 
         [Route("MaskValid")]
@@ -49,12 +53,9 @@ namespace IMS.Controllers
         public IActionResult AddNote(int contactID,string note)
         {
             Contact contact = _context.Contacts.Include(n => n.Messages).SingleOrDefault(n => n.Id == contactID);
-            ContactHandling contactHandling = new ContactHandling()
+            Message contactHandling = new Message()
             {
-                Contact = contact,
-                Description = "Add Note To Contact #" + contact.Id,
-                Note = note,
-                CreatedDate = DateTime.Now
+              Content = note , ContactId = contactID
             };
             _context.Add(contactHandling);
             _context.SaveChanges();
@@ -64,10 +65,10 @@ namespace IMS.Controllers
         [Route("/update-note")]
         public IActionResult UpdateNote(int id, string note)
         {
-            Message contactHandling = _context.Messages.SingleOrDefault(n => n.Id == id);
-            contactHandling.Content = note;
+            Message message = _context.Messages.SingleOrDefault(n => n.Id == id);
+            message.Content = note;
             _context.SaveChanges();
-            return RedirectToAction("Details", "Contact", new { id = contactHandling.ContactId });
+            return RedirectToAction("Details", "Contact", new { id = message.ContactId });
         }
 
         [Route("/send-email")]
