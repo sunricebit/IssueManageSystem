@@ -106,19 +106,6 @@ namespace IMS.Controllers
                     Models.User avatar = _context.Users.SingleOrDefault(u => u.Id == id);
                     avatar.Avatar = downloadLink;
                     _context.SaveChanges();
-                    // Xóa file avatar 
-                    var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Avatars");
-                    // Tạo đối tượng DirectoryInfo
-                    DirectoryInfo directoryInfo = new DirectoryInfo(oldFilePath);
-
-                    // Lấy danh sách tất cả các tệp tin trong thư mục
-                    FileInfo[] files = directoryInfo.GetFiles();
-
-                    // Xóa tất cả các tệp tin
-                    foreach (FileInfo fileOfAvatars in files)
-                    {
-                        fileOfAvatars.Delete();
-                    }
                     ViewBag.Success = "Create avatar successful.";
                 }
 
