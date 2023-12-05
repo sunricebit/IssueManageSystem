@@ -450,3 +450,21 @@ Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttito
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (5, 'SSG101', 'Working in Group Skills', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
 
 Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.');
+
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (1, 'ASS1', 'Assignment 1', null, 1);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (2, 'ASS2', 'Assignment 2', null, 2);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (3, 'ASS3', 'Assignment 3', 'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 3);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (4, 'ASS1', 'Assignment 1', null, 4);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (5, 'ASS2', 'Assignment 2', null, 5);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (6, 'ASS3', 'Assignment 3', null, 1);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (7, 'ASS1', 'Assignment 1', null, 2);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (8, 'ASS2', 'Assignment 2', null, 3);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (9, 'ASS3', 'Assignment 3', null, 4);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (10, 'ASS1', 'Assignment 1', null, 5);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (11, 'ASS2', 'Assignment 2', null, 1);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (12, 'ASS3', 'Assignment 3', null, 2);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (13, 'ASS1', 'Assignment 1', 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
+
+Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.', 3);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (14, 'ASS2', 'Assignment 2', null, 4);
+insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (15, 'ASS3', 'Assignment 3', null, 5);
