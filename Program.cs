@@ -5,7 +5,9 @@ builder.Services.AddDbContext<IMSContext>(options => new IMSContext());
 builder.Services.AddSingleton<IHashService, HashService>();
 builder.Services.AddSingleton<IMailService, MailService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<SettingDAO>();
+builder.Services.AddScoped<PermissionDAO>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSession(options =>
