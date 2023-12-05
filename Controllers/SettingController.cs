@@ -14,45 +14,6 @@ namespace IMS.Controllers
             _settingDAO = settingDAO;
         }
 
-        //[Route("List")]
-        //[HttpPost]
-        //public IActionResult SettingList(int? pageNumber, string? filterByType, string? searchByValue,
-        //    [FromForm] Dictionary<string, dynamic>? filters, [FromForm] Dictionary<string, dynamic>? searchs)
-        //{
-        //    int tempPageNumber = pageNumber ?? 1;
-        //    int tempPageSize = 2;
-        //    Paginate<Setting> paginate = new Paginate<Setting>(tempPageNumber, tempPageSize);
-        //    Dictionary<string, dynamic> filter = filters, search = searchs;
-
-        //    // Filter và hoặc search -> quay về trang đầu
-        //    if (!string.IsNullOrEmpty(filterByType) && !filterByType.Equals("ALL"))
-        //    {
-        //        filter.Add("Type", filterByType);
-        //    }
-
-        //    if (!string.IsNullOrEmpty(searchByValue))
-        //    {
-        //        search.Add("Value", searchByValue);
-        //    }
-
-        //    // khởi tạo màn hình
-        //    if (filterByType == null && searchByValue == null && filters.Count == 0 && searchs.Count == 0)
-        //    {
-        //        filter = null;
-        //        search = null;
-        //    }
-
-        //    ViewBag.Filter = filter;
-        //    ViewBag.Search = search;
-        //    ViewBag.TypeValue = filterByType;
-        //    ViewBag.SearchValue = searchByValue;
-        //    ViewBag.SettingList = paginate.GetListPaginate<Setting>(filter, search);
-        //    ViewBag.Action = "SettingList";
-        //    ViewBag.Controller = "Setting";
-        //    ViewBag.Pagination = paginate.GetPagination();
-        //    return View();
-        //}
-
         [Route("List")]
         public IActionResult SettingList(int? pageNumber, string? filterByType, string? searchByValue)
         {

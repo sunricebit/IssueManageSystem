@@ -29,7 +29,6 @@ public class HomeController : Controller
     }
 
     [Route("BlankDashboard")]
-    [CustomAuthorize(RoleUser.Admin, RoleUser.Student, RoleUser.Teacher, RoleUser.Marketer)]
     public IActionResult Blank()
     {
         User user = HttpContext.Session.GetUser();
