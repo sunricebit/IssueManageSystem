@@ -6,17 +6,12 @@ namespace IMS.Common
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     public class CustomAuthorizeAttribute : ActionFilterAttribute
     {
-        private readonly PermissionDAO _permissionDAO;
+        //private readonly IPermissionService permissionService;
 
         //public CustomAuthorizeAttribute(params string[] requiredRole)
         //{
         //    _requiredRoles = requiredRole;
         //}
-
-        public CustomAuthorizeAttribute(PermissionDAO permissionDAO)
-        {
-            _permissionDAO = permissionDAO;
-        }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
@@ -34,6 +29,8 @@ namespace IMS.Common
             //}
             //base.OnActionExecuting(context);
 
+            var permissionService = (IPermissionService)context.HttpContext.RequestServices.GetService(typeof(IPermissionService));
+
             User? user = context.HttpContext.Session.GetUser();
             if (user == null)
             {
@@ -50,17 +47,17 @@ namespace IMS.Common
                 string pageLink = "/" + routeValues["controller"]?.ToString() + "/" + routeValues["action"]?.ToString();
 
                 // Check đường dẫn trong permission
-                bool isPageExist = _permissionDAO.IsExist(pageLink);
-                if (isPageExist)
+                bool isPageExist = permissionService.IsExist(pageLink);
+                if (!isPageExist)
                 {
                     // Nếu chưa có thì add và cấp quyền cho admin, các user khác unable
-                    _permissionDAO.CreateNewPermission(pageLink);
+                    permissionService.CreateNewPermission(pageLink);
                 }
 
                 // Có rồi thì check quyền
-                if (!_permissionDAO.CheckPermission(pageLink, user.Role.Value))
+                if (!permissionService.CheckPermission(pageLink, user.Role.Value))
                 {
-                    context.Result = new RedirectToRouteResult("Auth", "SignIn", null);
+                    context.Result = new RedirectToActionResult("NotAccess", "Error", null);
                     return;
                 }
             }

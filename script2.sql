@@ -299,8 +299,9 @@ VALUES ('ROLE', 'Admin'),
        ('CONTACT_TYPE', 'IT Career Development'),
        ('CONTACT_TYPE', 'Financial Aid and Scholarships'),
        ('CONTACT_TYPE', 'Faculty and Research'),
-       ('CONTACT_TYPE', 'International Students');
-
+       ('CONTACT_TYPE', 'International Students'),
+       ('PAGE_LINK', '/Setting/SettingList');
+       
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (2, 'subject@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 2, 'Queenie Suff', 'https://robohash.org/consectetursuntet.png?size=100x100&set=set1', null, '0654960037', '36459 Nevada Trail', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (3, 'class@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 3, 'Jeremie Bethel', 'https://robohash.org/voluptatibusconsequaturin.png?size=100x100&set=set1', 1, '0720320267', '09 Hudson Terrace', 1);
@@ -496,10 +497,11 @@ insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (
 insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (15, 'ZCH285', 'Fusce consequat. Nulla nisl. Nunc nisl.
 
 Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 5, 5);
-       ('CONTACT_TYPE', 'International Students');
-       
+
 insert into `IMS`.`Permission` (`RoleId`, `PageId` ,`CanRead`)
 value ('1','18',1),
 ('2','18',1),
 ('3','18',1),
-('4','18',1);
+('4','18',1),
+('5','18',1),
+('6','18',1);

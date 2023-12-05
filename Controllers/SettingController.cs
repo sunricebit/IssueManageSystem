@@ -15,6 +15,7 @@ namespace IMS.Controllers
         }
 
         [Route("List")]
+        [CustomAuthorize]
         public IActionResult SettingList(int? pageNumber, string? filterByType, string? searchByValue)
         {
             int tempPageNumber = pageNumber ?? 1;
@@ -42,6 +43,7 @@ namespace IMS.Controllers
         }
 
         [Route("Add")]
+        [CustomAuthorize]
         public IActionResult AddSetting()
         {
 
@@ -50,6 +52,7 @@ namespace IMS.Controllers
 
 
         [Route("Add"), HttpPost]
+        [CustomAuthorize]
         public IActionResult AddSetting(SettingViewModel? settingView)
         {
             if (settingView == null)
@@ -79,6 +82,7 @@ namespace IMS.Controllers
         }
 
         [Route("Details")]
+        [CustomAuthorize]
         public IActionResult SettingDetail(int id)
         {
             Setting setting = _settingDAO.GetSettingById(id);
@@ -93,6 +97,7 @@ namespace IMS.Controllers
         }
 
         [Route("Update"), HttpPost]
+        [CustomAuthorize]
         public IActionResult SettingUpdate(SettingViewModel? settingView)
         {
             if (settingView == null)
