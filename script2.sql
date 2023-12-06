@@ -55,7 +55,7 @@ CREATE TABLE `User` (
     `Password` VARCHAR(64) NOT NULL,
     `RoleId` INTEGER NOT NULL,
     `Name` VARCHAR(50) NOT NULL,
-    `Avatar` VARCHAR(100) NULL,
+    `Avatar` VARCHAR(250) NULL,
     `Gender` BOOLEAN NULL,
     `Phone` VARCHAR(15) NULL,
     `Address` VARCHAR(191) NULL,
