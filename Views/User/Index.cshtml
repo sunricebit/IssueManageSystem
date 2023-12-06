@@ -28,24 +28,29 @@
                 </a>
             </div>
 
-            <div class="col-md-auto">
-                <a class="btn btn-primary" asp-controller="User" asp-action="Create">
-                    <i class="fas fa-plus"></i> New
-                </a>
-            </div>
+            
         </div>
 
 
     </div>
     
     <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-table me-1"></i>
-            User Table
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-table me-1"></i>
+                User Table
+            </div>
+            <div class="col-md-auto">
+                <a class="btn btn-primary" asp-controller="User" asp-action="Create">
+                    <i class="fas fa-plus"></i> New
+                </a>
+            </div>
         </div>
         <div class="card-body">
             <div class="mb-3 row">
+                
                 <form asp-controller="User" asp-action="Index" method="get" id="FilterAndSearchForm">
+                    <div class="row">
                     <input type="hidden" id="pageNumber" name="pageNumber" />
                     <div class="col-md-4 mb-3">
                         <label for="roleFilter" class="form-label">Filter by Role:</label>
@@ -77,6 +82,7 @@
                         <button type="submit" class="btn btn-primary">Search</button>
 
                     </div>
+                    </div>
                     </form>
                     
                    
@@ -91,7 +97,7 @@
                             <th onclick="sortTable(1)">Email</th>
                         <th onclick ="sortTable(2)">Role</th>
                         <th>Phone</th>
-                        <th onclick="sortTable(3)">Address</th>
+                       
                         <th>Status</th>
                         <th class="sortable">Action</th>
                         
@@ -110,7 +116,7 @@
                             <td>@user.Email</td>
                             <td>@user.Role.Value</td>
                             <td>@user.Phone</td>
-                            <td>@user.Address</td>
+                          
                             @if (@user.Status == true)
                             {
                                 <td>
@@ -126,7 +132,7 @@
                                 <td>
                                     <form asp-action="ToggleStatus" asp-route-id="@user.Id" method="post">
                                         <button type="submit" class="btn btn-secondary btn-sm">
-                                            Inactive
+                                            Deactive
                                         </button>
                                     </form>
                                 </td>
@@ -136,12 +142,7 @@
                                         <a asp-action="Details" asp-route-id="@user.Id" asp-controller="User" class="btn btn-info">
                                             <i class="fas fa-eye"></i> Details
                                         </a>
-                                        <form method="post" asp-action="Delete" asp-route-id="@user.Id" asp-controller="User">
-
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                        </form>
+                                        
                                     </div>
                                 </td>
                         </tr>
