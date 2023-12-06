@@ -124,6 +124,23 @@ namespace IMS.Services
             client.Send(message);
             client.Disconnect(true);
         }
+
+        public void SendMailContact(string email, string body)
+        {
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Admin", "tunahe140525@fpt.edu.vn"));
+            message.To.Add(new MailboxAddress(email, email));
+            message.Subject = "Send to Contact";
+            message.Body = new TextPart("plain")
+            {
+                Text = body
+            };
+            using var client = new SmtpClient();
+            client.Connect(host, port, useSsl);
+            client.Authenticate(emailSender, password);
+            client.Send(message);
+            client.Disconnect(true);
+        }
     }
 }
 

@@ -1,8 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Setting List";
     Pagination pagination = ViewBag.Pagination;
-    var x = ViewBag.Filter;
-    var y = ViewBag.Search;
 }
 
 <div class="container-fluid px-4">
@@ -22,35 +20,36 @@
         </div>
         <div class="card-body">
             <form asp-controller="Setting" asp-action="SettingList" method="get" id="FilterAndSearchForm">
-    @* Thêm input ẩn *@
-    <input type="hidden" id="pageNumber" name="pageNumber"/>
-    <div class="row">
-        <div class="col-md-3">
-            <label for="Type" class="form-label">Filter by Type:</label>
-            <select class="form-control" id="Type" name="filterByType">
-                <option value="PAGE_LINK" selected="@(ViewBag.TypeValue == "PAGE_LINK")">Page Links</option>
-                <option value="ROLE" selected="@(ViewBag.TypeValue == "ROLE")">Role Names</option>
-                <option value="CONTACT_TYPE" selected="@(ViewBag.TypeValue == "CONTACT_TYPE")">Contact Type</option>
-                <option value="POST_CATEGORY" selected="@(ViewBag.TypeValue == "POST_CATEGORY")">Post Category</option>
-                @if (ViewBag.TypeValue == null)
-                {
-                    <option value="ALL" selected>All</option>
-                }
-                else
-                {
-                    <option value="ALL">All</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label for="keyword" class="form-label">Search:</label>
-            <input type="text" id="keyword" name="searchByValue" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
-        </div>
-        <div class="col-md-3 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary">Search</button>
-        </div>
-    </div>
-</form>
+                @*thêm input ẩn *@
+                <input type="hidden" id="pageNumber" name="pageNumber"/>
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="Type" class="form-label">Filter by Type:</label>
+                        <select class="form-control" id="Type" name="filterByType">
+                            @if (ViewBag.TypeValue == null && ViewBag.TypeValue == "ALL")
+                            {
+                                <option value="ALL" selected>All</option>
+                            }
+                            else
+                            {
+                                <option value="ALL">All</option>
+                            }
+                            <option value="PAGE_LINK" selected="@(ViewBag.TypeValue == "PAGE_LINK")">Page Links</option>
+                            <option value="ROLE" selected="@(ViewBag.TypeValue == "ROLE")">Role Names</option>
+                            <option value="CONTACT_TYPE" selected="@(ViewBag.TypeValue == "CONTACT_TYPE")">Contact Type</option>
+                            <option value="POST_CATEGORY" selected="@(ViewBag.TypeValue == "POST_CATEGORY")">Post Category</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="keyword" class="form-label">Search:</label>
+                        <input type="text" id="keyword" name="searchByValue" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </form>
+            <br />
             @{
                 if (ViewBag.SettingList != null)
                 {
@@ -72,7 +71,7 @@
                                     <td>@setting.Value</td>
                                     <td>
                                         <a asp-action="SettingDetail" asp-route-id="@setting.Id" asp-controller="Setting" class="btn btn-info btn-sm">
-                                            <i class="fas fa-eye"></i>
+                                            <i class="fas fa-eye"></i> View Details/Update
                                         </a>
                                     </td>
                                 </tr>

@@ -1,0 +1,21 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    string tab = Context.Request.Query["tab"];
+
+    tab = tab ?? "userdetails";
+    string title = tab == "userdetails" ? "User details" : "Password change";
+}
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link @(@tab == "userdetails" ? "text-primary":"")" href="/userprofile?tab=userdetails">User Profile</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(@tab == "change-password" ? "text-primary":"")" href="/userprofile?tab=change-password">Change password</a>
+    </li>
+</ul>
+<div>
+    <h3 class="text-h3 mb-4 mt-4">@title</h3>
+    @RenderBody()
+</div>
+

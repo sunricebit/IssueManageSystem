@@ -280,22 +280,25 @@ namespace IMS.Models
             {
                 entity.ToTable("Permission", "IMS");
 
-                entity.HasIndex(e => new { e.RoleId, e.Page }, "Permission_RoleId_Page_idx");
+                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_Page_idx");
 
-                entity.HasIndex(e => new { e.RoleId, e.Page }, "Permission_RoleId_Page_key")
+                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_Page_key")
                     .IsUnique();
 
-                entity.HasIndex(e => e.RoleId, "Permission_RoleId_key")
-                    .IsUnique();
-
-                entity.Property(e => e.Page).HasMaxLength(191);
+                entity.HasOne(d => d.Page)
+                    .WithMany(p => p.PermissionPages)
+                    .HasForeignKey(d => d.PageId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Permission_PageId_fkey");
 
                 entity.HasOne(d => d.Role)
-                    .WithOne(p => p.Permission)
-                    .HasForeignKey<Permission>(d => d.RoleId)
+                    .WithMany(p => p.PermissionRoles)
+                    .HasForeignKey(d => d.RoleId)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("Permission_RoleId_fkey");
             });
+
+        
 
             modelBuilder.Entity<Post>(entity =>
             {
@@ -419,6 +422,8 @@ namespace IMS.Models
             modelBuilder.Entity<Setting>(entity =>
             {
                 entity.ToTable("Setting", "IMS");
+
+                entity.HasIndex(e => e.Id, "Setting_Id_idx");
 
                 entity.HasIndex(e => new { e.Type, e.Value }, "Setting_Type_Value_idx");
 

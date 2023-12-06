@@ -70,7 +70,7 @@ namespace IMS.Controllers
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                mailService.SendPassword(email, password);
+                //mailService.SendPassword(email, password);
             }
 
             HttpContext.Session.SetUser(user);
@@ -107,8 +107,8 @@ namespace IMS.Controllers
             {
                 Email = vm.Email.Trim(),
                 Password = hashService.HashPassword(vm.Password),
-                Name = vm.Name,
-                Phone = vm.Phone,
+                Name = vm.Name.Trim(),
+                Phone = vm.Phone?.Trim(),
                 ConfirmToken = hashService.RandomHash(),
                 RoleId = role.Id
             };

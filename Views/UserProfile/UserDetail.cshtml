@@ -1,41 +1,39 @@
 ﻿@model IMS.Models.User;
 
 @{
-    ViewData["Title"] = "Index";
-    string tab = ViewData["tab"]?.ToString() ?? "userdetails";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    
-    ViewBag.Title = "Avatar Management";
+    Layout = "~/Views/Shared/_TabBar.cshtml";
 }
-<style>
-    .popup {
-        display: none;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        border: 1px solid #ccc;
-        padding: 20px;
-        background-color: #fff;
-        z-index: 1;
-        width:450px;
-    }
 
-    .popup-content {
-        /*text-align: center;*/
-    }
-
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-        .close:hover {
-            color: black;
+    <style>
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid #ccc;
+            padding: 20px;
+            background-color: #fff;
+            z-index: 1;
+            width: 450px;
         }
+
+        .popup-content {
+            /*text-align: center;*/
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+            .close:hover {
+                color: black;
+            }
+
         .avatar {
             width: 100px;
             height: 100px;
@@ -44,64 +42,57 @@
             overflow: hidden;
         }
 
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .avatarAdd{
-        width: 50px;
-        height: 50px;
-        overflow: hidden;
-        margin-left: 35px;
-        margin-top: 10px;
+            .avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .avatarAdd {
+            width: 50px;
+            height: 50px;
+            overflow: hidden;
+            margin-left: 35px;
+            margin-top: 10px;
         }
 
-        .avatarAdd img {
-            width: 60%;
-            object-fit: cover;
-            border-radius:50%;
+            .avatarAdd img {
+                width: 60%;
+                object-fit: cover;
+                border-radius: 50%;
+            }
 
-        }
-        .avatarAdd :hover{
-            background-color:gray;
-        }
-        .active-color{
-                background-color: green !important;
-                color: #f8f9fa;
-        }
-</style>
-<ul class="nav nav-tabs">
-    <li class="nav-item">
-        <a id="Home"  class="nav-link @(@tab == "userdetails" ? "active-color":"")" href="/userprofile?tab=userdetails">User Profile</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="/userprofile?tab=changepassword">Change Password</a>
-    </li>
-   
-</ul>
-<h1>User Details</h1>
+            .avatarAdd :hover {
+                background-color: gray;
+            }
 
-@if ( Model.Avatar == null){
+        .active-color {
+            background-color: green !important;
+            color: #f8f9fa;
+        }
+    </style>
+
+@if (Model.Avatar == null)
+{
     <div class="avatar">
         <img src="~/img/avatarDemo.jpg" alt="Avatar">
     </div>
-    <div class="avatarAdd" >
+    <div class="avatarAdd">
         <img src="~/img/addAvatar.png" alt="Thumbnail" class="thumbnail" onclick="openPopup('popupAdd')">
     </div>
-   
+
 }
-else 
+else
 {
     <div class="avatar" style=" border: 1px solid #000;">
-        <img src="~/Avatars/@Model.Avatar" alt="Avatar" class="avatar" />
+        <img src="@Html.DisplayFor(model => model.Avatar)" alt="Avatar" class="avatar" />
 
     </div>
     <div class="avatarAdd">
         <img src="~/img/editAvatar.png" alt="Thumbnail" class="thumbnail" onclick="openPopup('popupEdit')">
     </div>
 
-    
+
 }
 
 <div>
@@ -135,14 +126,16 @@ else
             @Html.DisplayNameFor(model => model.Gender)
         </dt>
         <dd class="col-sm-10">
-            @if(Model.Gender==true){
+            @if (Model.Gender == true)
+            {
                 <p>Male</p>
             }
             else if (Model.Gender == null)
             {
                 <p></p>
             }
-            else{
+            else
+            {
                 <p>Female</p>
             }
         </dd>
@@ -155,7 +148,7 @@ else
             Edit profile
         </button>
     </div>
-   
+
 </div>
 
 <div class="modal" tabindex="-1" id="popupEditDetails" style="background-color:#2220208c">
@@ -211,7 +204,7 @@ else
                     </div>
                     <div class="form-group" style="float:right">
                         <input style="background-color: #43A047;border-color: #43A047; height:40px;"
-                               type="button" value="Save" class="btn btn-primary" 
+                               type="button" value="Save" class="btn btn-primary"
                                onclick="validateAndSubmit()" />
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup('popupEditDetails')" style="height:40px">Close</button>
 
@@ -227,7 +220,7 @@ else
 </div>
 
 
-    <!-- Popup Add -->
+<!-- Popup Add -->
 <div class="modal" tabindex="-1" id="popupAdd" style="background-color:#2220208c">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -249,7 +242,7 @@ else
         </div>
     </div>
 </div>
-   
+
 <!-- Popup Edit -->
 <div class="modal" tabindex="-1" id="popupEdit" style="background-color:#2220208c">
     <div class="modal-dialog modal-dialog-centered">
@@ -262,20 +255,20 @@ else
             <div class="modal-body">
                 <p>
                     @using (Html.BeginForm("UpdateAvatar", "UserProfile", FormMethod.Post, new { enctype = "multipart/form-data", style = "display: flex;" }))
-                {
-                    @Html.HiddenFor(model => model.Id)
+                    {
+                        @Html.HiddenFor(model => model.Id)
 
-                    <label for="file">Update Avatar:</label>
-                    <input type="file" name="file" id="file" required />
+                        <label for="file">Update Avatar:</label>
+                        <input type="file" name="file" id="file" required />
                         <input type="submit" value="Update" style="background-color: #43A047;border-radius: 3px;height: fit-content;" />
-                }
+                    }
                 </p>
                 <p>
-                        <label for="file">Delete Avatar:</label>
-                        <input type="submit" value="Delete" onclick="openPopup('popupDelete')" style="background-color: #43A047;border-radius: 3px; margin-top:5px" />
+                    <label for="file">Delete Avatar:</label>
+                    <input type="submit" value="Delete" onclick="openPopup('popupDelete')" style="background-color: #43A047;border-radius: 3px; margin-top:5px" />
                 </p>
             </div>
-            
+
         </div>
     </div>
 </div>
@@ -306,22 +299,20 @@ else
     </div>
 </div>
 
-
-<script>
-    var popup = document.getElementById('popupDeleteSuccess');
+<script>var popup = document.getElementById('popupDeleteSuccess');
     popup.style.display = 'block';
-            
-     function openPopup(popupView) {
+
+    function openPopup(popupView) {
         var popup = document.getElementById(popupView);
-            popup.style.display = 'block';
-        }
+        popup.style.display = 'block';
+    }
 
     function closePopup(popupView) {
         var popup = document.getElementById(popupView);
-            popup.style.display = 'none';
-        }
+        popup.style.display = 'none';
+    }
 
-   function validateAndSubmit() {
+    function validateAndSubmit() {
         // Lấy giá trị từ thẻ input
         var phoneInput = $("#Phone");
         var nameInput = $("#Name");
@@ -343,12 +334,12 @@ else
 
         // Kiểm tra
 
-        if (!phoneRegex.test(phoneValue)&& phoneValue!="") {
+        if (!phoneRegex.test(phoneValue) && phoneValue != "") {
             // Hiển thị thông báo lỗi và đặt lỗi cho trường input
             //phoneInput.addClass("input-validation-error");
             phoneError.text("Invalid phone number, phone number has 10 digits and starts with 0.");
-        } 
-        else if (nameValue==""){
+        }
+        else if (nameValue == "") {
             nameError.text("Please enter a name.");
         }
         else {
@@ -356,5 +347,5 @@ else
             document.forms["form"].submit();
             //$("form").submit/*();*/
         }
-    }
-</script>
+    }</script>
+

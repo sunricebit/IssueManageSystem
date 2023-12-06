@@ -1,0 +1,109 @@
+﻿@model List<IMS.ViewModels.Permission.PermissionViewModel>
+@{
+    ViewData["Title"] = "Manage Permission";
+    List<string> roles = ViewBag.Roles;
+}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="mt-4">Permission List</h1>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Permission Table
+        </div>
+        <div class="card-body">
+            @if (ViewBag.SuccessMessage != null)
+            {
+                <div class="alert alert-success">
+                    <ul>
+                        <li>@ViewBag.SuccessMessage</li>
+                    </ul>
+                </div>
+            }
+            <table class="table table-bordered" id="permissionTable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        @{
+                            var orderedRoles = roles.OrderBy(r => r);
+                        }
+                        @foreach (var role in orderedRoles)
+                        {
+                            <th>@role</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var permission in Model)
+                    {
+                        <tr>
+                            <td>@permission.Page</td>
+                            @{
+                                var orderedRolesAccess = permission.RolesAcess.OrderBy(roleAccess => roleAccess.Key);
+                            }
+                            @foreach (var roleAccess in orderedRolesAccess)
+                            {
+                                <td>
+                                    <input type="checkbox" @(roleAccess.Value ? "checked" : "") /> Can Access
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <br />
+            <button class="btn btn-primary" onclick="updatePermissionData()">
+                <i class="fa-solid fa-pen-to-square"></i>
+                Update Permision
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getPermissionData() {
+        var permissionData = [];
+
+        // Duyệt qua từng hàng trong tbody
+        $("#permissionTable tbody tr").each(function () {
+            var pageValue = $(this).find("td:first").text();
+            var rolesAccess = {};
+
+            // Duyệt qua từng ô checkbox trong hàng
+            $(this).find("td input[type=checkbox]").each(function (index) {
+                var roleValue = $("#permissionTable thead th:eq(" + (index + 1) + ")").text();
+                var canAccess = $(this).prop("checked");
+
+                rolesAccess[roleValue] = canAccess;
+            });
+
+            // Tạo đối tượng PermissionViewModel và thêm vào danh sách
+            var permissionViewModel = {
+                Page: pageValue,
+                RolesAcess: rolesAccess
+            };
+
+            permissionData.push(permissionViewModel);
+        });
+        console.log(permissionData);
+        return permissionData;
+    }
+
+    function updatePermissionData() {
+        var permissionData = getPermissionData();
+
+        $.ajax({
+            url: '/Permission/Update', // Thay đổi thành đường dẫn thực tế của bạn
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(permissionData),
+            success: function (data) {
+                console.log(data);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+</script>

@@ -14,46 +14,8 @@ namespace IMS.Controllers
             _settingDAO = settingDAO;
         }
 
-        //[Route("List")]
-        //[HttpPost]
-        //public IActionResult SettingList(int? pageNumber, string? filterByType, string? searchByValue,
-        //    [FromForm] Dictionary<string, dynamic>? filters, [FromForm] Dictionary<string, dynamic>? searchs)
-        //{
-        //    int tempPageNumber = pageNumber ?? 1;
-        //    int tempPageSize = 2;
-        //    Paginate<Setting> paginate = new Paginate<Setting>(tempPageNumber, tempPageSize);
-        //    Dictionary<string, dynamic> filter = filters, search = searchs;
-
-        //    // Filter và hoặc search -> quay về trang đầu
-        //    if (!string.IsNullOrEmpty(filterByType) && !filterByType.Equals("ALL"))
-        //    {
-        //        filter.Add("Type", filterByType);
-        //    }
-
-        //    if (!string.IsNullOrEmpty(searchByValue))
-        //    {
-        //        search.Add("Value", searchByValue);
-        //    }
-
-        //    // khởi tạo màn hình
-        //    if (filterByType == null && searchByValue == null && filters.Count == 0 && searchs.Count == 0)
-        //    {
-        //        filter = null;
-        //        search = null;
-        //    }
-
-        //    ViewBag.Filter = filter;
-        //    ViewBag.Search = search;
-        //    ViewBag.TypeValue = filterByType;
-        //    ViewBag.SearchValue = searchByValue;
-        //    ViewBag.SettingList = paginate.GetListPaginate<Setting>(filter, search);
-        //    ViewBag.Action = "SettingList";
-        //    ViewBag.Controller = "Setting";
-        //    ViewBag.Pagination = paginate.GetPagination();
-        //    return View();
-        //}
-
         [Route("List")]
+        [CustomAuthorize]
         public IActionResult SettingList(int? pageNumber, string? filterByType, string? searchByValue)
         {
             int tempPageNumber = pageNumber ?? 1;
@@ -81,6 +43,7 @@ namespace IMS.Controllers
         }
 
         [Route("Add")]
+        [CustomAuthorize]
         public IActionResult AddSetting()
         {
 
@@ -89,6 +52,7 @@ namespace IMS.Controllers
 
 
         [Route("Add"), HttpPost]
+        [CustomAuthorize]
         public IActionResult AddSetting(SettingViewModel? settingView)
         {
             if (settingView == null)
@@ -118,6 +82,7 @@ namespace IMS.Controllers
         }
 
         [Route("Details")]
+        [CustomAuthorize]
         public IActionResult SettingDetail(int id)
         {
             Setting setting = _settingDAO.GetSettingById(id);
@@ -132,6 +97,7 @@ namespace IMS.Controllers
         }
 
         [Route("Update"), HttpPost]
+        [CustomAuthorize]
         public IActionResult SettingUpdate(SettingViewModel? settingView)
         {
             if (settingView == null)

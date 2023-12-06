@@ -91,7 +91,7 @@ namespace IMS.Common
                             query.Where((Expression<Func<T, bool>>)filterExpressions.Aggregate(Expression.AndAlso));
                         }
 
-                        filterExpressions.Clear();
+                            filterExpressions.Clear();
                     }
                 }
             }
@@ -171,6 +171,7 @@ namespace IMS.Common
             }
 
             return query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            _context.Dispose();
         }
 
         //public IEnumerable<T> GetListPaginate<T>() where T : class
