@@ -31,47 +31,102 @@ namespace IMS.Controllers
         [Route("[controller]")]
         public async Task<IActionResult> Index(int page = 1, int pageSize = 6, string searchTerm = "", string filterCat="")
         {
-            ViewBag.Search = searchTerm;
-            var cate = _context.Settings.Where(c=>c.Type
-            == "POST_CATEGORY").ToList();
-            ViewBag.Setting = new SelectList(cate, "Value", "Value");
-            if (searchTerm == null)
+            int? id = HttpContext.Session.GetUser()?.Id;
+            if (id==null)
             {
-                if (filterCat == "Category")
-                {
-                    var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).ToList();
-                    Pagination(page, pageSize, postList, searchTerm);
-                }
-                else
-                {
-                    var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                    Where(p =>  p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).ToList();
-                    Pagination(page, pageSize, postList, searchTerm);
-                }
-               
+                return NotFound();
             }
             else
             {
-                if (filterCat == "Category")
+                ViewBag.Search = searchTerm;
+                var cate = _context.Settings.Where(c => c.Type
+                == "POST_CATEGORY").ToList();
+                ViewBag.Setting = new SelectList(cate, "Value", "Value");
+
+                var user = _context.Users.Include(u => u.Role).Where(u => u.Role.Type == "ROLE").SingleOrDefault(u => u.Id == id);
+                if (user.Role.Value == "Admin" || user.Role.Value == "Marketer Manager")
                 {
-                    var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                   Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper())
-               || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper())).ToList();
-                    Pagination(page, pageSize, postList, searchTerm);
+                    if (searchTerm == null)
+                    {
+                        if (filterCat == "Category")
+                        {
+                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).ToList();
+                            Pagination(page, pageSize, postList, searchTerm);
+                        }
+                        else
+                        {
+                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
+                            Where(p => p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).ToList();
+                            Pagination(page, pageSize, postList, searchTerm);
+                        }
+
+                    }
+                    else
+                    {
+                        if (filterCat == "Category")
+                        {
+                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
+                           Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper())
+                       || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper())).ToList();
+                            Pagination(page, pageSize, postList, searchTerm);
+
+                        }
+                        else
+                        {
+                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
+                             Where(p => (p.Title.ToUpper().Contains(searchTerm.ToUpper())
+                         || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper()))
+                         && p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).ToList();
+                            Pagination(page, pageSize, postList, searchTerm);
+
+                        }
+                    }
+
 
                 }
                 else
                 {
-                    var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                     Where(p => (p.Title.ToUpper().Contains(searchTerm.ToUpper())
-                 || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper()))
-                 && p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).ToList();
-                    Pagination(page, pageSize, postList, searchTerm);
+                    if (searchTerm == null)
+                    {
+                        if (filterCat == "Category")
+                        {
+                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p=>p.Author.Id==id).ToList();
+                            Pagination(page, pageSize, postList, searchTerm);
+                        }
+                        else
+                        {
+                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
+                            Where(p => p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.Author.Id == id).ToList();
+                            Pagination(page, pageSize, postList, searchTerm);
+                        }
+
+                    }
+                    else
+                    {
+                        if (filterCat == "Category")
+                        {
+                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
+                           Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper())
+                       || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper())).Where(p => p.Author.Id == id).ToList();
+                            Pagination(page, pageSize, postList, searchTerm);
+
+                        }
+                        else
+                        {
+                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
+                             Where(p => (p.Title.ToUpper().Contains(searchTerm.ToUpper())
+                         || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper()))
+                         && p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.Author.Id == id).ToList();
+                            Pagination(page, pageSize, postList, searchTerm);
+
+                        }
+                    }
+
 
                 }
             }
+           
 
-          
             return View();
         }
        
@@ -130,10 +185,6 @@ namespace IMS.Controllers
             if (ModelState.IsValid)
             {
                 var category = _context.Settings.SingleOrDefault(s => s.Value == post.Category);
-                if (id != post.Id)
-                {
-                    return NotFound();
-                }
                 if (imgFile != null && imgFile.Length > 0)
                 {
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imgFile.FileName);
@@ -156,14 +207,15 @@ namespace IMS.Controllers
                     {
                         Title = post.Title,
                         Description = post.Description,
-                        CreatedAt = post.CreatedAt,
+                        CreatedAt = DateTime.Now,
                         ImageUrl = post.ImageUrl,
                         AuthorId = (int)id,
                         CategoryId = category.Id,
                         IsPublic = post.IsPublic,
                     };
-                    _context.Add(post);
+                    _context.Add(postViewModel);
                     await _context.SaveChangesAsync();
+                    ViewBag.Success = "success";
                     return RedirectToAction(nameof(Index));
                 }
                
@@ -237,7 +289,7 @@ namespace IMS.Controllers
                     {
                         postUpdate.Title = post.Title;
                         postUpdate.Description = post.Description;
-                        postUpdate.CreatedAt = post.CreatedAt;
+                        postUpdate.CreatedAt = (DateTime)post.CreatedAt;
                         postUpdate.ImageUrl = post.ImageUrl;
                         postUpdate.Author.Name = post.Author;
                         postUpdate.CategoryId = cate.Id;
@@ -248,7 +300,7 @@ namespace IMS.Controllers
                     {
                         postUpdate.Title = post.Title;
                         postUpdate.Description = post.Description;
-                        postUpdate.CreatedAt = post.CreatedAt;
+                        postUpdate.CreatedAt = (DateTime)post.CreatedAt;
                         postUpdate.Author.Name = post.Author;
                         postUpdate.CategoryId = cate.Id;
                         postUpdate.IsPublic = post.IsPublic;
