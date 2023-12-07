@@ -19,7 +19,7 @@
         {
             PageSize = pageSize;
             ItemCount = itemCount;
-            PageIndex = pageIndex < TotalPages ? pageIndex : 1;
+            PageIndex = pageIndex > TotalPages ? 1 : pageIndex;
             Items = items;
         }
 

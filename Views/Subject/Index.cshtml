@@ -58,9 +58,11 @@
                             <td>@subject.Id</td>
                             <td>@subject.Code</td>
                             <td>@subject.Name</td>
-                            <td>@subject.IsActive</td>
                             <td>
-                                <a asp-action="Active" asp-route-id="@subject.Id">@(subject.IsActive! == true ? "Deactivate":"Activate")</a>
+                                <input class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" readonly @(subject.IsActive ? "checked" : "") />
+                            </td>
+                            <td>
+                                <a class="page-link text-decoration text-primary" href="@Url.Action("Active", "Subject", new {subjectId = subject.Id, page = Model.PageIndex,search = Model.Additional.Search, type = Model.Additional.Type })">@(subject.IsActive ? "Deactivate":"Activate")</a>
                             </td>
                         </tr>
                     }
@@ -73,7 +75,7 @@
 
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
-                    <li class="page-item"><a class="page-link" href="@Url.Action("Index", "Subject", new {page = i,search = Model.Additional.Search, type = Model.Additional.Type })">@i</a></li>
+                    <li class="page-item"><a class="page-link" href="@Url.Action("Index", "Subject", new { page = i,search = Model.Additional.Search, type = Model.Additional.Type })">@i</a></li>
                 }
 
             </ul>
