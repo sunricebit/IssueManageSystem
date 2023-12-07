@@ -41,7 +41,6 @@ CREATE TABLE `Post` (
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `UpdatedAt` DATETIME(3) NULL,
     `IsPublic` BOOLEAN NOT NULL DEFAULT false,
-
     `ImageUrl` VARCHAR(300) NULL,
     `AuthorId` INTEGER NOT NULL,
     `CategoryId` INTEGER NULL,
