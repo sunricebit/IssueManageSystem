@@ -1,10 +1,8 @@
 ﻿using Firebase.Auth;
 using Firebase.Storage;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.Metrics;
-using System.Xml.Linq;
-using System;
-using System.IO;
+using IMS.ViewModels.Auth;
+
 namespace IMS.Controllers
 {
     public class UserProfileController : Controller
@@ -19,7 +17,8 @@ namespace IMS.Controllers
             _context = context;
         }
         [Route("/userprofile")]
-        public IActionResult Index([FromQuery] string tab)
+        [CustomAuthorize]
+        public IActionResult User([FromQuery] string tab)
         {
             try
             {
@@ -30,7 +29,12 @@ namespace IMS.Controllers
                         {
                             int? id = HttpContext.Session.GetUser()?.Id;
                             var User = _context.Users.SingleOrDefault(u => u.Id == id);
-                            return View(User);
+                            return View("UserDetail", User);
+                        }
+
+                    case "change-password":
+                        {
+                            return View("PasswordChange", new ChangePasswordViewModel());
                         }
 
                 }
@@ -41,7 +45,7 @@ namespace IMS.Controllers
                 ViewBag.ErrorMessage = "Error:" + ex.Message;
                 return View();
             }
-            
+
         }
         public async Task<IActionResult> EditUserProfile()
         {
@@ -56,11 +60,11 @@ namespace IMS.Controllers
                 ViewBag.ErrorMessage = "Error:" + ex.Message;
                 return View();
             }
-           
+
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUserProfile( [Bind("Id,Name,Phone,Address,Gender")] Models.User User)
+        public async Task<IActionResult> EditUserProfile([Bind("Id,Name,Phone,Address,Gender")] Models.User User)
         {
             try
             {
@@ -79,12 +83,12 @@ namespace IMS.Controllers
                 return RedirectToAction(nameof(Index), new { tab = "userdetails" });
             }
 
-           
+
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> CreateAvatar( IFormFile file)
+        public async Task<IActionResult> CreateAvatar(IFormFile file)
         {
             try
             {
@@ -99,7 +103,7 @@ namespace IMS.Controllers
                         file.CopyTo(fileStream);
                     }
 
-                   
+
                     var fileStream2 = new FileStream(filePath, FileMode.Open);
                     var downloadLink = await Upload(fileStream2, file.FileName);
                     int? id = HttpContext.Session.GetUser()?.Id;
@@ -116,7 +120,7 @@ namespace IMS.Controllers
                 ViewBag.ErrorMessage = "Error:" + ex.Message;
                 return RedirectToAction(nameof(Index), new { tab = "userdetails" });
             }
-            
+
         }
         public async Task<string> Upload(FileStream stream, string filename)
         {
@@ -151,12 +155,13 @@ namespace IMS.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateAvatar(IFormFile file)
         {
-            try {
+            try
+            {
                 int? id = HttpContext.Session.GetUser()?.Id;
                 // Xử lý cập nhật avatar và lưu vào cơ sở dữ liệu
                 var existingAvatar = _context.Users.FirstOrDefault(u => u.Id == id);
-                
-                if (existingAvatar.Avatar != null )
+
+                if (existingAvatar.Avatar != null)
                 {
                     string[] arr = existingAvatar.Avatar.Split('=');
                     if (file != null && file.Length > 0)
@@ -191,7 +196,7 @@ namespace IMS.Controllers
                         existingAvatar.Avatar = downloadLink;
                         _context.SaveChanges();
 
-                        
+
                         ViewBag.Success = "Update avatar successful.";
 
                     }
@@ -204,7 +209,7 @@ namespace IMS.Controllers
                 ViewBag.ErrorMessage = "Error:" + ex.Message;
                 return RedirectToAction(nameof(Index), new { tab = "userdetails" });
             }
-           
+
         }
 
 
@@ -236,9 +241,38 @@ namespace IMS.Controllers
                 ViewBag.ErrorMessage = "Error:" + ex.Message;
                 return RedirectToAction(nameof(Index), new { tab = "userdetails" });
             }
-          
+
         }
 
 
+        [Route("/userprofile")]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel vm, [FromServices] IHashService hashService)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("PasswordChange", vm);
+            }
+            if (vm.OldPassword.Equals(vm.NewPassword))
+            {
+                ViewBag.Error = "Your current password incorrect!!!";
+                return View("PasswordChange", vm);
+            }
+            int userId = HttpContext.Session.GetUser()!.Id;
+            var user = _context.Users.SingleOrDefault(user => user.Id == userId);
+            if (user == null) return RedirectToAction("SignIn");
+
+            if (!hashService.Verify(vm.OldPassword, user.Password))
+            {
+                ViewBag.Error = "Your current password incorrect!!!";
+                return View("PasswordChange", vm);
+            }
+
+            user!.Password = hashService.HashPassword(vm.NewPassword);
+            await _context.SaveChangesAsync();
+            ViewBag.Success = "Your password was updated!!!";
+            ModelState.Clear();
+            return View("PasswordChange", new ChangePasswordViewModel());
+        }
     }
 }

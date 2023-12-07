@@ -25,8 +25,8 @@ namespace IMS.Models
         public virtual DbSet<Milestone> Milestones { get; set; } = null!;
         public virtual DbSet<Permission> Permissions { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
-        public virtual DbSet<PrismaMigration> PrismaMigrations { get; set; } = null!;
         public virtual DbSet<Project> Projects { get; set; } = null!;
+        public virtual DbSet<Report> Reports { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
         public virtual DbSet<Subject> Subjects { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
@@ -280,9 +280,11 @@ namespace IMS.Models
             {
                 entity.ToTable("Permission", "IMS");
 
-                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_Page_idx");
+                entity.HasIndex(e => e.PageId, "Permission_PageId_fkey");
 
-                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_Page_key")
+                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_PageId_idx");
+
+                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_PageId_key")
                     .IsUnique();
 
                 entity.HasOne(d => d.Page)
@@ -297,8 +299,6 @@ namespace IMS.Models
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("Permission_RoleId_fkey");
             });
-
-        
 
             modelBuilder.Entity<Post>(entity =>
             {
@@ -316,7 +316,9 @@ namespace IMS.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
-                entity.Property(e => e.ImageUrl).HasMaxLength(100);
+                entity.Property(e => e.Excerpt).HasColumnType("text");
+
+                entity.Property(e => e.ImageUrl).HasMaxLength(300);
 
                 entity.Property(e => e.Title).HasColumnType("text");
 
@@ -333,42 +335,6 @@ namespace IMS.Models
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("Post_CategoryId_fkey");
-            });
-
-            modelBuilder.Entity<PrismaMigration>(entity =>
-            {
-                entity.ToTable("_prisma_migrations", "IMS");
-
-                entity.Property(e => e.Id)
-                    .HasMaxLength(36)
-                    .HasColumnName("id");
-
-                entity.Property(e => e.AppliedStepsCount).HasColumnName("applied_steps_count");
-
-                entity.Property(e => e.Checksum)
-                    .HasMaxLength(64)
-                    .HasColumnName("checksum");
-
-                entity.Property(e => e.FinishedAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("finished_at");
-
-                entity.Property(e => e.Logs)
-                    .HasColumnType("text")
-                    .HasColumnName("logs");
-
-                entity.Property(e => e.MigrationName)
-                    .HasMaxLength(255)
-                    .HasColumnName("migration_name");
-
-                entity.Property(e => e.RolledBackAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("rolled_back_at");
-
-                entity.Property(e => e.StartedAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("started_at")
-                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
             });
 
             modelBuilder.Entity<Project>(entity =>
@@ -419,6 +385,33 @@ namespace IMS.Models
                         });
             });
 
+            modelBuilder.Entity<Report>(entity =>
+            {
+                entity.ToTable("Report", "IMS");
+
+                entity.HasIndex(e => e.PostId, "Report_PostId_fkey");
+
+                entity.HasIndex(e => e.ReporterId, "Report_ReporterId_fkey");
+
+                entity.Property(e => e.Content).HasMaxLength(300);
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
+
+                entity.HasOne(d => d.Post)
+                    .WithMany(p => p.Reports)
+                    .HasForeignKey(d => d.PostId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Report_PostId_fkey");
+
+                entity.HasOne(d => d.Reporter)
+                    .WithMany(p => p.Reports)
+                    .HasForeignKey(d => d.ReporterId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Report_ReporterId_fkey");
+            });
+
             modelBuilder.Entity<Setting>(entity =>
             {
                 entity.ToTable("Setting", "IMS");
@@ -443,7 +436,13 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.Id, "Subject_Id_idx");
 
+                entity.HasIndex(e => e.SubjectManagerId, "Subject_SubjectManagerId_fkey");
+
                 entity.Property(e => e.Code).HasMaxLength(10);
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
@@ -452,6 +451,12 @@ namespace IMS.Models
                     .HasDefaultValueSql("'1'");
 
                 entity.Property(e => e.Name).HasMaxLength(100);
+
+                entity.HasOne(d => d.SubjectManager)
+                    .WithMany(p => p.Subjects)
+                    .HasForeignKey(d => d.SubjectManagerId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Subject_SubjectManagerId_fkey");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -467,7 +472,7 @@ namespace IMS.Models
 
                 entity.Property(e => e.Address).HasMaxLength(191);
 
-                entity.Property(e => e.Avatar).HasMaxLength(100);
+                entity.Property(e => e.Avatar).HasMaxLength(300);
 
                 entity.Property(e => e.ConfirmToken).HasMaxLength(64);
 
