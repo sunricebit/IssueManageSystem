@@ -46,13 +46,45 @@ namespace IMS.Controllers
                     break;
             }
 
-            subjects = subjects.Include(subject => subject.SubjectManager);
+            subjects = subjects.Include(subject => subject.SubjectManager).OrderByDescending(s=> s.CreatedAt);
 
             PaginateEnginee<Subject, SubjectSearchViewModel> a = PaginateEnginee<Subject, SubjectSearchViewModel>.Create(subjects, page ?? 1);
             a.Additional = new SubjectSearchViewModel(search ?? "", type ?? "");
 
             return View(a);
         }
+
+        [Route("/subjects")]
+        [HttpPost]
+        public IActionResult Index(PaginateEnginee<Subject, SubjectSearchViewModel> b,  int? page, string? search, string? type)
+        {
+
+            var subjects = _context.Subjects.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                subjects = subjects.Where(subjects => subjects.Code.ToLower().Contains(search.ToLower()) || subjects.Name.ToLower().Contains(search.ToLower()));
+            }
+
+            switch (type)
+            {
+                case "activate":
+                    subjects = subjects.Where(subject => subject.IsActive == true);
+                    break;
+                case "deactivate":
+                    subjects = subjects.Where(subject => subject.IsActive == false);
+                    break;
+            }
+
+            subjects = subjects.Include(subject => subject.SubjectManager).OrderByDescending(s => s.CreatedAt);
+
+            PaginateEnginee<Subject, SubjectSearchViewModel> a = PaginateEnginee<Subject, SubjectSearchViewModel>.Create(subjects, page ?? 1);
+            a.Additional = new SubjectSearchViewModel(search ?? "", type ?? "");
+
+            return View(a);
+        }
+
+
 
         public async Task<IActionResult> Active(int subjectId, int? page, string? search, string? type)
         {
@@ -63,5 +95,7 @@ namespace IMS.Controllers
 
             return RedirectToAction("Index", new { page = page, search = search, type = type });
         }
+
+
     }
 }

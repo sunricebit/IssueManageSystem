@@ -5,6 +5,11 @@ namespace IMS.Models
 {
     public partial class Post
     {
+        public Post()
+        {
+            Reports = new HashSet<Report>();
+        }
+
         public int Id { get; set; }
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
@@ -18,5 +23,6 @@ namespace IMS.Models
 
         public virtual User Author { get; set; } = null!;
         public virtual Setting? Category { get; set; }
+        public virtual ICollection<Report> Reports { get; set; }
     }
 }

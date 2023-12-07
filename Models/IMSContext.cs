@@ -26,6 +26,7 @@ namespace IMS.Models
         public virtual DbSet<Permission> Permissions { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
         public virtual DbSet<Project> Projects { get; set; } = null!;
+        public virtual DbSet<Report> Reports { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
         public virtual DbSet<Subject> Subjects { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
@@ -382,6 +383,33 @@ namespace IMS.Models
 
                             j.HasIndex(new[] { "StudentId" }, "ProjectStudent_StudentId_fkey");
                         });
+            });
+
+            modelBuilder.Entity<Report>(entity =>
+            {
+                entity.ToTable("Report", "IMS");
+
+                entity.HasIndex(e => e.PostId, "Report_PostId_fkey");
+
+                entity.HasIndex(e => e.ReporterId, "Report_ReporterId_fkey");
+
+                entity.Property(e => e.Content).HasMaxLength(300);
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
+
+                entity.HasOne(d => d.Post)
+                    .WithMany(p => p.Reports)
+                    .HasForeignKey(d => d.PostId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Report_PostId_fkey");
+
+                entity.HasOne(d => d.Reporter)
+                    .WithMany(p => p.Reports)
+                    .HasForeignKey(d => d.ReporterId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Report_ReporterId_fkey");
             });
 
             modelBuilder.Entity<Setting>(entity =>
