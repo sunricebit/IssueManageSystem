@@ -36,6 +36,7 @@
                     <th>Id</th>
                     <th>Code</th>
                     <th>Name</th>
+                    <th>Manager</th>
                     <th>Status</th>
                     <th></th>
                 </tr>
@@ -58,6 +59,7 @@
                             <td>@subject.Id</td>
                             <td>@subject.Code</td>
                             <td>@subject.Name</td>
+                            <td>@subject.SubjectManager.Name</td>
                             <td>
                                 <input class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" readonly @(subject.IsActive == true ? "checked" : "") />
                             </td>

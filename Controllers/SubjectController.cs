@@ -46,6 +46,7 @@ namespace IMS.Controllers
                     break;
             }
 
+            subjects = subjects.Include(subject => subject.SubjectManager);
 
             PaginateEnginee<Subject, SubjectSearchViewModel> a = PaginateEnginee<Subject, SubjectSearchViewModel>.Create(subjects, page ?? 1);
             a.Additional = new SubjectSearchViewModel(search ?? "", type ?? "");
