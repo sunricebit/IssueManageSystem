@@ -1,0 +1,104 @@
+﻿@model IMS.ViewModels.Post.Post
+
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h4>Detail Post</h4>
+<hr />
+
+<div class="d-flex">
+    <a asp-action="Index" class="btn btn-outline-success" style="height:fit-content">Back to List</a>
+
+</div>
+<div class="row">
+    <form asp-action="Create" method="post" id="editForm" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        @*<input type="hidden" id="imgUrl" name="imgUrl" value="@Model.ImageUrl" />*@
+        @*<input type="hidden" asp-for="Id" />*@
+        <div class="row align-items-stretch">
+            <div class="col-md-6" style="margin-top:30px">
+                <div class="form-group mb-4 d-flex">
+                    <img id="selectedImg" src="~/img/addImage.png" style="width: 52px;border-radius: 8px;" alt="User Avatar" />
+                    <div class="btn btn-outline-success " id="changeImg" style=" height:fit-content;margin-top:7px">
+                        <label class="form-label text-green m-0" for="imgFile">Choose Image</label>
+                        <input type="file" class="form-control d-none" id="imgFile" name="imgFile" onchange="displaySelectedImage(event, 'selectedImg')" />
+                    </div>
+
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-4 ">
+                    <label asp-for="IsPublic" class="form-check-label">
+                        @*data-post-id="@item.Id"*@
+                        @*<input class="form-check-input" asp-for="IsPublic" readonly /> @Html.DisplayNameFor(model => model.IsPublic)*@
+                    </label>
+                    <input asp-for="IsPublic" class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" />
+
+                </div>
+
+                <div class="form-group mb-md-0 mb-4">
+                    
+                    @* Hiển thị select khi đang ở chế độ chỉnh sửa *@
+                    <select id="selectCate" name="category" asp-items="ViewBag.Setting" class="form-control" >
+                        <option value="Category" class="form-control">Category</option>
+                    </select>
+                    @*<input asp-for="Category" class="form-control"  readonly />*@
+                    <span asp-validation-for="Category" class="text-danger"></span>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+
+                <div class="form-group form-group-textarea mb-md-0" style="height:100%">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea asp-for="Description" class="form-control" style="height:350px" ></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" value="Save" class="btn btn-outline-success" id="saveButton">Save</button>
+    </form>
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function displaySelectedImage(event, elementId) {
+        const selectedImage = document.getElementById(elementId);
+        const fileInput = event.target;
+
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                selectedImage.src = e.target.result;
+            };
+
+            reader.readAsDataURL(fileInput.files[0]);
+        }
+    }
+
+    function openPopup(popupView) {
+        var popup = document.getElementById(popupView);
+        popup.style.display = 'block';
+    }
+
+    function closePopup(popupView) {
+        var popup = document.getElementById(popupView);
+        popup.style.display = 'none';
+    }
+</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
