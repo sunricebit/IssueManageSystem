@@ -446,42 +446,42 @@ Aenean fermentum. Donec ut mauris eget massa tempor convallis. Nulla neque liber
 Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.', 1, null, 4, 12);
 
 
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (1, 'MAE101', 'Mathematics for Engineering', 1, null);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (2, 'CEA201', 'Computer Organization and Architecture', 1, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (1, 'MAE101', 'Mathematics for Engineering', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (2, 'CEA201', 'Computer Organization and Architecture', 1, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
 
 Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.
 
-Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.');
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (3, 'CSI101', 'Connecting to Computer Science', 1, null);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (4, 'PRF192', 'Programming Fundamentals', 1, 'Fusce consequat. Nulla nisl. Nunc nisl.
+Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (3, 'CSI101', 'Connecting to Computer Science', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (4, 'PRF192', 'Programming Fundamentals', 1, 'Fusce consequat. Nulla nisl. Nunc nisl.
 
-Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.');
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (5, 'SSG101', 'Working in Group Skills', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (5, 'SSG101', 'Working in Group Skills', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
 
-Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.');
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
 
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (6, 'PRJ321', 'Web-Based Java Applications', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (6, 'PRJ321', 'Web-Based Java Applications', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
 
-Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.');
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
 
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (7, 'NWC202', 'Computer Networking', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (7, 'NWC202', 'Computer Networking', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
 
-Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.');
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
 
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (8, 'SWE102', 'Introduction to Software Engineering', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (8, 'SWE102', 'Introduction to Software Engineering', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
 
-Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.');
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
 
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (9, 'JPD121', 'Elementary Japanese 1.2', 1, null);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (10, 'LAB221', 'Desktop Java Lab', 0, null);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (11, 'JPD131', 'Elementary Japanese 2.1', 1, null);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (12, 'LAB231', 'Web Java Lab', 0, null);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (9, 'JPD121', 'Elementary Japanese 1.2', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (10, 'LAB221', 'Desktop Java Lab', 0, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (11, 'JPD131', 'Elementary Japanese 2.1', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (12, 'LAB231', 'Web Java Lab', 0, null, 2);
 
 
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (13, 'PRN292', '.NET and C#', 1, null);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (14, 'SWR301', 'Software Requirements', 0, null);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (15, 'SWQ391', 'Software Quality Assurance and Testing', 1, null);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (16, 'OJS201', 'On the job training	', 1, null);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (13, 'PRN292', '.NET and C#', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (14, 'SWR301', 'Software Requirements', 0, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (15, 'SWQ391', 'Software Quality Assurance and Testing', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (16, 'OJS201', 'On the job training	', 1, null, 2);
 
 
 insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (1, 'ASS1', 'Assignment 1', null, 1);
