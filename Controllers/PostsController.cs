@@ -145,26 +145,7 @@ namespace IMS.Controllers
             ViewBag.Search = searchTerm;
             ViewBag.PostList = itemsOnPage;
         }
-        // GET: Posts/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null || _context.Posts == null)
-            {
-                return NotFound();
-            }
-
-            var post = await _context.Posts
-                .Include(p => p.Author)
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (post == null)
-            {
-                return NotFound();
-            }
-
-            return View(post);
-        }
-
+       
         // GET: Posts/Create
         public IActionResult Create()
         {
@@ -233,6 +214,7 @@ namespace IMS.Controllers
 
             var post = _context.Posts.Include(p => p.Author).Include(p => p.Category).SingleOrDefault(p=>p.Id==id);
             var cate = _context.Settings.Where(c => c.Type == "POST_CATEGORY").Where(c=>c.Value!=post.Category.Value).ToList();
+            var report = _context.Reports.Where(r => r.PostId == post.Id).Include(r=>r.Reporter).ToList();
             ViewBag.Setting = new SelectList(cate, "Value", "Value");
             var postViewModel = new IMS.ViewModels.Post.Post
             {
@@ -243,6 +225,7 @@ namespace IMS.Controllers
                 Author = post.Author.Name,
                 Category = post.Category.Value,
                 IsPublic= post.IsPublic,
+                Reports= report,
             };
             if (post == null)
             {
@@ -442,25 +425,6 @@ namespace IMS.Controllers
             }
 
             return View(post);
-        }
-
-        // POST: Posts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            if (_context.Posts == null)
-            {
-                return Problem("Entity set 'IMSContext.Posts'  is null.");
-            }
-            var post = await _context.Posts.FindAsync(id);
-            if (post != null)
-            {
-                _context.Posts.Remove(post);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool PostExists(int id)

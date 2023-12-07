@@ -5,14 +5,30 @@
     ViewData["Title"] = "Detail";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    .popup-container {
+        position: absolute;
+        display: none;
+        background-color: white;
+        padding: 10px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index:9999;
+    }
+
+    .content-cell {
+        max-width: 300px;
+        word-wrap: break-word;
+    }
+</style>
 
 <h4>Detail Post</h4>
 <hr />
 
 <div class="d-flex">
     <a asp-action="Index" class="btn btn-outline-success" style="height:fit-content">Back to List</a> |
-    <p class="btn btn-outline-success" style="width:50px" onclick="toggleEditing()" >Edit</p>
-
+    <p class="btn btn-outline-success" style="width:50px" onclick="toggleEditing()" >Edit</p>|
+    <p class="btn btn-outline-success" style="width:100px" onclick="openPopup('popupReport')">Report</p>
 </div>
 <div class="row">
     <form asp-action="Edit" method="post" id="editForm" enctype="multipart/form-data">
@@ -103,6 +119,59 @@
     </form>
 
 </div>
+<!---popupReport--->
+<div class="modal" tabindex="-1" id="popupReport" style="background-color:#2220208c">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup('popupReport')"></button>
+            </div>
+            <!-- Nội dung của popup delete -->
+            @if (@Model.Reports != null)
+            {
+                    <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                   Content
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Reports)
+                            {
+                                    <tr >
+                                        <td>@item.Reporter.Name</td>
+                                        <td >
+                                            <p class="content-cell d-flex" style="width:fit-content"
+                                    onmouseover="showFullContent('@item.Content', event)" onmouseout="hideContent()" 
+                                   >@item.Content</p>
+                                        </td>
+                                    </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else{
+                    <p>Post report is empty!</p>
+            }
+            
+            <div class="modal-footer">
+               
+                <input type="submit" value="Close" onclick="closePopup('popupReport')" style="background-color: gray;border-radius: 3px; margin-top:9px" />
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="popup-container" id="popupContainer" style="max-width: 300px"></div>
 <!---popupdelete--->
 <div class="modal" tabindex="-1" id="popupDelete" style="background-color:#2220208c">
     <div class="modal-dialog modal-dialog-centered">
@@ -182,6 +251,43 @@
         var popup = document.getElementById(popupView);
         popup.style.display = 'none';
     }
+
+    function showFullContent(content, event) {
+        var popupContainer = document.getElementById('popupContainer');
+        var contentCell = event.target.querySelector('.content-cell');
+
+        // Đặt nội dung của popup container
+        popupContainer.innerHTML = content;
+
+        // Đặt vị trí và hiển thị popup container
+        popupContainer.style.left = (event.clientX + window.scrollX) + 'px';
+        popupContainer.style.top = (event.clientY + window.scrollY)  + 'px';
+        //popupContainer.style.left = event.pageX + 'px';
+        //popupContainer.style.top = event.pageY + 'px';
+        popupContainer.style.display = 'block';
+    }
+
+    function hideContent() {
+        var popupContainer = document.getElementById('popupContainer');
+
+        // Ẩn popup container khi di chuột ra
+        popupContainer.style.display = 'none';
+    }
+
+
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var elements = document.querySelectorAll('.content-cell');
+        elements.forEach(function (element) {
+            var content = element.textContent.trim();
+            var maxLength = 100;
+            if (content.length > maxLength) {
+                element.textContent = content.substring(0, maxLength) + '...';
+                //element.title = content; // Hiển thị toàn bộ nội dung khi di chuột qua
+            }
+        });
+    });
 </script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
