@@ -1,0 +1,97 @@
+﻿@model IMS.Models.Post;
+@{
+   
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog-Z Bootstrap 5.0 HTML Template</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="~/css/post.css">
+    <!--
+
+    TemplateMo 556 Catalog-Z
+
+    https://templatemo.com/tm-556-catalog-z
+
+    -->
+
+</head>
+<body>
+    <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll">
+        <form class="d-flex tm-search-form" asp-action="Index" method="get">
+            <input class="form-controler tm-search-input" type="search" placeholder="Search" aria-label="Search" value="@ViewBag.Search" name="searchTerm">
+            <button class="btn btn-outline-success tm-search-btn" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="container-fluid tm-container-content tm-mt-60">
+        
+        <div class="row tm-mb-90 tm-gallery">
+            @foreach (var post in ViewBag.PostList)
+            {
+                <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 col-12 mb-5">
+                    <figure class="effect-ming tm-video-item">
+                        <img src="@post.ImageUrl" alt="Image" class="img-fluid">
+                        <figcaption class="d-flex align-items-center justify-content-center">
+                            <h2>View</h2>
+                            <a href="photo-detail.html">View more</a>
+                        </figcaption>
+                    </figure>
+                    <div class="d-grid justify-content-between tm-text-gray">
+                        <span class="tm-text-gray-light">@post.Title</span>
+                            <span>Author: @post.AuthorName</span>
+                            <span>Date: @post.CreatedAt.ToString("dd/MM/yyyy")</span>
+                    </div>
+                </div>
+            }
+
+            
+        </div> <!-- row -->
+        <div class="row tm-mb-90">
+            <div class="col-12 d-flex justify-content-between align-items-center tm-paging-col">
+                @*<a href="javascript:void(0);" class="btn btn-Primary tm-btn-prev mb-2 disabled">Previous</a>*@
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a class="btn btn-Primary tm-btn-prev mb-2 " href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })">&laquo; Previous</a>
+                }
+                else
+                {
+                    <a class="btn btn-Primary tm-btn-prev mb-2 disabled">&laquo; Previous</a>
+
+                }
+                <div class="tm-paging d-flex">
+                  
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <a class="@((i == ViewBag.CurrentPage) ? "active" : "") tm-paging-link" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })">@i</a>
+                    }
+                   
+                </div>
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })" class="btn btn-Primary tm-btn-next">Next &raquo;</a>
+                }
+                else
+                {
+                    <a class="btn btn-Primary tm-btn-prev mb-2 disabled">Next &raquo;</a>
+
+                }
+                @*<a href="javascript:void(0);" class="btn btn-Primary tm-btn-next">Next Page</a>*@
+            </div>
+        </div>
+    </div> <!-- container-fluid, tm-container-content -->
+
+   
+    <script src="js/plugins.js"></script>
+    <script>
+       
+    </script>
+</body>
+</html>

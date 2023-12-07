@@ -1,0 +1,199 @@
+﻿@model IEnumerable<IMS.Models.Post>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Post List</h1>
+
+<div class="d-flex justify-content-between p-md-5" style="float:right">
+    <a asp-action="Create" class="btn btn-outline-success" style="height: fit-content;margin: auto;">Create New</a>
+    <form asp-action="Index" method="get" class="d-flex">
+        <div class="d-flex m-2">
+            <select name="filterCat"  asp-items="ViewBag.Setting"
+                    class="form-control"
+                    style="color: #6c757d">
+                <option value="Category" class="form-control">Category</option>
+            </select>
+            <button class="btn btn-outline-success">Filter</button>
+        </div>
+        <div class="d-flex m-2">
+            <input class="form-control tm-search-input" type="search" placeholder="Search" aria-label="Search" value="@ViewBag.Search" name="searchTerm">
+            <button class="btn btn-outline-success tm-search-btn" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+       
+    </form>
+    
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsPublic)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ImageUrl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in ViewBag.PostList)
+        {
+        <tr>
+                <td data-post-id="@item.Id">
+                    @item.Id
+            </td>
+            <td>
+                    @item.Title
+            </td>
+
+            <td>
+                    @item.Description
+            </td>
+            <td>
+                    @item.CreatedAt.ToString("dd/MM/yyyy")
+            </td>
+            
+            <td class="d-flex justify-content-center">
+                    @*<input type="checkbox" @(item.IsPublic ? "checked" : "") disabled />*@
+                    <input data-post-id="@item.Id" class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" @(item.IsPublic ? "checked" : "") />
+            </td>
+            <td>
+                    <img src="@item.ImageUrl" alt="Image" class="img-fluid">
+            </td>
+            <td>
+                @item.Author.Name
+            </td>
+            <td>
+                @item.Category.Value
+            </td>
+            <td>
+                    <a class="btn btn-outline-success" asp-action="Edit" asp-route-id="@item.Id">Details</a>
+                @*<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>*@
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<div class="row tm-mb-90">
+    <div class="col-12 d-flex justify-content-between align-items-center tm-paging-col">
+        @*<a href="javascript:void(0);" class="btn btn-Primary tm-btn-prev mb-2 disabled">Previous</a>*@
+        @if (ViewBag.CurrentPage > 1)
+        {
+            <a  class="btn btn-outline-success" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })">&laquo; Previous</a>
+        }
+        else
+        {
+            <a class="btn btn-Primary tm-btn-prev mb-2 disabled">&laquo; Previous</a>
+
+        }
+        <div class="tm-paging d-flex">
+
+            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+            {
+                <a class="@((i == ViewBag.CurrentPage) ? "active" : "") btn btn-outline-success m-2" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })">@i</a>
+            }
+
+        </div>
+        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+        {
+            <a class="btn btn-outline-success" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })">Next &raquo;</a>
+        }
+        else
+        {
+            <a class="btn btn-Primary tm-btn-prev mb-2 disabled">Next &raquo;</a>
+
+        }
+        @*<a href="javascript:void(0);" class="btn btn-Primary tm-btn-next">Next Page</a>*@
+    </div>
+</div>
+<style>
+    /* Thiết lập kiểu cho thông báo */
+    #notification {
+        display: none;
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        padding: 15px;
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 5px;
+    }
+</style>
+<div id="notification">Thông báo đây!</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+ 
+    $(document).ready(function () {
+        $('.is-public-checkbox').on('click', function () {
+            var isChecked = $(this).prop('checked');
+            var postId = $(this).data('post-id');
+
+            // Gửi yêu cầu đến server để cập nhật giá trị IsPublic
+            $.ajax({
+                url: '/UpdateIsPublic',
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                data: { postId: postId, isPublic: isChecked },
+                success: function (result) {
+                    if (result.success) {
+                        // Cập nhật thành công
+                        console.log('Updated successfully.');
+                    } 
+                    else {
+                        console.error('Update failed.');
+                    }
+                },
+                error: function () {
+                    console.error('Error during update.');
+                }
+            });
+            
+        });
+
+    });
+</script>
+<script>
+
+    function showNotification(message) {
+        var notification = document.getElementById('notification');
+        notification.innerHTML = message;
+        notification.style.display = 'block';
+
+        // Tự đóng sau 1 giây
+        setTimeout(function () {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+
+    // Gọi hàm hiển thị thông báo
+    var successValue = '@ViewBag.Success';
+    if (successValue === 'success') {
+        showNotification('Thao tác thành công!');
+    }
+
+</script>
