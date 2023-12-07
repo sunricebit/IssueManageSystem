@@ -7,7 +7,6 @@
         public int PageSize { get; set; }
         public List<T> Items { get; set; }
 
-        //Add additional
         public A Additional { get; set; }
 
         public int TotalPages => (int)Math.Ceiling((double)ItemCount / PageSize);

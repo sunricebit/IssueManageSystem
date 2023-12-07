@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 public class SubjectSearchViewModel
 {
-    public string Search { get; set; }
-    public string Type { get; set; }
+    public string? Search { get; set; }
+    public string? Type { get; set; }
 
     public SubjectSearchViewModel(string search, string type)
     {

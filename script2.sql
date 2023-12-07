@@ -202,6 +202,7 @@ CREATE TABLE `Subject` (
     `Description` TEXT NULL,
     `IsActive` BOOLEAN NOT NULL DEFAULT true,
     `SubjectManagerId` INTEGER NOT NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `Subject_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)

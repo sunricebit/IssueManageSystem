@@ -51,16 +51,20 @@
     </nav>
     <div id="layoutSidenav">
         <div id="layoutSidenav_nav">
-            @if (role.Equals(RoleUser.Admin)){
+            @if (role.Equals(RoleUser.Admin))
+            {
                 @Html.Partial("./Sidebar/AdminSidebarPartial")
             }
-            @if (role.Equals(RoleUser.Marketer)){
+            @if (role.Equals(RoleUser.Marketer))
+            {
                 @Html.Partial("./Sidebar/MarketerSidebarPartial")
             }
-            @if (role.Equals(RoleUser.Teacher)){
+            @if (role.Equals(RoleUser.Teacher))
+            {
                 @Html.Partial("./Sidebar/TeacherSidebarPartial")
             }
-            @if (role.Equals(RoleUser.Student)){
+            @if (role.Equals(RoleUser.Student))
+            {
                 @Html.Partial("./Sidebar/StudentSidebarPartial")
             }
             @if (role.Equals(RoleUser.Manager))
@@ -96,6 +100,9 @@
     <script src="~/js/datatables-sort.js" asp-append-version="true"></script>
     <script src="~/js/confirm-popup.js" asp-append-version="true"></script>
     <script src="~/js/GetInput.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
