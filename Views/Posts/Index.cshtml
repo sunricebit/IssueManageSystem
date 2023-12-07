@@ -77,12 +77,18 @@
             </td>
             
             <td class="d-flex justify-content-center">
-                    @*<input type="checkbox" @(item.IsPublic ? "checked" : "") disabled />*@
                     <input data-post-id="@item.Id" class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" @(item.IsPublic ? "checked" : "") />
             </td>
             <td>
-                    <img src="@item.ImageUrl" alt="Image" class="img-fluid">
-            </td>
+                    @if (@item.ImageUrl!=null)
+                    {
+                        <img src="@item.ImageUrl" alt="Image" class="img-fluid">
+                    }
+                    else
+                    {
+                        <div></div>
+                    }
+                </td>
             <td>
                 @item.Author.Name
             </td>
@@ -97,6 +103,7 @@
 }
     </tbody>
 </table>
+<div id="notification" style="display:none;"> Thông báo sẽ được hiển thị ở đây</div>
 <div class="row tm-mb-90">
     <div class="col-12 d-flex justify-content-between align-items-center tm-paging-col">
         @*<a href="javascript:void(0);" class="btn btn-Primary tm-btn-prev mb-2 disabled">Previous</a>*@
@@ -126,10 +133,23 @@
             <a class="btn btn-Primary tm-btn-prev mb-2 disabled">Next &raquo;</a>
 
         }
+
         @*<a href="javascript:void(0);" class="btn btn-Primary tm-btn-next">Next Page</a>*@
     </div>
 </div>
 <style>
+
+    #notification {
+        position: fixed;
+        bottom: 20px;
+        right: 10px;
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        z-index: 9999;
+    }
+</style>
+@*<style>
     /* Thiết lập kiểu cho thông báo */
     #notification {
         display: none;
@@ -141,13 +161,20 @@
         color: white;
         border-radius: 5px;
     }
-</style>
-<div id="notification">Thông báo đây!</div>
+</style>*@
+@*<div id="notification">Thông báo đây!</div>*@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 <script>
- 
+    function showNotification(message, duration) {
+        var notification = document.getElementById("notification");
+        notification.innerHTML = message;
+        notification.style.display = "block";
+        setTimeout(function () {
+            notification.style.display = "none";
+        }, duration);
+    }
     $(document).ready(function () {
         $('.is-public-checkbox').on('click', function () {
             var isChecked = $(this).prop('checked');
@@ -160,11 +187,13 @@
                 contentType: 'application/x-www-form-urlencoded',
                 data: { postId: postId, isPublic: isChecked },
                 success: function (result) {
-                    if (result.success) {
+                    if (result) {
                         // Cập nhật thành công
+                        showNotification("Updated successfully!", 5000);
                         console.log('Updated successfully.');
                     } 
                     else {
+                        showNotification("Updated failed!", 5000);
                         console.error('Update failed.');
                     }
                 },
@@ -176,6 +205,7 @@
         });
 
     });
+    
 </script>
 <script>
 

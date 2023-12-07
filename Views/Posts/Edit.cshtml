@@ -15,21 +15,36 @@
 
 </div>
 <div class="row">
-    <form asp-action="Edit" method="post" id="editForm">
+    <form asp-action="Edit" method="post" id="editForm" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-        <div class="col-md-4">
-            <div class="d-flex align-items-center justify-content-center mb-4">
-                <img id="selectedImg" src="@Model.ImageUrl" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" alt="User Avatar" />
+        <div class="col-md-4 d-flex">
+            @if(Model.ImageUrl!= null){
+                <img id="selectedImg" src="@Model.ImageUrl" style="width: 100px;border-radius: 8px;" alt="User Avatar" />
+                <div style="display:inline-block">
+                    <div class="btn btn-outline-success m-1" id="changeImg" style="display: none">
+                    <label class="form-label text-green m-0" for="imgFile">Choose Img</label>
 
-                <div class="btn btn-primary btn-rounded ml-3">
-                    <label class="form-label text-white m-0" for="imgFile">Choose avatar</label>
+                    <input type="file" class="form-control d-none" id="imgFile" name="imgFile" onchange="displaySelectedImage(event, 'selectedImg')" />
+                    </div>
+                    <div class="btn btn-outline-success m-1" id="changeImg">
+                        <label class="form-label text-green m-0"  onclick="openPopup('popupDelete')">Delete Img</label>
+                    </div>
+                </div>
+                
+            }
+            else
+            {
+                <img id="selectedImg" src="~/img/addImage.png" style="width: 52px;border-radius: 8px;" alt="User Avatar" />
+                <div class="btn btn-outline-success " id="changeImg" style="display: none ; height:fit-content;margin-top:7px">
+                    <label class="form-label text-green m-0" for="imgFile">Choose Image</label>
                     <input type="file" class="form-control d-none" id="imgFile" name="imgFile" onchange="displaySelectedImage(event, 'selectedImg')" />
                 </div>
-            </div>
+            }
+            
         </div>
-        <input type="hidden" id="imgUrl" name="imgUrl" value="@Model.ImageUrl" />
+        <input type="hidden" id="imgUrl" name="imgUrl"  value="@Model.ImageUrl" />
         <input type="hidden" asp-for="Id" />
         <div class="row align-items-stretch">
             <div class="col-md-6">
@@ -55,11 +70,6 @@
                 </div>
 
                 <div class="form-group mb-md-0 mb-4">
-                    <label asp-for="ImageUrl" class="control-label"></label>
-                    <input asp-for="ImageUrl" class="form-control" readonly />
-                    <span asp-validation-for="ImageUrl" class="text-danger"></span>
-                </div>
-                <div class="form-group mb-md-0 mb-4">
                     <label asp-for="Author" class="control-label">Author</label>
                     <input asp-for="Author" class="form-control" readonly />
                     <span asp-validation-for="Author" class="text-danger"></span>
@@ -83,7 +93,7 @@
 
                 <div class="form-group form-group-textarea mb-md-0" style="height:100%">
                     <label asp-for="Description" class="control-label"></label>
-                    <textarea asp-for="Description" class="form-control" style="height:400px" readonly></textarea>
+                    <textarea asp-for="Description" class="form-control" style="height:350px" readonly></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
             </div>
@@ -93,7 +103,30 @@
     </form>
 
 </div>
+<!---popupdelete--->
+<div class="modal" tabindex="-1" id="popupDelete" style="background-color:#2220208c">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Confirm delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup('popupDelete')"></button>
+            </div>
+            <!-- Nội dung của popup delete -->
+            <div class="modal-body">
+                Are you sure you want to delete this avatar?
+            </div>
+            <div class="modal-footer">
+                @using (Html.BeginForm("DeleteAvatar", "Posts", FormMethod.Post))
+                {
+                    @Html.HiddenFor(model => model.Id)
+                    <input type="submit" value="Yes" onclick="closePopup('popupDelete')" style="background-color: #43A047;border-radius: 3px; margin-top:5px" />
+                }
+                <input type="submit" value="No" onclick="closePopup('popupDelete')" style="background-color: gray;border-radius: 3px; margin-top:9px" />
 
+            </div>
+        </div>
+    </div>
+</div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     var isEditing = true;
@@ -108,13 +141,16 @@
                 input.readOnly = !isEditing;
                 input.disabled = !isEditing;
             }
+            changeImg
         });
         if (!isEditing) {
             document.getElementById('saveButton').style.display = 'none';
+            document.getElementById('changeImg').style.display = 'none';
             document.getElementById('inputCate').style.display = 'inline-block';
             document.getElementById('selectCate').style.display = 'none';
         } else {
             document.getElementById('saveButton').style.display = 'inline-block';
+            document.getElementById('changeImg').style.display = 'inline-block';
             document.getElementById('inputCate').style.display = 'none';
             document.getElementById('selectCate').style.display = 'inline-block';
         }
@@ -136,6 +172,16 @@
                 reader.readAsDataURL(fileInput.files[0]);
             }
         }
+
+    function openPopup(popupView) {
+        var popup = document.getElementById(popupView);
+        popup.style.display = 'block';
+    }
+
+    function closePopup(popupView) {
+        var popup = document.getElementById(popupView);
+        popup.style.display = 'none';
+    }
 </script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

@@ -10,6 +10,7 @@ using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Bibliography;
 using Firebase.Auth;
 using Firebase.Storage;
+using IMS.ViewModels.Post;
 
 namespace IMS.Controllers
 {
@@ -74,7 +75,7 @@ namespace IMS.Controllers
             return View();
         }
        
-        public void Pagination(int page, int pageSize, List<Post> postList, string searchTerm)
+        public void Pagination(int page, int pageSize, List<Models.Post> postList, string searchTerm)
         {
 
             // Tính toán số trang và dữ liệu cho trang hiện tại
@@ -112,8 +113,8 @@ namespace IMS.Controllers
         // GET: Posts/Create
         public IActionResult Create()
         {
-            ViewData["AuthorId"] = new SelectList(_context.Users, "Id", "Id");
-            ViewData["CategoryId"] = new SelectList(_context.Settings, "Id", "Id");
+            var cate = _context.Settings.Where(c => c.Type == "POST_CATEGORY").ToList();
+            ViewBag.Setting = new SelectList(cate, "Value", "Value");
             return View();
         }
 
@@ -122,15 +123,52 @@ namespace IMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,CreatedAt,UpdatedAt,IsPublic,ImageUrl,AuthorId,CategoryId")] Post post)
+        public async Task<IActionResult> Create(ViewModels.Post.Post post, IFormFile? imgFile)
         {
+            int? id = HttpContext.Session.GetUser()?.Id;
+            
             if (ModelState.IsValid)
             {
-                _context.Add(post);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var category = _context.Settings.SingleOrDefault(s => s.Value == post.Category);
+                if (id != post.Id)
+                {
+                    return NotFound();
+                }
+                if (imgFile != null && imgFile.Length > 0)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imgFile.FileName);
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Avatars", fileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+
+                        imgFile.CopyTo(fileStream);
+
+                    }
+                    var fileStream2 = new FileStream(filePath, FileMode.Open);
+                    var downloadLink = await Upload(fileStream2, imgFile.FileName);
+
+                    post.ImageUrl = downloadLink;
+                }
+                if (id!=null)
+                {
+                    var postViewModel = new IMS.Models.Post
+                    {
+                        Title = post.Title,
+                        Description = post.Description,
+                        CreatedAt = post.CreatedAt,
+                        ImageUrl = post.ImageUrl,
+                        AuthorId = (int)id,
+                        CategoryId = category.Id,
+                        IsPublic = post.IsPublic,
+                    };
+                    _context.Add(post);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+               
             }
-            return View(post);
+                return View(post);
         }
 
         // GET: Posts/Edit/5
@@ -167,7 +205,7 @@ namespace IMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, IMS.ViewModels.Post.Post post,string category, IFormFile imgFile)
+        public async Task<IActionResult> Edit(int id, IMS.ViewModels.Post.Post post,string category, IFormFile? imgFile)
         {
             if (id != post.Id)
             {
@@ -194,15 +232,29 @@ namespace IMS.Controllers
             {
                 try
                 {
-                    IMS.Models.Post postUpdate = _context.Posts.Include(p => p.Author).Include(p => p.Category).SingleOrDefault(p => p.Id == id); ;
-                    postUpdate.Title = post.Title;
-                    postUpdate.Description = post.Description;
-                    postUpdate.CreatedAt = post.CreatedAt;
-                    postUpdate.ImageUrl = post.ImageUrl;
-                    postUpdate.Author.Name = post.Author;
-                    postUpdate.CategoryId = cate.Id;
-                    postUpdate.IsPublic = post.IsPublic;
-                    _context.SaveChanges();
+                    IMS.Models.Post postUpdate = _context.Posts.Include(p => p.Author).Include(p => p.Category).SingleOrDefault(p => p.Id == id);
+                    if (imgFile != null)
+                    {
+                        postUpdate.Title = post.Title;
+                        postUpdate.Description = post.Description;
+                        postUpdate.CreatedAt = post.CreatedAt;
+                        postUpdate.ImageUrl = post.ImageUrl;
+                        postUpdate.Author.Name = post.Author;
+                        postUpdate.CategoryId = cate.Id;
+                        postUpdate.IsPublic = post.IsPublic;
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        postUpdate.Title = post.Title;
+                        postUpdate.Description = post.Description;
+                        postUpdate.CreatedAt = post.CreatedAt;
+                        postUpdate.Author.Name = post.Author;
+                        postUpdate.CategoryId = cate.Id;
+                        postUpdate.IsPublic = post.IsPublic;
+                        _context.SaveChanges();
+                    }
+                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -219,6 +271,8 @@ namespace IMS.Controllers
             }
             return RedirectToAction(nameof(Edit));
         }
+
+       
         public async Task<string> Upload(FileStream stream, string filename)
         {
             var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
@@ -278,13 +332,45 @@ namespace IMS.Controllers
                     }
                     else
                     {
-                        throw;
+                    //throw;
+                    Console.Error.WriteLine("error");
                     }
                 }
-            return RedirectToAction(nameof(Index), new { success = "success" });
+            return RedirectToAction(nameof(Index));
 
         }
 
+
+        [HttpPost]
+        public IActionResult DeleteAvatar(int id)
+        {
+            try
+            {
+                //int? id = HttpContext.Session.GetUser()?.Id;
+                // Xử lý xóa avatar và cập nhật cơ sở dữ liệu
+                var imgToDelete = _context.Posts.FirstOrDefault(a => a.Id == id);
+
+                if (imgToDelete.ImageUrl != null)
+                {
+                    // Xóa file avatar
+                    //var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Avatars", avatarToDelete.Avatar);
+                    //System.IO.File.Delete(filePath);
+
+                    // Xóa avatar trong cơ sở dữ liệu
+                    // Cập nhật thông tin avatar trong cơ sở dữ liệu
+                    imgToDelete.ImageUrl = null;
+                    _context.SaveChanges();
+                }
+                ViewBag.Success = "Delete avatar successful";
+                return RedirectToAction(nameof(Edit), new { id = id });
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "Error:" + ex.Message;
+                return RedirectToAction(nameof(Index), new { tab = "userdetails" });
+            }
+
+        }
 
         // GET: Posts/Delete/5
         public async Task<IActionResult> Delete(int? id)
