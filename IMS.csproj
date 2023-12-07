@@ -31,6 +31,7 @@
     <None Remove="Views\Home\" />
     <None Remove="Views\Auth\" />
     <None Remove="Extensions\" />
+    <None Remove="Views\Subject\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\Auth\" />
@@ -40,5 +41,6 @@
     <Folder Include="Extensions\" />
     <Folder Include="wwwroot\img\" />
     <Folder Include="wwwroot\Avatars\" />
+    <Folder Include="Views\Subject\" />
   </ItemGroup>
 </Project>

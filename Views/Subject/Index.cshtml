@@ -1,0 +1,89 @@
+﻿@model PaginateEnginee<Subject, SubjectSearchViewModel>;
+
+@{
+    ViewData["Title"] = "Subject List";
+}
+
+<div class="container-fluid mt-5">
+    <div class="card p-4">
+        <div class="mb-3">
+            @using (Html.BeginForm("Index", "Subject", new { page = Model.PageIndex, search = Model.Additional.Search, type = Model.Additional.Type }, FormMethod.Get))
+            {
+                <div class="row align-items-end">
+                    <input type="hidden" class="form-control" asp-for="PageIndex" placeholder="Searh subject code or name" name="page">
+                    <div class="col-md-2">
+                        <label class="form-label">Type</label>
+                        <select class="form-select" name="type" asp-for="Additional.Type">
+                            <option value="all">All</option>
+                            <option value="activate">Activate</option>
+                            <option value="deactivate">Deactivate</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Search</label>
+                        <input type="text" class="form-control" placeholder="Searh subject code or name" name="search" asp-for="Additional.Search">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <table style="border-width: 1px;  border-color: #e0e0e0" class="table table-bordered " id="sorttable-table">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Id</th>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.NoItemsFound)
+                {
+                    <tr>
+                        <td colspan=4>
+                            <div class="text-secondary text-center">No item not found</div>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var subject in Model.Items)
+                    {
+                        <tr>
+                            <td>@subject.Id</td>
+                            <td>@subject.Code</td>
+                            <td>@subject.Name</td>
+                            <td>@subject.IsActive</td>
+                            <td>
+                                <a asp-action="Active" asp-route-id="@subject.Id">@(subject.IsActive! == true ? "Deactivate":"Activate")</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item"><a class="page-link" href="@Url.Action("Index", "Subject", new {page = i,search = Model.Additional.Search, type = Model.Additional.Type })">@i</a></li>
+                }
+
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+<script>function submitForm(model, page) {
+        console.log(model)
+        $('#paginationForm').submit();
+    }</script>
+

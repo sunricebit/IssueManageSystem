@@ -37,6 +37,7 @@ CREATE TABLE `Post` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
     `Description` TEXT NULL,
+    `Excerpt` TEXT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `UpdatedAt` DATETIME(3) NULL,
     `IsPublic` BOOLEAN NOT NULL DEFAULT false,
@@ -198,7 +199,7 @@ CREATE TABLE `Subject` (
     `Code` VARCHAR(10) NOT NULL,
     `Name` VARCHAR(100) NOT NULL,
     `Description` TEXT NULL,
-    `IsActive` BOOLEAN NOT NULL DEFAULT true,
+    `IsActive` BOOLEAN NOT NULL DEFAULT false,
 
     INDEX `Subject_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
@@ -453,6 +454,30 @@ Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttito
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (5, 'SSG101', 'Working in Group Skills', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
 
 Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.');
+
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (6, 'PRJ321', 'Web-Based Java Applications', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.');
+
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (7, 'NWC202', 'Computer Networking', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.');
+
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (8, 'SWE102', 'Introduction to Software Engineering', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.');
+
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (9, 'JPD121', 'Elementary Japanese 1.2', 1, null);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (10, 'LAB221', 'Desktop Java Lab', 0, null);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (11, 'JPD131', 'Elementary Japanese 2.1', 1, null);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (12, 'LAB231', 'Web Java Lab', 0, null);
+
+
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (13, 'PRN292', '.NET and C#', 1, null);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (14, 'SWR301', 'Software Requirements', 0, null);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (15, 'SWQ391', 'Software Quality Assurance and Testing', 1, null);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (16, 'OJS201', 'On the job training	', 1, null);
+
 
 insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (1, 'ASS1', 'Assignment 1', null, 1);
 insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (2, 'ASS2', 'Assignment 2', null, 2);
