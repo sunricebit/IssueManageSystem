@@ -1,8 +1,5 @@
 ﻿@using IMS.ViewModels.Paginate;
 
-@*
-   
-*@
 @{
     ViewData["Title"] = "User List";
     Pagination pagination = ViewBag.Pagination;
@@ -190,27 +187,4 @@
     </div>
 }
 <script>
-    function filterUsersByRole(roleId) {
-       
-
-        if (roleId === "") {
-            window.location.href = '/User';
-        } else {
-            window.location.href = `/User/FilterRole?roleid=${roleId}`;
-        }
-    }
     
-        function filterUsersByStatus(status) {
-        if (status === "") {
-            window.location.href = '/User';
-        } else {
-            window.location.href = `/User/FilterStatus?status=${status}`;
-        }}
-    $(document).ready(function () {
-        $('#successModal').modal('show');
-    });
-    function submitForm() {
-        document.getElementById("importForm").submit();
-    }
-
-</script>

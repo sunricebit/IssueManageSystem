@@ -23,7 +23,7 @@ namespace IMS.Controllers
         private readonly IUserService userService;
         private readonly IMailService _mailService;
         private readonly IHashService _hashService;
-        public UserController(IUserService service, Microsoft.AspNetCore.Hosting.IHostingEnvironment env, IMailService mailService, IHashService hashService)
+        public UserController(IUserService service, IMailService mailService, IHashService hashService)
         {
             userService = service;
             _mailService = mailService;
@@ -206,11 +206,7 @@ namespace IMS.Controllers
                         ThrowOnCancel = true
                     }
                 );
-
-                // Specify the path to the old avatar to be deleted
                 var oldAvatarPath = $"User/{filename}";
-
-                // Delete the file
                 await storage.Child(oldAvatarPath).DeleteAsync();
             }
             catch (Exception ex)
@@ -373,13 +369,10 @@ namespace IMS.Controllers
                 return NotFound();
             }
 
-            // Invert the status
             user.Status = !user.Status;
-
-            // Update the user in the database
+       
             userService.UpdateUser(user);
 
-            // Redirect back to the Index action or any other desired action
             return RedirectToAction("Index");
         }
 
