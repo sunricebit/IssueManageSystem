@@ -11,8 +11,8 @@ CREATE TABLE `Setting` (
     `Value` VARCHAR(50) NOT NULL,
     `Description` VARCHAR(400) NULL,
 
-    INDEX `Setting_Type_Value_idx`(`Type`, `Value`),
     INDEX `Setting_Id_idx`(`Id`),
+    INDEX `Setting_Type_Value_idx`(`Type`, `Value`),
     UNIQUE INDEX `Setting_Type_Value_key`(`Type`, `Value`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -41,7 +41,7 @@ CREATE TABLE `Post` (
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `UpdatedAt` DATETIME(3) NULL,
     `IsPublic` BOOLEAN NOT NULL DEFAULT false,
-    `ImageUrl` VARCHAR(100) NULL,
+    `ImageUrl` VARCHAR(300) NULL,
     `AuthorId` INTEGER NOT NULL,
     `CategoryId` INTEGER NULL,
 
@@ -56,7 +56,7 @@ CREATE TABLE `User` (
     `Password` VARCHAR(64) NOT NULL,
     `RoleId` INTEGER NOT NULL,
     `Name` VARCHAR(50) NOT NULL,
-    `Avatar` VARCHAR(250) NULL,
+    `Avatar` VARCHAR(300) NULL,
     `Gender` BOOLEAN NULL,
     `Phone` VARCHAR(15) NULL,
     `Address` VARCHAR(191) NULL,
@@ -89,6 +89,7 @@ CREATE TABLE `Class` (
     `Description` VARCHAR(300) NULL,
     `TeacherId` INTEGER NULL,
     `SubjectId` INTEGER NULL,
+    `IsActive` BOOLEAN NOT NULL DEFAULT false,
 
     INDEX `Class_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
@@ -165,8 +166,8 @@ CREATE TABLE `Permission` (
     `CanUpdate` BOOLEAN NOT NULL DEFAULT false,
     `CanDelete` BOOLEAN NOT NULL DEFAULT false,
 
-    INDEX `Permission_RoleId_Page_idx`(`RoleId`, `PageId`),
-    UNIQUE INDEX `Permission_RoleId_Page_key`(`RoleId`, `PageId`),
+    INDEX `Permission_RoleId_PageId_idx`(`RoleId`, `PageId`),
+    UNIQUE INDEX `Permission_RoleId_PageId_key`(`RoleId`, `PageId`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -199,7 +200,7 @@ CREATE TABLE `Subject` (
     `Code` VARCHAR(10) NOT NULL,
     `Name` VARCHAR(100) NOT NULL,
     `Description` TEXT NULL,
-    `IsActive` BOOLEAN NOT NULL DEFAULT false,
+    `IsActive` BOOLEAN NOT NULL DEFAULT true,
 
     INDEX `Subject_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
@@ -266,10 +267,10 @@ ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_AssignmentId_fkey` FOREIGN KEY
 ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Permission` ADD CONSTRAINT `Permission_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Permission` ADD CONSTRAINT `Permission_PageId_fkey` FOREIGN KEY (`PageId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Permission` ADD CONSTRAINT `Permission_PageId_fkey` FOREIGN KEY (`PageId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Permission` ADD CONSTRAINT `Permission_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Project` ADD CONSTRAINT `Project_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;

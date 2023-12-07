@@ -18,6 +18,7 @@ namespace IMS.Models
         public string? Description { get; set; }
         public int? TeacherId { get; set; }
         public int? SubjectId { get; set; }
+        public bool IsActive { get; set; }
 
         public virtual Subject? Subject { get; set; }
         public virtual User? Teacher { get; set; }
