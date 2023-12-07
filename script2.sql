@@ -201,6 +201,7 @@ CREATE TABLE `Subject` (
     `Name` VARCHAR(100) NOT NULL,
     `Description` TEXT NULL,
     `IsActive` BOOLEAN NOT NULL DEFAULT true,
+    `SubjectManagerId` INTEGER NOT NULL,
 
     INDEX `Subject_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
@@ -283,6 +284,9 @@ ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_ProjectId_fkey` FORE
 
 -- AddForeignKey
 ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 INSERT INTO `IMS`.`Setting` (`Type`, `Value`)
 VALUES ('ROLE', 'Admin'),

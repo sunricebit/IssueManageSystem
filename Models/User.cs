@@ -13,6 +13,7 @@ namespace IMS.Models
             IssueAuthors = new HashSet<Issue>();
             Posts = new HashSet<Post>();
             Projects = new HashSet<Project>();
+            Subjects = new HashSet<Subject>();
             ClassesNavigation = new HashSet<Class>();
             ProjectsNavigation = new HashSet<Project>();
         }
@@ -38,6 +39,7 @@ namespace IMS.Models
         public virtual ICollection<Issue> IssueAuthors { get; set; }
         public virtual ICollection<Post> Posts { get; set; }
         public virtual ICollection<Project> Projects { get; set; }
+        public virtual ICollection<Subject> Subjects { get; set; }
 
         public virtual ICollection<Class> ClassesNavigation { get; set; }
         public virtual ICollection<Project> ProjectsNavigation { get; set; }

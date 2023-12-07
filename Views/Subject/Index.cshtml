@@ -59,10 +59,10 @@
                             <td>@subject.Code</td>
                             <td>@subject.Name</td>
                             <td>
-                                <input class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" readonly @(subject.IsActive ? "checked" : "") />
+                                <input class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" readonly @(subject.IsActive == true ? "checked" : "") />
                             </td>
                             <td>
-                                <a class="page-link text-decoration text-primary" href="@Url.Action("Active", "Subject", new {subjectId = subject.Id, page = Model.PageIndex,search = Model.Additional.Search, type = Model.Additional.Type })">@(subject.IsActive ? "Deactivate":"Activate")</a>
+                                <a class="page-link text-decoration text-primary" href="@Url.Action("Active", "Subject", new {subjectId = subject.Id, page = Model.PageIndex,search = Model.Additional.Search, type = Model.Additional.Type })">@(subject.IsActive == true ? "Deactivate":"Activate")</a>
                             </td>
                         </tr>
                     }

@@ -445,6 +445,8 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.Id, "Subject_Id_idx");
 
+                entity.HasIndex(e => e.SubjectManagerId, "Subject_SubjectManagerId_fkey");
+
                 entity.Property(e => e.Code).HasMaxLength(10);
 
                 entity.Property(e => e.Description).HasColumnType("text");
@@ -454,6 +456,12 @@ namespace IMS.Models
                     .HasDefaultValueSql("'1'");
 
                 entity.Property(e => e.Name).HasMaxLength(100);
+
+                entity.HasOne(d => d.SubjectManager)
+                    .WithMany(p => p.Subjects)
+                    .HasForeignKey(d => d.SubjectManagerId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Subject_SubjectManagerId_fkey");
             });
 
             modelBuilder.Entity<User>(entity =>
