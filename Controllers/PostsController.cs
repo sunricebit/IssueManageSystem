@@ -8,13 +8,18 @@ using Microsoft.EntityFrameworkCore;
 using IMS.Models;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Bibliography;
+using Firebase.Auth;
+using Firebase.Storage;
 
 namespace IMS.Controllers
 {
     public class PostsController : Controller
     {
         private readonly IMSContext _context;
-
+        private static string ApiKey = "AIzaSyBjstBnMJX7h_NlJ5-vqcQE0V-Ldaztnk8";
+        private static string Bucket = "imsmanagement-35781.appspot.com";
+        private static string AuthEmail = "abc@gmail.com";
+        private static string AuthPassword = "123456";
         public PostsController(IMSContext context)
         {
             _context = context;
@@ -137,6 +142,8 @@ namespace IMS.Controllers
             }
 
             var post = _context.Posts.Include(p => p.Author).Include(p => p.Category).SingleOrDefault(p=>p.Id==id);
+            var cate = _context.Settings.Where(c => c.Type == "POST_CATEGORY").Where(c=>c.Value!=post.Category.Value).ToList();
+            ViewBag.Setting = new SelectList(cate, "Value", "Value");
             var postViewModel = new IMS.ViewModels.Post.Post
             {
                 Title = post.Title,
@@ -145,6 +152,7 @@ namespace IMS.Controllers
                 ImageUrl = post.ImageUrl,
                 Author = post.Author.Name,
                 Category = post.Category.Value,
+                IsPublic= post.IsPublic,
             };
             if (post == null)
             {
@@ -159,13 +167,29 @@ namespace IMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, IMS.ViewModels.Post.Post post)
+        public async Task<IActionResult> Edit(int id, IMS.ViewModels.Post.Post post,string category, IFormFile imgFile)
         {
             if (id != post.Id)
             {
                 return NotFound();
             }
+            if (imgFile != null && imgFile.Length > 0)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imgFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Avatars", fileName);
 
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+
+                    imgFile.CopyTo(fileStream);
+
+                }
+                var fileStream2 = new FileStream(filePath, FileMode.Open);
+                var downloadLink = await Upload(fileStream2, imgFile.FileName);
+
+                post.ImageUrl = downloadLink;
+            }
+            var cate = _context.Settings.SingleOrDefault(c => c.Value == category);
             if (ModelState.IsValid)
             {
                 try
@@ -176,7 +200,8 @@ namespace IMS.Controllers
                     postUpdate.CreatedAt = post.CreatedAt;
                     postUpdate.ImageUrl = post.ImageUrl;
                     postUpdate.Author.Name = post.Author;
-                    postUpdate.Category.Value = post.Category;
+                    postUpdate.CategoryId = cate.Id;
+                    postUpdate.IsPublic = post.IsPublic;
                     _context.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -194,7 +219,35 @@ namespace IMS.Controllers
             }
             return RedirectToAction(nameof(Edit));
         }
-        //[Route("UpdateIsPublic")]
+        public async Task<string> Upload(FileStream stream, string filename)
+        {
+            var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
+            var a = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
+            var cancellation = new CancellationTokenSource();
+            var task = new FirebaseStorage(
+                Bucket,
+                new FirebaseStorageOptions
+                {
+                    AuthTokenAsyncFactory = () => Task.FromResult(a.FirebaseToken),
+                    ThrowOnCancel = true
+                }
+                ).Child("User")
+                 .Child(filename)
+                 .PutAsync(stream, cancellation.Token);
+            try
+            {
+                string link = await task;
+                return link;
+
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine("Exception was thrown : {0}", ex);
+                return null;
+            }
+        }
+
         [Route("UpdateIsPublic")]
         [HttpPost]
         //[ValidateAntiForgeryToken]
