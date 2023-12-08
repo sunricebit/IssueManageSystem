@@ -1,4 +1,5 @@
 ﻿@model PaginateEnginee<Subject, SubjectSearchViewModel>;
+@inject Intermediate intermediate
 
 @{
     ViewData["Title"] = "Subject List";
@@ -22,7 +23,6 @@
                     <div class="col-md-4">
                         <label class="form-label">Search</label>
                         <input type="text" class="form-control" placeholder="Searh subject code or name" name="search" asp-for="Additional.Search">
-                        <span asp-validation-for="Additional.Search" class="text-danger"></span>
                     </div>
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-primary">Search</button>
@@ -30,7 +30,7 @@
 
 
                     <div class="col-md-2 text-end">
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                        <button type="button" class="btn btn-primary" onclick="openPopupAddSubject()">
                             New subject
                         </button>
                     </div>
@@ -94,50 +94,57 @@
     </div>
 </div>
 
-<!-- Button trigger modal -->
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal" id="exampleModal" tabindex="-1" style="background-color:#2220208c">
     <div class="modal-dialog">
         <div class="modal-content">
-            @using (Html.BeginForm("AddSubject", "YourController", FormMethod.Post, new { @id = "addSubjectForm" }))
+            @using (Html.BeginForm("AddSubject", "Subject", new { page = Model.PageIndex, search = Model.Additional.Search, type = Model.Additional.Type }, FormMethod.Post))
             {
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup()"></button>
                 </div>
                 <div class="modal-body">
                     @Html.AntiForgeryToken()
 
                     <div class="form-group">
                         @Html.LabelFor(model => model.Additional.Code, new { @class = "control-label" })
-                        @Html.TextBoxFor(model => model.Additional.Code, new { @class = "form-control" })
+                        @Html.TextBoxFor(model => model.Additional.Code, new { @class = "form-control", @id = "code" })
                         @Html.ValidationMessageFor(model => model.Additional.Code, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group">
                         @Html.LabelFor(model => model.Additional.Name, new { @class = "control-label" })
-                        @Html.TextBoxFor(model => model.Additional.Name, new { @class = "form-control" })
+                        @Html.TextBoxFor(model => model.Additional.Name, new { @class = "form-control", @id = "name" })
                         @Html.ValidationMessageFor(model => model.Additional.Name, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group">
                         @Html.LabelFor(model => model.Additional.Description, new { @class = "control-label" })
-                        @Html.TextBoxFor(model => model.Additional.Description, new { @class = "form-control" })
+                        @Html.TextBoxFor(model => model.Additional.Description, new { @class = "form-control", @id = "description" })
                     </div>
 
                     <div class="form-group">
-                        <label class="control-label">Is Active?</label>
+                        <label class="control-label">Is Active @intermediate.IsActive</label>
                         <div class="custom-control custom-switch">
-                            @Html.CheckBoxFor(model => model.Additional.IsActive, new { @class = "custom-control-input", id = "isActiveSwitch" })
+                            <input type="checkbox" checked id="isActive" />
+                            @*@Html.CheckBoxFor(model => intermediate.IsActive, new { @id = "isActive" })*@
                             <label class="custom-control-label" for="isActiveSwitch"></label>
                         </div>
                     </div>
 
                     <div class="form-group">
                         @Html.LabelFor(model => model.Additional.SubjectManagerId, new { @class = "control-label" })
-                        @Html.DropDownListFor(model => model.Additional.SubjectManagerId, ViewBag.SubjectManagers as SelectList, "Select a Subject Manager", new { @class = "form-control" })
+                        @Html.DropDownListFor(model => model.Additional.SubjectManagerId, ViewBag.SubjectManagers as SelectList, "Select a Subject Manager", new { @class = "form-control", @id = "subjectManagerId" })
                         @Html.ValidationMessageFor(model => model.Additional.SubjectManagerId, "", new { @class = "text-danger" })
                     </div>
+
+                    @if (!string.IsNullOrEmpty(@intermediate.Error))
+                    {
+                        <div class="text-danger text-center mt-3">
+                            @intermediate.Error
+                        </div>
+                    }
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -145,6 +152,69 @@
                 </div>
             }
         </div>
-
     </div>
 </div>
+
+<script>
+
+
+    var error = "@intermediate.Error";
+
+    if (sessionStorage.getItem("checked") === null) {
+        sessionStorage.setItem("checked", "false")
+    }
+
+    document.getElementById("isActive").addEventListener("change", function (e) {
+        sessionStorage.setItem("checked", this.checked)
+    })
+
+
+    if (error) {
+        openPopupAddSubject(error)
+    }
+
+    function openPopupAddSubject(error) {
+        var popup = document.getElementById("exampleModal");
+
+        if (error) {
+            document.getElementById("code").value = "@intermediate.Code";
+            document.getElementById("name").value = "@(intermediate.Name)";
+            document.getElementById("description").value = "@(intermediate.Description)";
+            document.getElementById("isActive").checked = sessionStorage.getItem("checked") === "true";
+            document.getElementById("subjectManagerId").value = "@(intermediate.SubjectManagerId)";
+        } else {
+            document.getElementById("code").value = "";
+            document.getElementById("name").value = "";
+            document.getElementById("description").value = "";
+            document.getElementById("isActive").checked = false;
+            document.getElementById("subjectManagerId").value = null;
+        }
+        popup.style.display = 'block';
+    }
+
+    function closePopup() {
+        var popup = document.getElementById("exampleModal");
+        popup.style.display = 'none';
+    }
+
+
+
+    //document.getElementById("code").addEventListener("change", (event) => {
+    //    sessionStorage.setItem("code", event.target.value)
+    //});
+    //document.getElementById("name").addEventListener("change", (event) => {
+    //    sessionStorage.setItem("name", event.target.value)
+    //});
+    //document.getElementById("description").addEventListener("change", (event) => {
+    //    sessionStorage.setItem("description", event.target.value)
+    //});
+    document.getElementById("isActive").addEventListener("change", (event) => {
+        sessionStorage.setItem("isActive", this.checked)
+    });
+    //document.getElementById("subjectManagerId").addEventListener("change", (event) => {
+    //    sessionStorage.setItem("subjectManagerId", event.target.value)
+    //});
+
+
+
+</script>
