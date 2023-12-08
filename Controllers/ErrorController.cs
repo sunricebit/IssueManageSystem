@@ -5,7 +5,7 @@ namespace IMS.Controllers
     [Route("Error")]
     public class ErrorController : Controller
     {
-        [Route("NotAccess")]
+        [Route  ("NotAccess")]
         public IActionResult NotAccess()
         {
             return View();
