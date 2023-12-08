@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 public class SubjectSearchViewModel
 {
@@ -11,6 +11,23 @@ public class SubjectSearchViewModel
         Search = search;
         Type = type;
     }
+
+    [Required]
+    [StringLength(10, ErrorMessage = "The password must be at least {2} characters long.", MinimumLength = 3)]
+    public string? Code { get; set; }
+
+    [Required]
+    public string? Name { get; set; }
+
+
+    public string? Description { get; set; }
+
+    [Required]
+    public bool IsActive { get; set; } = false;
+
+    [Required]
+    public int SubjectManagerId { get; set; }
+
 }
 
 
@@ -47,6 +64,7 @@ namespace IMS.Controllers
             }
 
             subjects = subjects.Include(subject => subject.SubjectManager).OrderByDescending(s=> s.CreatedAt);
+            ViewBag.SubjectManagers = new SelectList( _context.Users.Where(user => user.Role.Value == RoleUser.SubjectManager).ToList(),  "Id", "Name");
 
             PaginateEnginee<Subject, SubjectSearchViewModel> a = PaginateEnginee<Subject, SubjectSearchViewModel>.Create(subjects, page ?? 1);
             a.Additional = new SubjectSearchViewModel(search ?? "", type ?? "");
@@ -56,7 +74,7 @@ namespace IMS.Controllers
 
         [Route("/subjects")]
         [HttpPost]
-        public IActionResult Index(PaginateEnginee<Subject, SubjectSearchViewModel> b,  int? page, string? search, string? type)
+        public IActionResult Index(IFormCollection collection,  int? page, string? search, string? type)
         {
 
             var subjects = _context.Subjects.AsQueryable();
@@ -77,10 +95,8 @@ namespace IMS.Controllers
             }
 
             subjects = subjects.Include(subject => subject.SubjectManager).OrderByDescending(s => s.CreatedAt);
-
             PaginateEnginee<Subject, SubjectSearchViewModel> a = PaginateEnginee<Subject, SubjectSearchViewModel>.Create(subjects, page ?? 1);
             a.Additional = new SubjectSearchViewModel(search ?? "", type ?? "");
-
             return View(a);
         }
 
@@ -95,7 +111,5 @@ namespace IMS.Controllers
 
             return RedirectToAction("Index", new { page = page, search = search, type = type });
         }
-
-
     }
 }

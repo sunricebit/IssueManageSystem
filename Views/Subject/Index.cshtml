@@ -22,10 +22,19 @@
                     <div class="col-md-4">
                         <label class="form-label">Search</label>
                         <input type="text" class="form-control" placeholder="Searh subject code or name" name="search" asp-for="Additional.Search">
+                        <span asp-validation-for="Additional.Search" class="text-danger"></span>
                     </div>
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-primary">Search</button>
                     </div>
+
+
+                    <div class="col-md-2 text-end">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            New subject
+                        </button>
+                    </div>
+
                 </div>
             }
         </div>
@@ -85,5 +94,57 @@
     </div>
 </div>
 
+<!-- Button trigger modal -->
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("AddSubject", "YourController", FormMethod.Post, new { @id = "addSubjectForm" }))
+            {
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
 
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Additional.Code, new { @class = "control-label" })
+                        @Html.TextBoxFor(model => model.Additional.Code, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.Additional.Code, "", new { @class = "text-danger" })
+                    </div>
 
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Additional.Name, new { @class = "control-label" })
+                        @Html.TextBoxFor(model => model.Additional.Name, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.Additional.Name, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Additional.Description, new { @class = "control-label" })
+                        @Html.TextBoxFor(model => model.Additional.Description, new { @class = "form-control" })
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Is Active?</label>
+                        <div class="custom-control custom-switch">
+                            @Html.CheckBoxFor(model => model.Additional.IsActive, new { @class = "custom-control-input", id = "isActiveSwitch" })
+                            <label class="custom-control-label" for="isActiveSwitch"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Additional.SubjectManagerId, new { @class = "control-label" })
+                        @Html.DropDownListFor(model => model.Additional.SubjectManagerId, ViewBag.SubjectManagers as SelectList, "Select a Subject Manager", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.Additional.SubjectManagerId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
