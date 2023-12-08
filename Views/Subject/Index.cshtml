@@ -106,34 +106,33 @@
                 <div class="modal-body">
                     @Html.AntiForgeryToken()
 
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.Additional.Code, new { @class = "control-label" })
+                    <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.Additional.Code, new { @class = "control-label mb-1" })
                         @Html.TextBoxFor(model => model.Additional.Code, new { @class = "form-control", @id = "code" })
                         @Html.ValidationMessageFor(model => model.Additional.Code, "", new { @class = "text-danger" })
                     </div>
 
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.Additional.Name, new { @class = "control-label" })
+                    <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.Additional.Name, new { @class = "control-label mb-1" })
                         @Html.TextBoxFor(model => model.Additional.Name, new { @class = "form-control", @id = "name" })
                         @Html.ValidationMessageFor(model => model.Additional.Name, "", new { @class = "text-danger" })
                     </div>
 
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.Additional.Description, new { @class = "control-label" })
+                    <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.Additional.Description, new { @class = "control-label mb-1" })
                         @Html.TextBoxFor(model => model.Additional.Description, new { @class = "form-control", @id = "description" })
                     </div>
 
-                    <div class="form-group">
-                        <label class="control-label">Is Active @intermediate.IsActive</label>
+                    <div class="form-group mb-3">
+                        <label class="control-label">Activate </label>
                         <div class="custom-control custom-switch">
-                            <input type="checkbox" checked id="isActive" />
-                            @*@Html.CheckBoxFor(model => intermediate.IsActive, new { @id = "isActive" })*@
+                            <input type="checkbox" id="isActive" name="isActive"/>
                             <label class="custom-control-label" for="isActiveSwitch"></label>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.Additional.SubjectManagerId, new { @class = "control-label" })
+                    <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.Additional.SubjectManagerId, new { @class = "control-label mb-1" })
                         @Html.DropDownListFor(model => model.Additional.SubjectManagerId, ViewBag.SubjectManagers as SelectList, "Select a Subject Manager", new { @class = "form-control", @id = "subjectManagerId" })
                         @Html.ValidationMessageFor(model => model.Additional.SubjectManagerId, "", new { @class = "text-danger" })
                     </div>
@@ -147,7 +146,7 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup()">Close</button>
                     <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             }

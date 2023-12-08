@@ -81,6 +81,9 @@ namespace IMS.Controllers
             string code = collection["Additional.Code"];
             string name = collection["Additional.Name"];
             string description = collection["Additional.Description"];
+
+            var a = collection["isActive"].ToString();
+            bool isActive = !string.IsNullOrEmpty(collection["isActive"].ToString());
             int subjectManagerId = int.Parse(collection["Additional.SubjectManagerId"]);
 
             var subject = _context.Subjects.SingleOrDefault(subject => subject.Code.ToLower().Equals(code.Trim().ToLower()));
@@ -100,6 +103,7 @@ namespace IMS.Controllers
                 Code = code,
                 Name = name,
                 Description = description,
+                IsActive = isActive,
                 SubjectManagerId = subjectManagerId
             };
 
