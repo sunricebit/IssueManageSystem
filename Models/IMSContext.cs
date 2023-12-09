@@ -52,6 +52,10 @@ namespace IMS.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
+                entity.Property(e => e.IsActive)
+                    .IsRequired()
+                    .HasDefaultValueSql("'1'");
+
                 entity.Property(e => e.Name).HasMaxLength(100);
 
                 entity.HasOne(d => d.Subject)

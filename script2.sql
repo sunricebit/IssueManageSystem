@@ -87,6 +87,8 @@ CREATE TABLE `Assignment` (
     `Name` VARCHAR(100) NOT NULL,
     `Description` TEXT NULL,
     `SubjectId` INTEGER NULL,
+    `IsActive` BOOLEAN NOT NULL DEFAULT true,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `Assignment_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)

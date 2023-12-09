@@ -2,6 +2,7 @@ using System;
 using IMS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Org.BouncyCastle.Utilities;
 
 public class SubjectSearchViewModel
 {
@@ -26,17 +27,36 @@ public class SubjectSearchViewModel
     public string? Description { get; set; }
 
 
-    [Display(Name ="Activate")]
+    [Display(Name = "Activate")]
     public bool IsActive { get; set; }
 
     [Required(ErrorMessage = "Please select a manager")]
-    [Display(Name="Manager")]
+    [Display(Name = "Manager")]
     public int SubjectManagerId { get; set; } = 2;
 }
 
+public class AssignmentViewModel
+{
+    public string? Search { get; set; }
+    public string? Type { get; set; }
+
+    public int PageIndex { get; set; }
+    public int PageSize { get; set; }
+    public int TotalPages { get; set; }
+    public int ItemCount { get; set; }
+
+    public List<Assignment> Assignments { get; set; }
+
+    [Required(ErrorMessage = "Please enter assignment name")]
+    public string? Name { get; set; }
+
+    [StringLength(10, ErrorMessage = "The code must be at least {2} characters long.", MinimumLength = 3)]
+    public string? Description { get; set; }
 
 
-
+    [Display(Name = "Activate")]
+    public bool IsActive { get; set; }
+}
 
 namespace IMS.Controllers
 {
@@ -120,8 +140,6 @@ namespace IMS.Controllers
             return RedirectToAction("Index", new { page = page, search = search, type = type });
         }
 
-
-
         public async Task<IActionResult> Active(int subjectId, int? page, string? search, string? type)
         {
             var subject = _context.Subjects.SingleOrDefault(s => s.Id == subjectId);
@@ -179,10 +197,46 @@ namespace IMS.Controllers
 
         [Route("/subjects/{code}/assignments")]
         [HttpGet]
-        public IActionResult Assignments(string code)
+        public IActionResult Assignments(string code, string? search, int? page, string? type)
         {
-            var assignments = _context.Assignments.Where(assignment => assignment.Subject != null && assignment.Subject.Code == code).ToList();
-            return View(assignments);
+            var assignments = _context.Assignments.AsQueryable();
+            assignments = assignments.Where(ass => ass.Subject != null && ass.Subject.Code.ToLower().Contains(code.ToLower()));
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                assignments = assignments.Where(ass => ass.Name.ToLower().Contains(search.ToLower()));
+            }
+
+            switch (type)
+            {
+                case "activate":
+                    assignments = assignments.Where(assignment => assignment.IsActive == true);
+                    break;
+                case "deactivate":
+                    assignments = assignments.Where(assignment => assignment.IsActive == false);
+                    break;
+            }
+
+            int pageIndex = page ?? 1;
+            int pageSize = 2;
+            int itemCount = assignments.Count();
+            int totalPages = (int)Math.Ceiling((double)itemCount / pageSize);
+
+            if (pageIndex > totalPages) pageIndex = 1;
+            assignments = assignments.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+            return View(new AssignmentViewModel() { Assignments = assignments.ToList(), Search = search, PageIndex = pageIndex, PageSize = pageSize, TotalPages = totalPages, ItemCount = itemCount });
+        }
+
+        //[Route("/subjects/{code}/assignments/{assignmentId}/change-status")]
+        public async Task<IActionResult> AssignmentsActive(string code,int assignmentId, int? page, string? search, string? type)
+        {
+            var assignment = _context.Assignments.SingleOrDefault(s => s.Id == assignmentId);
+            if (assignment == null) return RedirectToAction("Assignments", new { page = page, search = search, type = type });
+            assignment.IsActive = !assignment.IsActive;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Assignments", new { code = code, search = search, page = page, type = type });
         }
     }
 }
