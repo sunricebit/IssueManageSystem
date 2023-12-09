@@ -27,8 +27,11 @@
 
 <div class="d-flex">
     <a asp-action="Index" class="btn btn-outline-success" style="height:fit-content">Back to List</a> |
-    <p class="btn btn-outline-success" style="width:50px" onclick="toggleEditing()" >Edit</p>|
-    <p class="btn btn-outline-success" style="width:100px" onclick="openPopup('popupReport')">Report</p>
+    <p class="btn btn-outline-success" style="width:50px" onclick="toggleEditing()" >Edit</p>
+    @if (@ViewBag.CheckAccount == "Admin" || @ViewBag.CheckAccount == "Marketer Manager")
+    {
+          <p>|</p>  <p class="btn btn-outline-success" style="width:100px" onclick="openPopup('popupReport')">Report</p>
+    }
 </div>
 <div class="row">
     <form asp-action="Edit" method="post" id="editForm" enctype="multipart/form-data">
@@ -44,7 +47,7 @@
 
                     <input type="file" class="form-control d-none" id="imgFile" name="imgFile" onchange="displaySelectedImage(event, 'selectedImg')" />
                     </div>
-                    <div class="btn btn-outline-success m-1" id="changeImg">
+                    <div class="btn btn-outline-success m-1" id="deleteImg">
                         <label class="form-label text-green m-0"  onclick="openPopup('popupDelete')">Delete Img</label>
                     </div>
                 </div>
@@ -71,15 +74,14 @@
                 </div>
 
                 <div class="form-group mb-4">
-                    <label asp-for="CreatedAt" class="control-label"></label>
+                    <label asp-for="CreatedAt" class="control-label">CreateDate</label>
                     <input asp-for="CreatedAt" class="form-control" readonly />
                     <span asp-validation-for="CreatedAt" class="text-danger"></span>
                 </div>
 
                 <div class="form-group mb-4 ">
                     <label asp-for="IsPublic" class="form-check-label">
-                        @*data-post-id="@item.Id"*@
-                        @*<input class="form-check-input" asp-for="IsPublic" readonly /> @Html.DisplayNameFor(model => model.IsPublic)*@
+                        Public
                     </label>
                     <input asp-for="IsPublic" class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" disabled />
 
@@ -217,6 +219,7 @@
             document.getElementById('changeImg').style.display = 'none';
             document.getElementById('inputCate').style.display = 'inline-block';
             document.getElementById('selectCate').style.display = 'none';
+
         } else {
             document.getElementById('saveButton').style.display = 'inline-block';
             document.getElementById('changeImg').style.display = 'inline-block';

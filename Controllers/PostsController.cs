@@ -11,6 +11,9 @@ using DocumentFormat.OpenXml.Bibliography;
 using Firebase.Auth;
 using Firebase.Storage;
 using IMS.ViewModels.Post;
+using System.Composition;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace IMS.Controllers
 {
@@ -21,6 +24,7 @@ namespace IMS.Controllers
         private static string Bucket = "imsmanagement-35781.appspot.com";
         private static string AuthEmail = "abc@gmail.com";
         private static string AuthPassword = "123456";
+        public static string checkCreate;
         public PostsController(IMSContext context)
         {
             _context = context;
@@ -32,6 +36,14 @@ namespace IMS.Controllers
         public async Task<IActionResult> Index(int page = 1, int pageSize = 6, string searchTerm = "", string filterCat="")
         {
             int? id = HttpContext.Session.GetUser()?.Id;
+
+            var user = _context.Users.Include(u => u.Role).Where(u => u.Role.Type == "ROLE").SingleOrDefault(u => u.Id == id);
+            ViewBag.CheckAccount = user.Role.Value;
+            if (checkCreate == "Create successful!")
+            {
+                ViewBag.Success = "Create successful!";
+                checkCreate = "";
+            }
             if (id==null)
             {
                 return NotFound();
@@ -43,7 +55,7 @@ namespace IMS.Controllers
                 == "POST_CATEGORY").ToList();
                 ViewBag.Setting = new SelectList(cate, "Value", "Value");
 
-                var user = _context.Users.Include(u => u.Role).Where(u => u.Role.Type == "ROLE").SingleOrDefault(u => u.Id == id);
+                
                 if (user.Role.Value == "Admin" || user.Role.Value == "Marketer Manager")
                 {
                     if (searchTerm == null)
@@ -57,6 +69,7 @@ namespace IMS.Controllers
                         {
                             var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
                             Where(p => p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).ToList();
+                            
                             Pagination(page, pageSize, postList, searchTerm);
                         }
 
@@ -129,8 +142,38 @@ namespace IMS.Controllers
 
             return View();
         }
-       
-        public void Pagination(int page, int pageSize, List<Models.Post> postList, string searchTerm)
+        [Route("LoadPopupReport")]
+        [HttpPost]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> LoadPopupReport(int postIdCheckReport)
+        {
+            List<ReportData> reportDatas = new List<ReportData>();
+            var reports = _context.Reports
+                        .Where(r => r.PostId == postIdCheckReport).Include(r=>r.Reporter)
+                        .ToList();
+            
+            foreach (var item in reports)
+            {
+                reportDatas.Add(new ReportData
+                {
+                    Content= item.Content,
+                    Reporter=item.Reporter.Name,
+                    CreatedAt=item.CreatedAt.ToString("dd/MM/yyyy"),
+                });
+            }
+            var jsonOptions = new JsonSerializerOptions
+            {
+                Converters = { new NullHandlingConverter() },
+                ReferenceHandler = ReferenceHandler.Preserve,
+                IgnoreReadOnlyProperties = true, // Add this line
+                                                 // Other options as needed
+            };
+
+            var jsonString = JsonSerializer.Serialize(reportDatas, jsonOptions);
+
+            return Content(jsonString, "application/json");
+        }
+            public void Pagination(int page, int pageSize, List<Models.Post> postList, string searchTerm)
         {
 
             // Tính toán số trang và dữ liệu cho trang hiện tại
@@ -159,13 +202,13 @@ namespace IMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ViewModels.Post.Post post, IFormFile? imgFile)
+        public async Task<IActionResult> Create(Models.Post post, IFormFile? imgFile, string category)
         {
             int? id = HttpContext.Session.GetUser()?.Id;
-            
+           
             if (ModelState.IsValid)
             {
-                var category = _context.Settings.SingleOrDefault(s => s.Value == post.Category);
+                var categoryData = _context.Settings.SingleOrDefault(s => s.Value == category);
                 if (imgFile != null && imgFile.Length > 0)
                 {
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imgFile.FileName);
@@ -188,15 +231,14 @@ namespace IMS.Controllers
                     {
                         Title = post.Title,
                         Description = post.Description,
-                        CreatedAt = DateTime.Now,
                         ImageUrl = post.ImageUrl,
                         AuthorId = (int)id,
-                        CategoryId = category.Id,
+                        CategoryId = categoryData.Id,
                         IsPublic = post.IsPublic,
                     };
                     _context.Add(postViewModel);
                     await _context.SaveChangesAsync();
-                    ViewBag.Success = "success";
+                    checkCreate = "Create successful!";
                     return RedirectToAction(nameof(Index));
                 }
                
@@ -207,10 +249,13 @@ namespace IMS.Controllers
         // GET: Posts/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            int? idAccount = HttpContext.Session.GetUser()?.Id;
             if (id == null || _context.Posts == null)
             {
                 return NotFound();
             }
+            var user = _context.Users.Include(u => u.Role).Where(u => u.Role.Type == "ROLE").SingleOrDefault(u => u.Id == idAccount);
+            ViewBag.CheckAccount = user.Role.Value;
 
             var post = _context.Posts.Include(p => p.Author).Include(p => p.Category).SingleOrDefault(p=>p.Id==id);
             var cate = _context.Settings.Where(c => c.Type == "POST_CATEGORY").Where(c=>c.Value!=post.Category.Value).ToList();
@@ -430,6 +475,18 @@ namespace IMS.Controllers
         private bool PostExists(int id)
         {
           return (_context.Posts?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+    }
+    public class NullHandlingConverter : JsonConverter<object>
+    {
+        public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
+        {
+            JsonSerializer.Serialize(writer, value, value?.GetType() ?? typeof(object), options);
         }
     }
 }
