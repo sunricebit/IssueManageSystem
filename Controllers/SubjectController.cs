@@ -48,7 +48,7 @@ public class AssignmentViewModel
     public List<Assignment> Assignments { get; set; }
 
     [Required(ErrorMessage = "Please enter assignment name")]
-    public string? Name { get; set; }
+    public string Name { get; set; }
 
     [StringLength(10, ErrorMessage = "The code must be at least {2} characters long.", MinimumLength = 3)]
     public string? Description { get; set; }
@@ -202,9 +202,9 @@ namespace IMS.Controllers
             var assignments = _context.Assignments.AsQueryable();
             assignments = assignments.Where(ass => ass.Subject != null && ass.Subject.Code.ToLower().Contains(code.ToLower()));
 
-            if (!string.IsNullOrEmpty(search))
+            if (!string.IsNullOrEmpty(search?.Trim()))
             {
-                assignments = assignments.Where(ass => ass.Name.ToLower().Contains(search.ToLower()));
+                assignments = assignments.Where(ass => ass.Name.ToLower().Contains(search.Trim().ToLower()));
             }
 
             switch (type)
@@ -229,14 +229,33 @@ namespace IMS.Controllers
         }
 
         //[Route("/subjects/{code}/assignments/{assignmentId}/change-status")]
-        public async Task<IActionResult> AssignmentsActive(string code,int assignmentId, int? page, string? search, string? type)
+        public async Task<IActionResult> AssignmentsActive(string code, int assignmentId, int? page, string? search, string? type)
         {
             var assignment = _context.Assignments.SingleOrDefault(s => s.Id == assignmentId);
-            if (assignment == null) return RedirectToAction("Assignments", new { page = page, search = search, type = type });
+            if (assignment == null) return RedirectToAction("Assignments", new { code = code });
             assignment.IsActive = !assignment.IsActive;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Assignments", new { code = code, search = search, page = page, type = type });
+            return RedirectToAction("Assignments", new { code = code });
+        }
+
+        [Route("/subjects/{code}/assignments")]
+        [HttpPost]
+        public async Task<IActionResult> Assignments(AssignmentViewModel vm, string code)
+        {
+            var subject = _context.Subjects.SingleOrDefault(s => s.Code == code);
+            if (subject == null) return NotFound();
+
+            Assignment assignment = new Assignment()
+            {
+                Name = vm.Name,
+                Description = vm.Description,
+                IsActive = vm.IsActive,
+                SubjectId = subject.Id
+            };
+            _context.Assignments.Add(assignment);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Assignments", new { code = code });
         }
     }
 }

@@ -32,7 +32,7 @@
                     </div>
 
                     <div class="col-md-2 text-end">
-                        <button type="button" class="btn btn-primary">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                             New Assignment
                         </button>
                     </div>
@@ -45,7 +45,6 @@
             <thead class="thead-dark">
                 <tr>
                     <th>Name</th>
-                    <th>Description</th>
                     <th>Activate</th>
                     <th></th>
                 </tr>
@@ -65,7 +64,6 @@
                     @foreach (var assignment in Model.Assignments)
                     {
                         <tr>
-                            <td>@assignment.Id</td>
                             <td>@assignment.Name</td>
                             <td>
                                 <input class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" readonly @(assignment.IsActive == true ? "checked" : "") />
@@ -80,22 +78,24 @@
         </table>
 
         <nav aria-label="Page navigation example">
-                <ul class="pagination">
+            <ul class="pagination">
 
-                    @for (int i = 1; i <= Model.TotalPages; i++)
-                    {
-                        <li class="page-item"><a class="page-link" href="@Url.Action("Assignments", "Subject", new { page = i,search = Model.Search, type = Model.Type })">@i</a></li>
-                    }
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item"><a class="page-link" href="@Url.Action("Assignments", "Subject", new { page = i,search = Model.Search, type = Model.Type })">@i</a></li>
+                }
 
-                </ul>
-            </nav>
+            </ul>
+        </nav>
     </div>
 </div>
 
-@*<div class="modal" id="exampleModal" tabindex="-1" style="background-color:#2220208c">
+
+
+<div class="modal" id="exampleModal" tabindex="-1" style="background-color:#2220208c">
     <div class="modal-dialog">
         <div class="modal-content">
-            @using (Html.BeginForm("AddSubject", "Subject", FormMethod.Post))
+            @using (Html.BeginForm("Assignments", "Subject", FormMethod.Post))
             {
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
@@ -111,7 +111,7 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Description, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                        @Html.LabelFor(model => model.Description, new { @class = "control-label mb-1" })
                         @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @id = "name" })
                     </div>
 
@@ -141,4 +141,4 @@
             }
         </div>
     </div>
-</div>*@
+</div>
