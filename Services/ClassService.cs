@@ -1,4 +1,7 @@
-﻿namespace IMS.Services
+﻿using DocumentFormat.OpenXml.VariantTypes;
+using NuGet.DependencyResolver;
+
+namespace IMS.Services
 {
     public class ClassService : IClassService
     {
@@ -10,6 +13,18 @@
         public IEnumerable<Class> GetClasses()
         {
             return _context.Classes.Include(c => c.Students).Include(c => c.Teacher).Include(c => c.Subject).ToList();
+        }
+        public IEnumerable<User> GetAllTeachers()
+        {
+          
+            var teachers = _context.Classes
+                .Include(c => c.Teacher) 
+                .Where(c => c.Teacher != null)
+                .Select(c => c.Teacher)
+                .Distinct()
+                .ToList();
+
+            return teachers;
         }
         public Class GetClass(int id)
         {
@@ -28,6 +43,11 @@
                 return classItem.Students.Count();
             }
             return 0;
+        }
+        public int GetTeacherIdByName(string name)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Name == name);
+            return user.Id;
         }
         public void AddClass(Class Class) 
         {

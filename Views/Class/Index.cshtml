@@ -48,12 +48,12 @@
                         <div class="col-md-4 mb-3">
                             <label for="roleFilter" class="form-label">Filter by Teacher:</label>
                             <select id="roleFilter" class="form-select" name="filterByTeacher">
-                                <option value="">Select Role</option>
+                                <option value="">Select Teacher</option>
 
-                               @* @foreach (var role in ViewBag.Roles)
+                                @foreach (var teacher in ViewBag.TeacherValue)
                                 {
-                                    <option value="@role.Id">@role.Value</option>
-                                }*@
+                                    <option value="@teacher.Name">@teacher.Name</option>
+                                }
                                 <option value="ALL">All Teacher</option>
 
                             </select>
@@ -125,7 +125,7 @@
                             <td>
                                 <div class="btn-group" role="group" aria-label="Class Actions">
                                     <!-- Add your action buttons here, e.g., details, edit, delete -->
-                                    <a asp-action="Details" asp-route-id="@classItem.Id" asp-controller="Class" class="btn btn-info">
+                                    <a asp-action="Details" asp-route-id="@classItem.Id" asp-controller="Class" class="btn btn-info btn-sm">
                                         <i class="fas fa-eye"></i> Details
                                     </a>
                                 </div>

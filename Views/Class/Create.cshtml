@@ -3,3 +3,131 @@
 *@
 @{
 }
+<h2 class="mb-4">Create Class</h2>
+@model IMS.ViewModels.Class.ClassViewModel
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="_token" value="@ViewBag.Token" />
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Name*</label>
+                <div class="col-10">
+                    <input id="Name" name="Name" asp-for="Name" class="form-control" required />
+                    <span id="nameError" asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description (Optional)</label>
+                <div class="col-10">
+                    <input asp-for="Description" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+
+
+            <div class="form-group">
+                <label for="teacherInput">Teacher (Email/Name)*</label>
+                <div class="col-10">
+                    <input type="text" class="form-control" id="teacherInput" name="teacherInput" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="subjectInput">Subject (Code/Name)*</label>
+                <div class="col-10">
+                    <input type="text" class="form-control" id="subjectInput" name="subjectInput" required />
+                </div>
+            </div>
+        </div>
+        <h3>Create Milestones</h3>
+
+        <div id="milestonesContainer">
+            <!-- Duyệt qua danh sách các Milestone đã thêm để hiển thị -->
+            @foreach (var Milestone in Model.Milestones)
+            {
+                <div class="milestone">
+                    <div class="form-group">
+                        <label for="milestones.Title">Milestone Title</label>
+                        <input type="text" class="form-control" name="milestones.Title" value="@Milestone.Title" readonly />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="milestones.Description">Milestone Description</label>
+                        <textarea class="form-control" name="milestones.Description" readonly>@Milestone.Description</textarea>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <button type="submit" class="btn btn-primary">Create</button>
+            <button type="reset" class="btn btn-primary">Reset</button>
+            <a href="/Class" class="btn btn-primary">Back to Classes</a>
+        </div>
+    </div>
+    <div class="modal" id="createMilestoneModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Milestone</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Trường thông tin để điền vào modal -->
+                    <div class="form-group">
+                        <label for="newMilestoneTitle">Milestone Title</label>
+                        <input type="text" class="form-control" id="newMilestoneTitle" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newMilestoneDescription">Milestone Description</label>
+                        <textarea class="form-control" id="newMilestoneDescription"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="addMilestone()">Add Milestone</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openCreateMilestoneModal() {
+            // Mở modal
+            $('#createMilestoneModal').modal('show');
+        }
+
+        function addMilestone() {
+            // Đóng modal
+            $('#createMilestoneModal').modal('hide');
+
+            // Lấy thông tin từ modal và thêm vào danh sách Milestone
+            var newMilestoneTitle = $('#newMilestoneTitle').val();
+            var newMilestoneDescription = $('#newMilestoneDescription').val();
+
+            // Thêm vào danh sách Milestone và hiển thị lên trang
+            var milestoneDiv = document.createElement('div');
+            milestoneDiv.classList.add('milestone');
+            milestoneDiv.innerHTML = `
+                        <div class="form-group">
+                            <label for="milestoneTitle">Milestone Title</label>
+                            <input type="text" class="form-control" name="milestones[${Model.Milestones.Count}].Title" value="${newMilestoneTitle}" readonly />
+                        </div>
+                        <div class="form-group">
+                            <label for="milestoneDescription">Milestone Description</label>
+                            <textarea class="form-control" name="milestones[${Model.Milestones.Count}].Description" readonly>${newMilestoneDescription}</textarea>
+                        </div>
+                    `;
+
+            $('#milestonesContainer').append(milestoneDiv);
+        }
+    </script>
+</form>

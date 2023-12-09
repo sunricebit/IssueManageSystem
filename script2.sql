@@ -88,7 +88,7 @@ CREATE TABLE `Class` (
     `Description` VARCHAR(300) NULL,
     `TeacherId` INTEGER NULL,
     `SubjectId` INTEGER NULL,
-
+    `Status` BOOLEAN NULL,
     INDEX `Class_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
