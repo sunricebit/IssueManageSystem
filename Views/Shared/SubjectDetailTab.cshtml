@@ -1,23 +1,41 @@
-﻿@{
+﻿
+@inject IMSContext context;
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var currentUrl = Context.Request.Path;
-    var code = Context.Request.RouteValues["code"];
+    var code = Context.Request.RouteValues["code"]?.ToString();
 
 
-    var title = currentUrl.ToString().Contains("information") ? "Information" : "Assignments"; ;
+    var title = currentUrl.ToString().Contains("information") ? "Information" : "Assignments";
+
+    string subjectCode = "";
+    string subjectName = "";
+    if (code != null)
+    {
+        var subject = context.Subjects.SingleOrDefault(s => s.Code == code);
+        if (subject != null)
+        {
+            subjectCode = subject.Code;
+            subjectName = subject.Name;
+        }
+
+    }
 }
 
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs mt-4">
     <li class="nav-item">
-        <a class="nav-link @(currentUrl.ToString().Contains("information") ? "text-primary":"")" href="/subjects/@code/information">Information</a>
+        <a class="nav-link @(currentUrl.ToString().Contains("information") ? "text-white bg-primary":"text-primary")" href="/subjects/@code/information">Information</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link @(currentUrl.ToString().Contains("assignments") ? "text-primary":"")" href="/subjects/@code/assignments">Assignments</a>
+        <a class="nav-link @(currentUrl.ToString().Contains("assignments") ? "text-white bg-primary":"text-primary")" href="/subjects/@code/assignments">Assignments</a>
     </li>
 </ul>
 <div>
+    <h2 class="my-4">@subjectCode : @subjectName</h2>
     <h3 class="my-4">@title</h3>
+    <a href="/subjects">Back to list</a>
+    <div class="mb-4"></div>
     @RenderBody()
 </div>
 
