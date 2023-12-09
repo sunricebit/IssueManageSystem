@@ -50,8 +50,6 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.SubjectId, "Assignment_SubjectId_fkey");
 
-                entity.Property(e => e.Code).HasMaxLength(50);
-
                 entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.Name).HasMaxLength(100);

@@ -1,4 +1,5 @@
 using System;
+using IMS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -21,15 +22,20 @@ public class SubjectSearchViewModel
     [Required(ErrorMessage = "Please enter subject name")]
     public string? Name { get; set; }
 
-
+    [StringLength(10, ErrorMessage = "The code must be at least {2} characters long.", MinimumLength = 3)]
     public string? Description { get; set; }
 
+
+    [Display(Name ="Activate")]
     public bool IsActive { get; set; }
 
     [Required(ErrorMessage = "Please select a manager")]
+    [Display(Name="Manager")]
     public int SubjectManagerId { get; set; } = 2;
-
 }
+
+
+
 
 
 namespace IMS.Controllers
@@ -91,7 +97,7 @@ namespace IMS.Controllers
             if (subject != null)
             {
                 intermediate.Error = "Subject exist";
-                intermediate.Code = code;
+                intermediate.Code = code.ToUpper().Trim();
                 intermediate.Name = name;
                 intermediate.Description = description;
                 intermediate.SubjectManagerId = subjectManagerId;
@@ -100,9 +106,9 @@ namespace IMS.Controllers
 
             Subject newSujnect = new()
             {
-                Code = code,
-                Name = name,
-                Description = description,
+                Code = code.ToUpper().Trim(),
+                Name = name.Trim(),
+                Description = description.Trim(),
                 IsActive = isActive,
                 SubjectManagerId = subjectManagerId
             };
@@ -124,6 +130,59 @@ namespace IMS.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("Index", new { page = page, search = search, type = type });
+        }
+
+
+        [Route("/subjects/{code}/information")]
+        public IActionResult SubjectInformation(string code)
+        {
+            var subject = _context.Subjects.Include(s => s.SubjectManager).SingleOrDefault(s => s.Code == code);
+            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.SubjectManager).ToList(), "Id", "Name");
+            if (subject == null) return RedirectToAction("NotFound", "Error");
+            AddSubjectViewModel vm = new()
+            {
+                Code = subject.Code.Trim(),
+                Name = subject.Name.Trim(),
+                Description = subject.Description?.Trim(),
+                SubjectManagerId = subject.SubjectManagerId,
+                IsActive = subject.IsActive ?? false,
+            };
+            return View(vm);
+        }
+
+        [Route("/subjects/{code}/information")]
+        [HttpPost]
+        public async Task<IActionResult> SubjectInformation(AddSubjectViewModel vm, string code)
+        {
+            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.SubjectManager).ToList(), "Id", "Name");
+            if (!ModelState.IsValid) return View(vm);
+
+            var subject = _context.Subjects.Include(s => s.SubjectManager).SingleOrDefault(s => s.Code == code);
+            if (subject == null)
+            {
+                ViewBag.Error = "Subject not found!!!";
+                return View(vm);
+            };
+
+            subject.Code = vm.Code.Trim();
+            subject.Name = vm.Name.Trim();
+            subject.Description = vm.Description?.Trim();
+            subject.SubjectManagerId = vm.SubjectManagerId;
+            subject.IsActive = vm.IsActive;
+
+            ViewBag.Success = "Update subject successfully ";
+
+            await _context.SaveChangesAsync();
+
+            return View(vm);
+        }
+
+        [Route("/subjects/{code}/assignments")]
+        [HttpGet]
+        public IActionResult Assignments(string code)
+        {
+            var assignments = _context.Assignments.Where(assignment => assignment.Subject != null && assignment.Subject.Code == code).ToList();
+            return View(assignments);
         }
     }
 }

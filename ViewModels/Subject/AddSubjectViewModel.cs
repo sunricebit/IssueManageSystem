@@ -5,6 +5,7 @@ namespace IMS.ViewModels.Subject
 	{
         [Required(ErrorMessage = "Please enter subject code.")]
         [StringLength(10, ErrorMessage = "The code must be at least {2} characters long and max 10 characters.", MinimumLength = 3)]
+        [RegularExpression(@"^\S*$", ErrorMessage = "Code cannot contain spaces")]
         public string Code { get; set; }
 
         [Required(ErrorMessage = "Please enter subject name.")]

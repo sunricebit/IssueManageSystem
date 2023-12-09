@@ -45,5 +45,6 @@
     <Folder Include="wwwroot\Avatars\" />
     <Folder Include="Views\Subject\" />
     <Folder Include="ViewModels\Subject\" />
+    <Folder Include="ViewModels\Subject\" />
   </ItemGroup>
 </Project>

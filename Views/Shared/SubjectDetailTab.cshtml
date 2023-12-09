@@ -1,0 +1,23 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var currentUrl = Context.Request.Path;
+    var code = Context.Request.RouteValues["code"];
+
+
+    var title = currentUrl.ToString().Contains("information") ? "Information" : "Assignments"; ;
+}
+
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link @(currentUrl.ToString().Contains("information") ? "text-primary":"")" href="/subjects/@code/information">Information</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(currentUrl.ToString().Contains("assignments") ? "text-primary":"")" href="/subjects/@code/assignments">Assignments</a>
+    </li>
+</ul>
+<div>
+    <h3 class="my-4">@title</h3>
+    @RenderBody()
+</div>
+

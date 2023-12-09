@@ -64,7 +64,7 @@
                 {
                     @foreach (var subject in Model.Items)
                     {
-                        <tr>
+                        <tr style="cursor:pointer" onclick="window.location.href = '/subjects/@subject.Code/information'">
                             <td>@subject.Id</td>
                             <td>@subject.Code</td>
                             <td>@subject.Name</td>
@@ -107,13 +107,13 @@
                     @Html.AntiForgeryToken()
 
                     <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Additional.Code, new { @class = "control-label mb-1" })
+                        @Html.LabelFor(model => model.Additional.Code, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
                         @Html.TextBoxFor(model => model.Additional.Code, new { @class = "form-control", @id = "code" })
                         @Html.ValidationMessageFor(model => model.Additional.Code, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Additional.Name, new { @class = "control-label mb-1" })
+                        @Html.LabelFor(model => model.Additional.Name, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
                         @Html.TextBoxFor(model => model.Additional.Name, new { @class = "form-control", @id = "name" })
                         @Html.ValidationMessageFor(model => model.Additional.Name, "", new { @class = "text-danger" })
                     </div>
@@ -126,14 +126,14 @@
                     <div class="form-group mb-3">
                         <label class="control-label">Activate </label>
                         <div class="custom-control custom-switch">
-                            <input type="checkbox" id="isActive" name="isActive"/>
+                            <input type="checkbox" id="isActive" name="isActive" />
                             <label class="custom-control-label" for="isActiveSwitch"></label>
                         </div>
                     </div>
 
                     <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Additional.SubjectManagerId, new { @class = "control-label mb-1" })
-                        @Html.DropDownListFor(model => model.Additional.SubjectManagerId, ViewBag.SubjectManagers as SelectList, "Select a Subject Manager", new { @class = "form-control", @id = "subjectManagerId" })
+                        @Html.LabelFor(model => model.Additional.SubjectManagerId, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                        @Html.DropDownListFor(model => model.Additional.SubjectManagerId, ViewBag.SubjectManagers as SelectList, "Select a manager", new { @class = "form-control", @id = "subjectManagerId" })
                         @Html.ValidationMessageFor(model => model.Additional.SubjectManagerId, "", new { @class = "text-danger" })
                     </div>
 
@@ -213,6 +213,10 @@
     //document.getElementById("subjectManagerId").addEventListener("change", (event) => {
     //    sessionStorage.setItem("subjectManagerId", event.target.value)
     //});
+
+    function redirectToURL(url) {
+        window.location.href = url;
+    }
 
 
 

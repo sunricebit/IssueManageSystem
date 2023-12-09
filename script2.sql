@@ -84,7 +84,6 @@ CREATE TABLE `User` (
 -- CreateTable
 CREATE TABLE `Assignment` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `Code` VARCHAR(50) NOT NULL,
     `Name` VARCHAR(100) NOT NULL,
     `Description` TEXT NULL,
     `SubjectId` INTEGER NULL,
@@ -502,23 +501,23 @@ insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManag
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (16, 'OJS201', 'On the job training	', 1, null, 2);
 
 
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (1, 'ASS1', 'Assignment 1', null, 1);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (2, 'ASS2', 'Assignment 2', null, 2);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (3, 'ASS3', 'Assignment 3', 'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 3);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (4, 'ASS1', 'Assignment 1', null, 4);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (5, 'ASS2', 'Assignment 2', null, 5);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (6, 'ASS3', 'Assignment 3', null, 1);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (7, 'ASS1', 'Assignment 1', null, 2);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (8, 'ASS2', 'Assignment 2', null, 3);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (9, 'ASS3', 'Assignment 3', null, 4);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (10, 'ASS1', 'Assignment 1', null, 5);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (11, 'ASS2', 'Assignment 2', null, 1);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (12, 'ASS3', 'Assignment 3', null, 2);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (13, 'ASS1', 'Assignment 1', 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (1, 'Assignment 1', null, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (2, 'Assignment 2', null, 2);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (3, 'Assignment 3', 'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 3);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (4, 'Assignment 1', null, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (5, 'Assignment 2', null, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (6, 'Assignment 3', null, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (7, 'Assignment 1', null, 2);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (8, 'Assignment 2', null, 3);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (9, 'Assignment 3', null, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (10, 'Assignment 1', null, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (11, 'Assignment 2', null, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (12, 'Assignment 3', null, 2);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (13, 'Assignment 1', 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
 
 Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.', 3);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (14, 'ASS2', 'Assignment 2', null, 4);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (15, 'ASS3', 'Assignment 3', null, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (14, 'Assignment 2', null, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (15, 'Assignment 3', null, 5);
 
 insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (1, 'BSU397', 'Fusce consequat. Nulla nisl. Nunc nisl.', 1, 5);
 insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (2, 'LDT721', 'Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.
