@@ -35,7 +35,7 @@ public class SubjectSearchViewModel
     public int SubjectManagerId { get; set; } = 2;
 }
 
-public class AssignmentViewModel
+public class AssignmentViewModel: AssignmentViewModel2
 {
     public string? Search { get; set; }
     public string? Type { get; set; }
@@ -46,6 +46,14 @@ public class AssignmentViewModel
     public int ItemCount { get; set; }
 
     public List<Assignment> Assignments { get; set; }
+
+   
+}
+
+public class AssignmentViewModel2
+{
+    // 
+    public int Id { get; set; }
 
     [Required(ErrorMessage = "Please enter assignment name")]
     public string Name { get; set; }
@@ -228,15 +236,13 @@ namespace IMS.Controllers
             return View(new AssignmentViewModel() { Assignments = assignments.ToList(), Search = search, PageIndex = pageIndex, PageSize = pageSize, TotalPages = totalPages, ItemCount = itemCount });
         }
 
-        //[Route("/subjects/{code}/assignments/{assignmentId}/change-status")]
         public async Task<IActionResult> AssignmentsActive(string code, int assignmentId, int? page, string? search, string? type)
         {
             var assignment = _context.Assignments.SingleOrDefault(s => s.Id == assignmentId);
             if (assignment == null) return RedirectToAction("Assignments", new { code = code });
             assignment.IsActive = !assignment.IsActive;
             await _context.SaveChangesAsync();
-
-            return RedirectToAction("Assignments", new { code = code });
+            return RedirectToAction("Assignments", new { code = code, page = page, search = search, type= type });
         }
 
         [Route("/subjects/{code}/assignments")]
@@ -256,6 +262,21 @@ namespace IMS.Controllers
             _context.Assignments.Add(assignment);
             await _context.SaveChangesAsync();
             return RedirectToAction("Assignments", new { code = code });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateAssignment(AssignmentViewModel2 vm, string code, int? page, string? search, string? type)
+        {
+            var assignment = _context.Assignments.SingleOrDefault(ass => ass.Id == vm.Id);
+            if(assignment == null) return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
+
+            assignment.Name = vm.Name;
+            assignment.Description = vm.Description;
+            assignment.IsActive = vm.IsActive;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
         }
     }
 }
