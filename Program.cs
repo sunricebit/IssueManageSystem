@@ -9,6 +9,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<SettingDAO>();
 builder.Services.AddScoped<PermissionDAO>();
+builder.Services.AddSingleton<ErrorHelper>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSession(options =>

@@ -35,7 +35,7 @@ public class SubjectSearchViewModel
     public int SubjectManagerId { get; set; } = 2;
 }
 
-public class AssignmentViewModel: AssignmentViewModel2
+public class AssignmentViewModel : AssignmentViewModel2
 {
     public string? Search { get; set; }
     public string? Type { get; set; }
@@ -47,7 +47,7 @@ public class AssignmentViewModel: AssignmentViewModel2
 
     public List<Assignment> Assignments { get; set; }
 
-   
+
 }
 
 public class AssignmentViewModel2
@@ -78,7 +78,7 @@ namespace IMS.Controllers
         }
 
         [Route("/subjects")]
-        public IActionResult Index(int? page, string? search, string? type, [FromServices] Intermediate intermediate)
+        public IActionResult Index(int? page, string? search, string? type, [FromServices] Intermediate intermediate, [FromServices] ErrorHelper error)
         {
             var subjects = _context.Subjects.AsQueryable();
 
@@ -98,7 +98,7 @@ namespace IMS.Controllers
             }
 
             subjects = subjects.Include(subject => subject.SubjectManager).OrderByDescending(s => s.CreatedAt);
-            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.SubjectManager).ToList(), "Id", "Name");
+            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.Manager).ToList(), "Id", "Name");
 
             PaginateEnginee<Subject, SubjectSearchViewModel> a = PaginateEnginee<Subject, SubjectSearchViewModel>.Create(subjects, page ?? 1);
             a.Additional = new SubjectSearchViewModel(search ?? "", type ?? "");
@@ -108,43 +108,51 @@ namespace IMS.Controllers
 
         [Route("/subjects")]
         [HttpPost]
-        public async Task<IActionResult> AddSubject(IFormCollection collection, int? page, string? search, string? type, [FromServices] Intermediate intermediate)
+        public async Task<IActionResult> AddSubject(IFormCollection collection, int? page, string? search, string? type, [FromServices] Intermediate intermediate, [FromServices] ErrorHelper errorHelper)
         {
-            intermediate.Clear();
 
-            string code = collection["Additional.Code"];
-            string name = collection["Additional.Name"];
-            string description = collection["Additional.Description"];
-
-            var a = collection["isActive"].ToString();
-            bool isActive = !string.IsNullOrEmpty(collection["isActive"].ToString());
-            int subjectManagerId = int.Parse(collection["Additional.SubjectManagerId"]);
-
-            var subject = _context.Subjects.SingleOrDefault(subject => subject.Code.ToLower().Equals(code.Trim().ToLower()));
-
-            if (subject != null)
+            try
             {
-                intermediate.Error = "Subject exist";
-                intermediate.Code = code.ToUpper().Trim();
-                intermediate.Name = name;
-                intermediate.Description = description;
-                intermediate.SubjectManagerId = subjectManagerId;
-                return RedirectToAction("Index", new { page = page, search = search, type = type });
+                intermediate.Clear();
+
+                string code = collection["Additional.Code"];
+                string name = collection["Additional.Name"];
+                string description = collection["Additional.Description"];
+
+                var a = collection["isActive"].ToString();
+                bool isActive = !string.IsNullOrEmpty(collection["isActive"].ToString());
+                int subjectManagerId = int.Parse(collection["Additional.SubjectManagerId"]);
+
+                var subject = _context.Subjects.SingleOrDefault(subject => subject.Code.ToLower().Equals(code.Trim().ToLower()));
+
+                if (subject != null)
+                {
+                    intermediate.Error = "Subject exist";
+                    intermediate.Code = code.ToUpper().Trim();
+                    intermediate.Name = name;
+                    intermediate.Description = description;
+                    intermediate.SubjectManagerId = subjectManagerId;
+                    return RedirectToAction("Index", new { page = page, search = search, type = type });
+                }
+
+                Subject newSujnect = new()
+                {
+                    Code = code.ToUpper().Trim(),
+                    Name = name.Trim(),
+                    Description = description.Trim(),
+                    IsActive = isActive,
+                    SubjectManagerId = subjectManagerId
+                };
+
+                _context.Subjects.Add(newSujnect);
+                await _context.SaveChangesAsync();
+                errorHelper.Success = "Add subject successfully";
             }
-
-            Subject newSujnect = new()
+            catch
             {
-                Code = code.ToUpper().Trim(),
-                Name = name.Trim(),
-                Description = description.Trim(),
-                IsActive = isActive,
-                SubjectManagerId = subjectManagerId
-            };
+                errorHelper.Error = "Somethine error";
 
-            _context.Subjects.Add(newSujnect);
-            await _context.SaveChangesAsync();
-
-
+            }
             return RedirectToAction("Index", new { page = page, search = search, type = type });
         }
 
@@ -163,7 +171,7 @@ namespace IMS.Controllers
         public IActionResult SubjectInformation(string code)
         {
             var subject = _context.Subjects.Include(s => s.SubjectManager).SingleOrDefault(s => s.Code == code);
-            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.SubjectManager).ToList(), "Id", "Name");
+            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.Manager).ToList(), "Id", "Name");
             if (subject == null) return RedirectToAction("NotFound", "Error");
             AddSubjectViewModel vm = new()
             {
@@ -180,7 +188,7 @@ namespace IMS.Controllers
         [HttpPost]
         public async Task<IActionResult> SubjectInformation(AddSubjectViewModel vm, string code)
         {
-            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.SubjectManager).ToList(), "Id", "Name");
+            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.Manager).ToList(), "Id", "Name");
             if (!ModelState.IsValid) return View(vm);
 
             var subject = _context.Subjects.Include(s => s.SubjectManager).SingleOrDefault(s => s.Code == code);
@@ -226,7 +234,7 @@ namespace IMS.Controllers
             }
 
             int pageIndex = page ?? 1;
-            int pageSize = 2;
+            int pageSize = 5;
             int itemCount = assignments.Count();
             int totalPages = (int)Math.Ceiling((double)itemCount / pageSize);
 
@@ -242,7 +250,7 @@ namespace IMS.Controllers
             if (assignment == null) return RedirectToAction("Assignments", new { code = code });
             assignment.IsActive = !assignment.IsActive;
             await _context.SaveChangesAsync();
-            return RedirectToAction("Assignments", new { code = code, page = page, search = search, type= type });
+            return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
         }
 
         [Route("/subjects/{code}/assignments")]
@@ -268,7 +276,7 @@ namespace IMS.Controllers
         public async Task<IActionResult> UpdateAssignment(AssignmentViewModel2 vm, string code, int? page, string? search, string? type)
         {
             var assignment = _context.Assignments.SingleOrDefault(ass => ass.Id == vm.Id);
-            if(assignment == null) return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
+            if (assignment == null) return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
 
             assignment.Name = vm.Name;
             assignment.Description = vm.Description;
