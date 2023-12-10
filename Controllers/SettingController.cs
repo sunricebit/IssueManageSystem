@@ -16,7 +16,7 @@ namespace IMS.Controllers
 
         [Route("List")]
         [CustomAuthorize]
-        public IActionResult SettingList(int? pageNumber, string? filterByType, string? searchByValue)
+        public IActionResult SettingList(int? pageNumber, string? filterByType, bool? filterByStatus, string? searchByValue)
         {
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
@@ -27,7 +27,12 @@ namespace IMS.Controllers
             if (!string.IsNullOrEmpty(filterByType) && !filterByType.Equals("ALL"))
             {
                 filter.Add("Type", filterByType);
-            } 
+            }
+
+            if (filterByStatus != null)
+            {
+                filter.Add("Status", filterByStatus);
+            }
 
             if (!string.IsNullOrEmpty(searchByValue))
             {
@@ -53,7 +58,7 @@ namespace IMS.Controllers
 
         [Route("Add"), HttpPost]
         [CustomAuthorize]
-        public IActionResult AddSetting(SettingViewModel? settingView)
+        public IActionResult AddSetting(SettingViewModel? settingView, [FromServices] ErrorHelper errorMessage)
         {
             if (settingView == null)
             {
@@ -68,6 +73,9 @@ namespace IMS.Controllers
             {
                 Type = settingView.Type,
                 Value = settingView.Value,
+                Description = settingView.Description,
+                Status = settingView.Status,
+                Order = settingView.Order == null ? (sbyte)0 : (sbyte)settingView.Order,
             };
 
             if (_settingDAO.CheckSettingExist(setting))
@@ -77,8 +85,25 @@ namespace IMS.Controllers
             }
 
             _settingDAO.AddSetting(setting);
-            ViewBag.SuccessMessage = "Add setting success!";
-            return View();
+            errorMessage.Success = "Add setting success!";
+            return RedirectToAction("SettingList");
+        }
+
+        [HttpPost("UpdateStatus")]
+        public IActionResult ToggleStatus(int id)
+        {
+            var setting = _settingDAO.GetSettingById(id);
+
+            if (setting == null)
+            {
+                return NotFound();
+            }
+
+            setting.Status = !setting.Status;
+
+            _settingDAO.SetSetting(setting);
+
+            return RedirectToAction("SettingList");
         }
 
         [Route("Details")]
@@ -91,7 +116,9 @@ namespace IMS.Controllers
                 Id = id,
                 Type = setting.Type,
                 Value = string.IsNullOrEmpty(setting.Value) ? String.Empty : setting.Value.Trim(),
-                Description = string.IsNullOrEmpty(setting.Description) ? String.Empty : setting.Description.Trim()
+                Description = string.IsNullOrEmpty(setting.Description) ? String.Empty : setting.Description.Trim(),
+                Order = setting.Order,
+                Status = setting.Status,
             };
             return View(settingView);
         }
@@ -108,17 +135,19 @@ namespace IMS.Controllers
             if (!ModelState.IsValid) { return View("SettingDetail", settingView); }
 
             Setting setting = _settingDAO.GetSettingById(settingView.Id);
-            if (setting.Type == settingView.Type
-                && setting.Value == (string.IsNullOrEmpty(settingView.Value) ? String.Empty : settingView.Value.Trim())
-                && setting.Description == (string.IsNullOrEmpty(settingView.Description) ? String.Empty : settingView.Description.Trim()))
-            {
-                ViewBag.ErrorMessage = "Nothing change";
-                return View("SettingDetail", settingView);
-            }
+            //if (setting.Type == settingView.Type
+            //    && setting.Value == (string.IsNullOrEmpty(settingView.Value) ? String.Empty : settingView.Value.Trim())
+            //    && setting.Description == (string.IsNullOrEmpty(settingView.Description) ? String.Empty : settingView.Description.Trim()))
+            //{
+            //    ViewBag.ErrorMessage = "Nothing change";
+            //    return View("SettingDetail", settingView);
+            //}
 
             setting.Type = settingView.Type;
             setting.Value = string.IsNullOrEmpty(settingView.Value) ? String.Empty : settingView.Value.Trim();
             setting.Description = string.IsNullOrEmpty(settingView.Description) ? String.Empty : settingView.Description.Trim();
+            setting.Status = settingView.Status;
+            setting.Order = (sbyte)settingView.Order;
 
             if (!_settingDAO.CheckSettingCanUpdate(setting))
             {
