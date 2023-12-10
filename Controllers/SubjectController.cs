@@ -1,4 +1,5 @@
 using System;
+using IMS.Common;
 using IMS.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -78,32 +79,38 @@ namespace IMS.Controllers
         }
 
         [Route("/subjects")]
-        public IActionResult Index(int? page, string? search, string? type, [FromServices] Intermediate intermediate, [FromServices] ErrorHelper error)
+        public IActionResult Index(int? page, string? search, string? type, [FromServices] Intermediate intermediate, [FromServices] ErrorHelper errorHelper)
         {
-            var subjects = _context.Subjects.AsQueryable();
 
-            if (!string.IsNullOrEmpty(search))
+            try
             {
-                subjects = subjects.Where(subjects => subjects.Code.ToLower().Contains(search.ToLower()) || subjects.Name.ToLower().Contains(search.ToLower()));
-            }
+                var subjects = _context.Subjects.AsQueryable();
+                if (!string.IsNullOrEmpty(search))
+                {
+                    subjects = subjects.Where(subjects => subjects.Code.ToLower().Contains(search.ToLower()) || subjects.Name.ToLower().Contains(search.ToLower()));
+                }
 
-            switch (type)
+                switch (type)
+                {
+                    case "activate":
+                        subjects = subjects.Where(subject => subject.IsActive == true);
+                        break;
+                    case "deactivate":
+                        subjects = subjects.Where(subject => subject.IsActive == false);
+                        break;
+                }
+                subjects = subjects.Include(subject => subject.SubjectManager).OrderByDescending(s => s.CreatedAt);
+                ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.Manager).ToList(), "Id", "Name");
+
+                PaginateEnginee<Subject, SubjectSearchViewModel> a = PaginateEnginee<Subject, SubjectSearchViewModel>.Create(subjects, page ?? 1);
+                a.Additional = new SubjectSearchViewModel(search ?? "", type ?? "");
+
+                return View(a);
+            }
+            catch (Exception ex)
             {
-                case "activate":
-                    subjects = subjects.Where(subject => subject.IsActive == true);
-                    break;
-                case "deactivate":
-                    subjects = subjects.Where(subject => subject.IsActive == false);
-                    break;
+                return RedirectToAction("Blank", "Home");
             }
-
-            subjects = subjects.Include(subject => subject.SubjectManager).OrderByDescending(s => s.CreatedAt);
-            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.Manager).ToList(), "Id", "Name");
-
-            PaginateEnginee<Subject, SubjectSearchViewModel> a = PaginateEnginee<Subject, SubjectSearchViewModel>.Create(subjects, page ?? 1);
-            a.Additional = new SubjectSearchViewModel(search ?? "", type ?? "");
-
-            return View(a);
         }
 
         [Route("/subjects")]
@@ -156,135 +163,191 @@ namespace IMS.Controllers
             return RedirectToAction("Index", new { page = page, search = search, type = type });
         }
 
-        public async Task<IActionResult> Active(int subjectId, int? page, string? search, string? type)
+        public async Task<IActionResult> Active(int subjectId, int? page, string? search, string? type, [FromServices] ErrorHelper errorHelper)
         {
-            var subject = _context.Subjects.SingleOrDefault(s => s.Id == subjectId);
-            if (subject == null) return RedirectToAction("Index", new { page = page, search = search, type = type });
-            subject.IsActive = !subject.IsActive;
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Index", new { page = page, search = search, type = type });
+            try
+            {
+                var subject = _context.Subjects.SingleOrDefault(s => s.Id == subjectId);
+                if (subject == null) return RedirectToAction("Index", new { page = page, search = search, type = type });
+                subject.IsActive = !subject.IsActive;
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index", new { page = page, search = search, type = type });
+            }
+            catch (Exception ex)
+            {
+                errorHelper.Error = "Something error";
+                return RedirectToAction("Index", new { page = page, search = search, type = type });
+            }
         }
 
 
         [Route("/subjects/{code}/information")]
         public IActionResult SubjectInformation(string code)
         {
-            var subject = _context.Subjects.Include(s => s.SubjectManager).SingleOrDefault(s => s.Code == code);
-            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.Manager).ToList(), "Id", "Name");
-            if (subject == null) return RedirectToAction("NotFound", "Error");
-            AddSubjectViewModel vm = new()
+            try
             {
-                Code = subject.Code.Trim(),
-                Name = subject.Name.Trim(),
-                Description = subject.Description?.Trim(),
-                SubjectManagerId = subject.SubjectManagerId,
-                IsActive = subject.IsActive ?? false,
-            };
-            return View(vm);
+                var subject = _context.Subjects.Include(s => s.SubjectManager).SingleOrDefault(s => s.Code == code);
+                ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.Manager).ToList(), "Id", "Name");
+                if (subject == null) return RedirectToAction("NotFound", "Error");
+                AddSubjectViewModel vm = new()
+                {
+                    Code = subject.Code.Trim(),
+                    Name = subject.Name.Trim(),
+                    Description = subject.Description?.Trim(),
+                    SubjectManagerId = subject.SubjectManagerId,
+                    IsActive = subject.IsActive ?? false,
+                };
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Index", new { code = code });
+            }
         }
 
         [Route("/subjects/{code}/information")]
         [HttpPost]
-        public async Task<IActionResult> SubjectInformation(AddSubjectViewModel vm, string code)
+        public async Task<IActionResult> SubjectInformation(AddSubjectViewModel vm, string code, [FromServices] ErrorHelper errorHelper)
         {
-            ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.Manager).ToList(), "Id", "Name");
-            if (!ModelState.IsValid) return View(vm);
-
-            var subject = _context.Subjects.Include(s => s.SubjectManager).SingleOrDefault(s => s.Code == code);
-            if (subject == null)
+            try
             {
-                ViewBag.Error = "Subject not found!!!";
+
+                ViewBag.SubjectManagers = new SelectList(_context.Users.Where(user => user.Role.Value == RoleUser.Manager).ToList(), "Id", "Name");
+                if (!ModelState.IsValid) return View(vm);
+
+                var subject = _context.Subjects.Include(s => s.SubjectManager).SingleOrDefault(s => s.Code == code);
+                if (subject == null)
+                {
+                    ViewBag.Error = "Subject not found!!!";
+                    return View(vm);
+                };
+
+                subject.Code = vm.Code.Trim();
+                subject.Name = vm.Name.Trim();
+                subject.Description = vm.Description?.Trim();
+                subject.SubjectManagerId = vm.SubjectManagerId;
+                subject.IsActive = vm.IsActive;
+
+                ViewBag.Success = "Update subject successfully ";
+
+                await _context.SaveChangesAsync();
+
                 return View(vm);
-            };
-
-            subject.Code = vm.Code.Trim();
-            subject.Name = vm.Name.Trim();
-            subject.Description = vm.Description?.Trim();
-            subject.SubjectManagerId = vm.SubjectManagerId;
-            subject.IsActive = vm.IsActive;
-
-            ViewBag.Success = "Update subject successfully ";
-
-            await _context.SaveChangesAsync();
-
-            return View(vm);
+            }
+            catch (Exception ex)
+            {
+                errorHelper.Error = "Something error";
+                return View(vm);
+            }
         }
 
         [Route("/subjects/{code}/assignments")]
-        [HttpGet]
-        public IActionResult Assignments(string code, string? search, int? page, string? type)
+        public IActionResult Assignments(string code, string? search, int? page, string? type, [FromServices] ErrorHelper errorHelper)
         {
-            var assignments = _context.Assignments.AsQueryable();
-            assignments = assignments.Where(ass => ass.Subject != null && ass.Subject.Code.ToLower().Contains(code.ToLower()));
-
-            if (!string.IsNullOrEmpty(search?.Trim()))
+            try
             {
-                assignments = assignments.Where(ass => ass.Name.ToLower().Contains(search.Trim().ToLower()));
-            }
+                var assignments = _context.Assignments.AsQueryable();
+                assignments = assignments.Where(ass => ass.Subject != null && ass.Subject.Code.ToLower().Contains(code.ToLower()));
 
-            switch (type)
+                if (!string.IsNullOrEmpty(search?.Trim()))
+                {
+                    assignments = assignments.Where(ass => ass.Name.ToLower().Contains(search.Trim().ToLower()));
+                }
+
+                switch (type)
+                {
+                    case "activate":
+                        assignments = assignments.Where(assignment => assignment.IsActive == true);
+                        break;
+                    case "deactivate":
+                        assignments = assignments.Where(assignment => assignment.IsActive == false);
+                        break;
+                }
+
+                int pageIndex = page ?? 1;
+                int pageSize = 5;
+                int itemCount = assignments.Count();
+                int totalPages = (int)Math.Ceiling((double)itemCount / pageSize);
+
+                if (pageIndex > totalPages) pageIndex = 1;
+                assignments = assignments.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+                return View(new AssignmentViewModel() { Assignments = assignments.ToList(), Search = search, PageIndex = pageIndex, PageSize = pageSize, TotalPages = totalPages, ItemCount = itemCount });
+            }
+            catch (Exception ex)
             {
-                case "activate":
-                    assignments = assignments.Where(assignment => assignment.IsActive == true);
-                    break;
-                case "deactivate":
-                    assignments = assignments.Where(assignment => assignment.IsActive == false);
-                    break;
+                errorHelper.Error = "Something error";
+                return RedirectToAction("NotFound", "Error");
             }
-
-            int pageIndex = page ?? 1;
-            int pageSize = 5;
-            int itemCount = assignments.Count();
-            int totalPages = (int)Math.Ceiling((double)itemCount / pageSize);
-
-            if (pageIndex > totalPages) pageIndex = 1;
-            assignments = assignments.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-
-            var data = assignments.ToList();
-
-            return View(new AssignmentViewModel() { Assignments = assignments.ToList(), Search = search, PageIndex = pageIndex, PageSize = pageSize, TotalPages = totalPages, ItemCount = itemCount });
         }
 
-        public async Task<IActionResult> AssignmentsActive(string code, int assignmentId, int? page, string? search, string? type)
+        public async Task<IActionResult> AssignmentsActive(string code, int assignmentId, int? page, string? search, string? type, [FromServices] ErrorHelper errorHelper)
         {
-            var assignment = _context.Assignments.SingleOrDefault(s => s.Id == assignmentId);
-            if (assignment == null) return RedirectToAction("Assignments", new { code = code });
-            assignment.IsActive = !assignment.IsActive;
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
+            try
+            {
+
+                var assignment = _context.Assignments.SingleOrDefault(s => s.Id == assignmentId);
+                if (assignment == null) return RedirectToAction("Assignments", new { code = code });
+                assignment.IsActive = !assignment.IsActive;
+                await _context.SaveChangesAsync();
+                errorHelper.Success = "Update successfully";
+                return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
+            }
+            catch (Exception ex)
+            {
+                errorHelper.Error = "Update fail, something error";
+                return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
+            }
         }
 
         [Route("/subjects/{code}/assignments")]
         [HttpPost]
-        public async Task<IActionResult> Assignments(AssignmentViewModel vm, string code)
+        public async Task<IActionResult> Assignments(AssignmentViewModel vm, string code, [FromServices] ErrorHelper errorHelper)
         {
-            var subject = _context.Subjects.SingleOrDefault(s => s.Code == code);
-            if (subject == null) return NotFound();
 
-            Assignment assignment = new Assignment()
+            try
             {
-                Name = vm.Name,
-                Description = vm.Description,
-                IsActive = vm.IsActive,
-                SubjectId = subject.Id
-            };
-            _context.Assignments.Add(assignment);
-            await _context.SaveChangesAsync();
+
+                var subject = _context.Subjects.SingleOrDefault(s => s.Code == code);
+                if (subject == null) return NotFound();
+
+                Assignment assignment = new Assignment()
+                {
+                    Name = vm.Name,
+                    Description = vm.Description,
+                    IsActive = vm.IsActive,
+                    SubjectId = subject.Id
+                };
+                _context.Assignments.Add(assignment);
+                await _context.SaveChangesAsync();
+                errorHelper.Success = "Add assignment successfully";
+            }
+            catch (Exception ex)
+            {
+                errorHelper.Error = "Something error";
+            }
             return RedirectToAction("Assignments", new { code = code });
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAssignment(AssignmentViewModel2 vm, string code, int? page, string? search, string? type)
+        public async Task<IActionResult> UpdateAssignment(AssignmentViewModel2 vm, string code, int? page, string? search, string? type, [FromServices] ErrorHelper errorHelper)
         {
-            var assignment = _context.Assignments.SingleOrDefault(ass => ass.Id == vm.Id);
-            if (assignment == null) return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
+            try
+            {
 
-            assignment.Name = vm.Name;
-            assignment.Description = vm.Description;
-            assignment.IsActive = vm.IsActive;
+                var assignment = _context.Assignments.SingleOrDefault(ass => ass.Id == vm.Id);
+                if (assignment == null) return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
 
-            await _context.SaveChangesAsync();
+                assignment.Name = vm.Name;
+                assignment.Description = vm.Description;
+                assignment.IsActive = vm.IsActive;
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                errorHelper.Error = "Something error";
+            }
 
             return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
         }

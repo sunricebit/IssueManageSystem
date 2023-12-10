@@ -67,7 +67,7 @@
                         </td>
                         <td class="d-flex">
                             <a class="btn btn-link btn-sm" role="button" href="@Url.Action("AssignmentsActive", "Subject", new {code = code,  assignmentId = assignment.Id, page = Model.PageIndex, search = Model.Search, type = Model.Type})">@(assignment.IsActive == true ? "Deactivate":"Activate")</a>
-                            <button class="btn btn-link btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal_@assignment.Id">Link</button>
+                            <button class="btn btn-link btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal_@assignment.Id">Update</button>
                         </td>
                     </tr>
                 }
@@ -162,7 +162,7 @@
             @using (Html.BeginForm("Assignments", "Subject", FormMethod.Post))
             {
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Add assignment</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
