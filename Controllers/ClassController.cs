@@ -31,7 +31,7 @@ namespace IMS.Controllers
             }
             if (filterbyStatus != null && !filterbyStatus.Equals("All"))
             {
-                filter.Add("Status", filterbyStatus);
+                filter.Add("IsActive", filterbyStatus);
             }
           
             if (!string.IsNullOrEmpty(searchByValue))
@@ -76,7 +76,7 @@ namespace IMS.Controllers
                 Description = Class.Description,
                 TeacherId = Class.TeacherId,
                 SubjectId = Class.SubjectId,
-                Status = Class.Status,
+                IsActive = Class.IsActive,
                 Teacher = Class.Teacher,
                 Subject = Class.Subject,
                 Milestones = Class.Milestones,
@@ -101,14 +101,14 @@ namespace IMS.Controllers
             {
                 return View();
             }
-            classViewModel.Status = true;
+            classViewModel.IsActive = true;
             Class Class = new Class()
             {
                 Id= classViewModel.Id,
                 Description = classViewModel.Description,
                 TeacherId = classViewModel.TeacherId,
                 SubjectId = classViewModel.SubjectId,
-                Status = classViewModel.Status
+                IsActive = classViewModel.IsActive
             };
             _classService.AddClass(Class);
 
@@ -132,7 +132,7 @@ namespace IMS.Controllers
             Class1.SubjectId = classViewModel.SubjectId;  
            Class1.TeacherId = classViewModel.TeacherId;
             Class1.Name = classViewModel.Name;
-            Class1.Status = classViewModel.Status;
+            Class1.IsActive = classViewModel.IsActive;
             Class1.Description = classViewModel.Description;
             _classService.UpdateCLass(Class1);
             return RedirectToAction("Index");
@@ -147,7 +147,7 @@ namespace IMS.Controllers
                 return NotFound();
             }
 
-            Class.Status = !Class.Status;
+            Class.IsActive = !Class.IsActive;
 
             _classService.UpdateCLass(Class);
 

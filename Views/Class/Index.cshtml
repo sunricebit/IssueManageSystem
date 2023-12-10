@@ -102,7 +102,7 @@
                             <td>@(classItem.Teacher != null ? classItem.Teacher.Name : "Dont have teacher")</td>
                             <td>@(classItem.Subject != null ? classItem.Subject.Name : "Dont have subject")</td>
                             <td>@(classItem.Students != null ? classItem.Students.Count : 0)</td>
-                            @if (@classItem.Status == true)
+                            @if (@classItem.IsActive == true)
                             {
                                 <td>
                                     <form asp-action="ToggleStatus" asp-route-id="@classItem.Id" method="post">

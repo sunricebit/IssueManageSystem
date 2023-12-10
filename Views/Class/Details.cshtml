@@ -77,8 +77,8 @@
                                 <div class="form-group">
                                     <label for="statusToggle">Status</label>
                                     <div class="form-check form-switch">
-                                        <input type="hidden" name="Status" value="false" />
-                                        <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" @(Model.Status.HasValue && Model.Status.Value ? "checked" : "") onchange="changeStatus()" />
+                                        <input type="hidden" name="IsActive" value="false" />
+                                        <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" @(Model.IsActive ? "checked" : "") onchange="changeStatus()" />
                                     </div>
                                 </div>
                             </div>

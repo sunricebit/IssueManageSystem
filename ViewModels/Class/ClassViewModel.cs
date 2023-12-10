@@ -18,9 +18,9 @@ namespace IMS.ViewModels.Class
         public string? Description { get; set; }
         public int? TeacherId { get; set; }
         public int? SubjectId { get; set; }
-        public bool? Status { get; set; }
+        public bool IsActive { get; set; }
 
-        public virtual Subject? Subject { get; set; }
+        public virtual Models.Subject? Subject { get; set; }
         public virtual Models.User? Teacher { get; set; }
         public virtual ICollection<IssueSetting> IssueSettings { get; set; }
         public virtual ICollection<Milestone> Milestones { get; set; }
