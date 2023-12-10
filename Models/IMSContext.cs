@@ -280,6 +280,8 @@ namespace IMS.Models
             {
                 entity.ToTable("Permission", "IMS");
 
+                entity.HasIndex(e => e.PageId, "Permission_PageId_fkey");
+
                 entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_Page_idx");
 
                 entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_Page_key")
@@ -381,11 +383,9 @@ namespace IMS.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
-                entity.Property(e => e.EnglishName).HasMaxLength(100);
+                entity.Property(e => e.Name).HasMaxLength(100);
 
                 entity.Property(e => e.Status).HasDefaultValueSql("'1'");
-
-                entity.Property(e => e.VietnameseName).HasMaxLength(100);
 
                 entity.HasOne(d => d.Class)
                     .WithMany(p => p.Projects)

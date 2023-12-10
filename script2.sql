@@ -9,6 +9,8 @@ CREATE TABLE `Setting` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Type` VARCHAR(20) NOT NULL,
     `Value` VARCHAR(50) NOT NULL,
+    `Order` TINYINT NOT NULL,
+    `Status` BOOL NOT NULL,
     `Description` VARCHAR(400) NULL,
 
     INDEX `Setting_Type_Value_idx`(`Type`, `Value`),
@@ -162,7 +164,6 @@ CREATE TABLE `Permission` (
     `CanCreate` BOOLEAN NOT NULL DEFAULT false,
     `CanRead` BOOLEAN NOT NULL DEFAULT false,
     `CanUpdate` BOOLEAN NOT NULL DEFAULT false,
-    `CanDelete` BOOLEAN NOT NULL DEFAULT false,
 
     INDEX `Permission_RoleId_Page_idx`(`RoleId`, `PageId`),
     UNIQUE INDEX `Permission_RoleId_Page_key`(`RoleId`, `PageId`),
@@ -172,8 +173,7 @@ CREATE TABLE `Permission` (
 -- CreateTable
 CREATE TABLE `Project` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `EnglishName` VARCHAR(100) NOT NULL,
-    `VietnameseName` VARCHAR(100) NOT NULL,
+    `Name` VARCHAR(100) NOT NULL,
     `Status` BOOLEAN NULL DEFAULT true,
     `Description` TEXT NOT NULL,
     `ClassId` INTEGER NULL,
@@ -282,58 +282,56 @@ ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_ProjectId_fkey` FORE
 -- AddForeignKey
 ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
-INSERT INTO `IMS`.`Setting` (`Type`, `Value`)
-VALUES ('ROLE', 'Admin'),
-       ('ROLE', 'Subject Manager'),
-       ('ROLE', 'Class Manager'),
-       ('ROLE', 'Marketer Manager'),
-       ('ROLE', 'Teacher'),
-       ('ROLE', 'Student'),
-       ('POST_CATEGORY', 'Art and Culture'),
-       ('POST_CATEGORY', 'Travel and Adventure'),
-       ('POST_CATEGORY', 'Science and Technology'),
-       ('POST_CATEGORY', 'Health and Lifestyle'),
-       ('POST_CATEGORY', 'Learning and Personal Development'),
-       ('POST_CATEGORY', 'Family Life'),
-       ('CONTACT_TYPE', 'Networking'),
-       ('CONTACT_TYPE', 'IT Career Development'),
-       ('CONTACT_TYPE', 'Financial Aid and Scholarships'),
-       ('CONTACT_TYPE', 'Faculty and Research'),
-       ('CONTACT_TYPE', 'International Students'),
-       ('PAGE_LINK', '/Setting/SettingList');
+INSERT INTO `IMS`.`Setting` (`Type`, `Value`, `Order`, `Status`)
+VALUES ('ROLE', 'Admin', 1, 1),
+       ('ROLE', 'Manager', 1, 1),
+       ('ROLE', 'Marketer', 1, 1),
+       ('ROLE', 'Teacher', 1, 1),
+       ('ROLE', 'Student', 1, 1),
+       ('POST_CATEGORY', 'Art and Culture', 1, 1),
+       ('POST_CATEGORY', 'Travel and Adventure', 1, 1),
+       ('POST_CATEGORY', 'Science and Technology', 1, 1),
+       ('POST_CATEGORY', 'Health and Lifestyle', 1, 1),
+       ('POST_CATEGORY', 'Learning and Personal Development', 1, 1),
+       ('POST_CATEGORY', 'Family Life', 1, 1),
+       ('CONTACT_TYPE', 'Networking', 1, 1),
+       ('CONTACT_TYPE', 'IT Career Development', 1, 1),
+       ('CONTACT_TYPE', 'Financial Aid and Scholarships', 1, 1),
+       ('CONTACT_TYPE', 'Faculty and Research', 1, 1),
+       ('CONTACT_TYPE', 'International Students', 1, 1),
+       ('PAGE_LINK', '/Setting/SettingList', 1, 1);
        
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (2, 'subject@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 2, 'Queenie Suff', 'https://robohash.org/consectetursuntet.png?size=100x100&set=set1', null, '0654960037', '36459 Nevada Trail', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (3, 'class@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 3, 'Jeremie Bethel', 'https://robohash.org/voluptatibusconsequaturin.png?size=100x100&set=set1', 1, '0720320267', '09 Hudson Terrace', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (4, 'marketer@gmail.', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 4, 'Noella Quaintance', 'https://robohash.org/sedquodquis.png?size=100x100&set=set1', 0, '0176636839', '4522 Sycamore Avenue', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (5, 'teacher@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Bucky Ferrettini', 'https://robohash.org/liberoreiciendisvelit.png?size=100x100&set=set1', null, '0542942149', '16 Warbler Parkway', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (6, 'student@facebook.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Iolanthe Akker', 'https://robohash.org/eosnostrumquo.png?size=100x100&set=set1', 0, '0537712440', '33107 Barby Alley', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (7, 'imatschuk6@hibu.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Ingra Matschuk', 'https://robohash.org/maioresquinulla.png?size=100x100&set=set1', 1, '0241136823', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (8, 'dorridge7@homestead.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Daron Orridge', null, null, '0378177525', '62366 Northport Crossing', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (9, 'mgegay8@bing.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Maggi Gegay', 'https://robohash.org/esseofficiasint.png?size=100x100&set=set1', 1, '0181626572', '22277 Granby Way', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (10, 'khanratty9@eventbrite.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Kahlil Hanratty', 'https://robohash.org/impeditsequiporro.png?size=100x100&set=set1', 0, '0415660856', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (11, 'jkerswella@msn.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Jacklin Kerswell', 'https://robohash.org/ininullam.png?size=100x100&set=set1', 1, '0045353089', '16 Dayton Trail', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (12, 'dmccurdyb@opera.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Darcie McCurdy', 'https://robohash.org/utetest.png?size=100x100&set=set1', 0, '0114430360', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (13, 'atolumelloc@yale.edu', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Adelice Tolumello', 'https://robohash.org/ipsamnequelaborum.png?size=100x100&set=set1', 0, '0155192798', '9651 Nova Drive', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (14, 'mdubbled@sogou.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Marcelo Dubble', 'https://robohash.org/iustonullaqui.png?size=100x100&set=set1', 0, '0714674650', '021 Aberg Lane', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (15, 'rschulze@state.tx.us', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Ruthy Schulz', null, 0, '0346589718', '9 Marcy Hill', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (16, 'mannottf@trellian.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Marten Annott', 'https://robohash.org/necessitatibusquiculpa.png?size=100x100&set=set1', 1, '0948897513', '52802 School Parkway', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (17, 'mbridgewaterg@webs.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Marcella Bridgewater', 'https://robohash.org/nesciuntofficiisconsequuntur.png?size=100x100&set=set1', 1, '0741841275', '06067 Fallview Park', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (18, 'wmandevilleh@latimes.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Westley Mandeville', 'https://robohash.org/nisivelitperspiciatis.png?size=100x100&set=set1', 1, '0145591733', '05 Northview Junction', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (19, 'awinningi@google.com.au', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Alena Winning', null, 0, '0298745665', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (20, 'ntinghillj@marriott.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Natalya Tinghill', null, 0, '0529296287', '0379 Scott Lane', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (21, 'dmilingtonk@guardian.co.uk', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Druci Milington', 'https://robohash.org/etquiomnis.png?size=100x100&set=set1', 0, '0563458391', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (22, 'dmacguinessl@geocities.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Debora MacGuiness', null, 1, '0158369774', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (23, 'efleethamm@wsj.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Ethelred Fleetham', null, null, '0625333168', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (24, 'rseabornen@dyndns.org', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Ring Seaborne', null, 0, '0264063417', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (25, 'narthyo@squarespace.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Nicole Arthy', 'https://robohash.org/expeditaperferendisodit.png?size=100x100&set=set1', null, '0868364777', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (26, 'aarnoldip@cisco.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Almeta Arnoldi', 'https://robohash.org/quisquamaliquidet.png?size=100x100&set=set1', 0, '0256102363', '784 Pond Circle', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (27, 'drydingsq@wikia.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Duncan Rydings', 'https://robohash.org/etuttempora.png?size=100x100&set=set1', 1, '0150387157', '5 Holmberg Alley', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (28, 'rder@g.co', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Rex De Meyer', null, 0, '0478593443', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (29, 'esimcoxs@opensource.org', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Ellynn Simcox', 'https://robohash.org/consequaturetadipisci.png?size=100x100&set=set1', 1, '0266914275', '1282 Red Cloud Circle', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (30, 'fmeiningert@irs.gov', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Forester Meininger', 'https://robohash.org/laboreexercitationemratione.png?size=100x100&set=set1', 1, '0617649138', '62 Lakewood Gardens Junction', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (31, 'dscawnu@economist.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Daisy Scawn', null, 1, '0972010267', '55565 Pine View Court', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (32, 'mharmev@shop-pro.jp', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Mireille Harme', null, 0, '0568924091', '127 Northfield Plaza', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (2, 'manager@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 2, 'Queenie Suff', 'https://robohash.org/consectetursuntet.png?size=100x100&set=set1', null, '0654960037', '36459 Nevada Trail', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (3, 'marketer@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 3, 'Jeremie Bethel', 'https://robohash.org/voluptatibusconsequaturin.png?size=100x100&set=set1', 1, '0720320267', '09 Hudson Terrace', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (4, 'teacher@gmail.', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 4, 'Noella Quaintance', 'https://robohash.org/sedquodquis.png?size=100x100&set=set1', 0, '0176636839', '4522 Sycamore Avenue', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (5, 'student@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Bucky Ferrettini', 'https://robohash.org/liberoreiciendisvelit.png?size=100x100&set=set1', null, '0542942149', '16 Warbler Parkway', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (6, 'student@facebook.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Iolanthe Akker', 'https://robohash.org/eosnostrumquo.png?size=100x100&set=set1', 0, '0537712440', '33107 Barby Alley', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (7, 'imatschuk6@hibu.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ingra Matschuk', 'https://robohash.org/maioresquinulla.png?size=100x100&set=set1', 1, '0241136823', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (8, 'dorridge7@homestead.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Daron Orridge', null, null, '0378177525', '62366 Northport Crossing', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (9, 'mgegay8@bing.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Maggi Gegay', 'https://robohash.org/esseofficiasint.png?size=100x100&set=set1', 1, '0181626572', '22277 Granby Way', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (10, 'khanratty9@eventbrite.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Kahlil Hanratty', 'https://robohash.org/impeditsequiporro.png?size=100x100&set=set1', 0, '0415660856', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (11, 'jkerswella@msn.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Jacklin Kerswell', 'https://robohash.org/ininullam.png?size=100x100&set=set1', 1, '0045353089', '16 Dayton Trail', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (12, 'dmccurdyb@opera.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Darcie McCurdy', 'https://robohash.org/utetest.png?size=100x100&set=set1', 0, '0114430360', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (13, 'atolumelloc@yale.edu', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Adelice Tolumello', 'https://robohash.org/ipsamnequelaborum.png?size=100x100&set=set1', 0, '0155192798', '9651 Nova Drive', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (14, 'mdubbled@sogou.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Marcelo Dubble', 'https://robohash.org/iustonullaqui.png?size=100x100&set=set1', 0, '0714674650', '021 Aberg Lane', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (15, 'rschulze@state.tx.us', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ruthy Schulz', null, 0, '0346589718', '9 Marcy Hill', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (16, 'mannottf@trellian.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Marten Annott', 'https://robohash.org/necessitatibusquiculpa.png?size=100x100&set=set1', 1, '0948897513', '52802 School Parkway', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (17, 'mbridgewaterg@webs.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Marcella Bridgewater', 'https://robohash.org/nesciuntofficiisconsequuntur.png?size=100x100&set=set1', 1, '0741841275', '06067 Fallview Park', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (18, 'wmandevilleh@latimes.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Westley Mandeville', 'https://robohash.org/nisivelitperspiciatis.png?size=100x100&set=set1', 1, '0145591733', '05 Northview Junction', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (19, 'awinningi@google.com.au', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Alena Winning', null, 0, '0298745665', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (20, 'ntinghillj@marriott.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Natalya Tinghill', null, 0, '0529296287', '0379 Scott Lane', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (21, 'dmilingtonk@guardian.co.uk', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Druci Milington', 'https://robohash.org/etquiomnis.png?size=100x100&set=set1', 0, '0563458391', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (22, 'dmacguinessl@geocities.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Debora MacGuiness', null, 1, '0158369774', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (23, 'efleethamm@wsj.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ethelred Fleetham', null, null, '0625333168', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (24, 'rseabornen@dyndns.org', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ring Seaborne', null, 0, '0264063417', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (25, 'narthyo@squarespace.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Nicole Arthy', 'https://robohash.org/expeditaperferendisodit.png?size=100x100&set=set1', null, '0868364777', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (26, 'aarnoldip@cisco.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Almeta Arnoldi', 'https://robohash.org/quisquamaliquidet.png?size=100x100&set=set1', 0, '0256102363', '784 Pond Circle', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (27, 'drydingsq@wikia.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Duncan Rydings', 'https://robohash.org/etuttempora.png?size=100x100&set=set1', 1, '0150387157', '5 Holmberg Alley', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (28, 'rder@g.co', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Rex De Meyer', null, 0, '0478593443', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (29, 'esimcoxs@opensource.org', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ellynn Simcox', 'https://robohash.org/consequaturetadipisci.png?size=100x100&set=set1', 1, '0266914275', '1282 Red Cloud Circle', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (30, 'fmeiningert@irs.gov', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Forester Meininger', 'https://robohash.org/laboreexercitationemratione.png?size=100x100&set=set1', 1, '0617649138', '62 Lakewood Gardens Junction', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (31, 'dscawnu@economist.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Daisy Scawn', null, 1, '0972010267', '55565 Pine View Court', 1);
 
 insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (1, 'myellowlee0@rakuten.co.jp', 'Morley Yellowlee', '0579421047', 4, 14);
 insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (2, 'ldrewery1@cpanel.net', 'Lonnie Drewery', '0312487974', 4, 13);
@@ -498,10 +496,9 @@ insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (
 
 Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 5, 5);
 
-insert into `IMS`.`Permission` (`RoleId`, `PageId` ,`CanRead`)
-value ('1','18',1),
-('2','18',1),
-('3','18',1),
-('4','18',1),
-('5','18',1),
-('6','18',1);
+insert into IMS.Permission(RoleId, PageId, CanCreate, CanRead, CanUpdate) values
+(1, 17, 1, 1, 1),
+(2, 17, 0, 0, 0),
+(3, 17, 0, 0, 0),
+(4, 17, 0, 0, 0),
+(5, 17, 0, 0, 0);

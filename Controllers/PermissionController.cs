@@ -1,5 +1,4 @@
-﻿using IMS.DAO;
-using IMS.ViewModels.Permission;
+﻿using IMS.ViewModels.Permission;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMS.Controllers
@@ -20,9 +19,9 @@ namespace IMS.Controllers
         {
             List<PermissionViewModel> permissionList = _permissionDAO.GetAllPermission();
             List<string> roles = new List<string>();
-            foreach(var roleAccess in permissionList.First().RolesAcess)
+            foreach(var permission in permissionList)
             {
-                roles.Add(roleAccess.Key);
+                roles.Add(permission.Role);
             }
             ViewBag.Roles = roles;
             return View(permissionList);

@@ -34,7 +34,11 @@ namespace IMS.Common
             User? user = context.HttpContext.Session.GetUser();
             if (user == null)
             {
-                context.Result = new RedirectToRouteResult("Auth", "SignIn", null);
+                context.Result = new RedirectToRouteResult(new RouteValueDictionary(new
+                {
+                    controller = "Auth",
+                    action = "SignIn"
+                }));
                 return;
             }
 
@@ -50,12 +54,12 @@ namespace IMS.Common
                 bool isPageExist = permissionService.IsExist(pageLink);
                 if (!isPageExist)
                 {
-                    // Nếu chưa có thì add và cấp quyền cho admin, các user khác unable
+                    // Nếu chưa có thì add và cấp quyền cho admin, các user khác sẽ có quyền read
                     permissionService.CreateNewPermission(pageLink);
                 }
 
-                // Có rồi thì check quyền
-                if (!permissionService.CheckPermission(pageLink, user.Role.Value))
+                // Có rồi thì check quyền Access -> các quyền khác ngoài read cập nhật trong màn hình permission
+                if (!permissionService.CheckAccess(pageLink, user.Role.Value))
                 {
                     context.Result = new RedirectToActionResult("NotAccess", "Error", null);
                     return;
