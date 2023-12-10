@@ -50,6 +50,10 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.SubjectId, "Assignment_SubjectId_fkey");
 
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
+
                 entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.IsActive)
@@ -284,7 +288,7 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.PageId, "Permission_PageId_fkey");
 
-                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_Page_idx");
+                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_PageId_idx");
 
                 entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_PageId_key")
                     .IsUnique();

@@ -15,6 +15,7 @@ namespace IMS.Models
         public string? Description { get; set; }
         public int? SubjectId { get; set; }
         public bool? IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public virtual Subject? Subject { get; set; }
         public virtual ICollection<Milestone> Milestones { get; set; }
