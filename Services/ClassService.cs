@@ -10,6 +10,12 @@ namespace IMS.Services
         {
             _context = context;
         }
+        public bool ClassExist(string className)
+        {
+            var user = _context.Classes.FirstOrDefault(c => c.Name == className);
+            if (user != null) return true; else return false;
+            
+        }
         public IEnumerable<Class> GetClasses()
         {
             return _context.Classes.Include(c => c.Students).Include(c => c.Teacher).Include(c => c.Subject).ToList();
@@ -44,10 +50,11 @@ namespace IMS.Services
             }
             return 0;
         }
-        public int GetTeacherIdByName(string name)
+        public int GetTeacherIdByNameAndEmail(string name)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Name == name);
-            return user.Id;
+            var user = _context.Users.FirstOrDefault(u => u.Name == name || u.Email == name);
+            if (user != null) { return user.Id; }
+            else { return 0; }
         }
         public void AddClass(Class Class) 
         {
