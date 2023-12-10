@@ -72,7 +72,18 @@ namespace IMS.Controllers
             var role = userService.GetRole();
             ViewBag.Roles = role;
 
+            //string currentDirectory = Directory.GetCurrentDirectory();
+            //string avatarsDirectory = Path.Combine(currentDirectory, "wwwroot", "Avatars");
 
+            //DirectoryInfo directoryInfo = new DirectoryInfo(avatarsDirectory);
+
+            //if (directoryInfo.Exists)
+            //{
+            //    foreach (FileInfo file in directoryInfo.EnumerateFiles())
+            //    {
+            //        file.Delete();
+            //    }
+            //}
             return View();
         }
 
@@ -155,6 +166,7 @@ namespace IMS.Controllers
                 Avatar = userView.Avatar,
                 Status = userView.Status
             };
+           
             userService.AddUser(user);
 
             var roles = userService.GetRole();
