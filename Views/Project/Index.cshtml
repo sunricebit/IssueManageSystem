@@ -1,0 +1,107 @@
+﻿@{
+    ViewData["Title"] = "Project List";
+    Pagination pagination = ViewBag.Pagination;
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="mt-4">Projects List</h1>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+            <i class="fas fa-table me-1"></i>
+                Your Project
+            </div>
+            <div class="col-md-auto">
+                <a class="btn btn-primary" asp-controller="Project" asp-action="CreateProject">
+                    <i class="fas fa-plus"></i> New Project
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form asp-controller="Project" asp-action="Index" method="get" id="FilterAndSearchForm">
+                @*thêm input ẩn *@
+                <input type="hidden" id="pageNumber" name="pageNumber" />
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="Type" class="form-label">Filter by Status:</label>
+                        <select class="form-control" id="Status" name="filterByStatus">
+                            <option value="" selected>Select Status</option>
+                            <option value="">All</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="keyword" class="form-label">Search:</label>
+                        <input type="text" id="keyword" name="searchByName" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </form>
+            <br />
+            @{
+                if (ViewBag.ProjectList != null)
+                {
+                    <table class="table table-bordered" id="sortable-table">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable(0)" class="sortable">Id</th>
+                                <th onclick="sortTable(1)" class="sortable">Name</th>
+                                <th onclick="sortTable(2)" class="sortable">Class</th>
+                                <th onclick="sortTable(3)" class="sortable">Leader</th>
+                                <th class="sortable">Status</th>
+                                <th class="sortable">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (Project project in ViewBag.ProjectList)
+                            {
+                                <tr>
+                                    <td>@project.Id</td>
+                                    <td>@project.Name</td>
+                                    <td>@project.Class.Name</td>
+                                    <td>@project.Leader.Email</td>
+                                    @if (project.Status == true)
+                                    {
+                                        <td>
+                                            <form asp-action="ToggleStatus" asp-route-id="@project.Id" method="post">
+                                                <button type="submit" class="btn btn-success btn-sm" @(project.Leader.Email == ViewBag.User ? "" : "disabled")>
+                                                    Active
+                                                </button>
+                                            </form>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td>
+                                            <form asp-action="ToggleStatus" asp-route-id="@project.Id" method="post">
+                                                <button type="submit" class="btn btn-secondary btn-sm" @(project.Leader.Email == ViewBag.User ? "" : "disabled")>
+                                                    Deactive
+                                                </button>
+                                            </form>
+                                        </td>
+                                    }
+
+                                    <td>
+                                        <a asp-action="ProjectDetail" asp-route-id="@project.Id" asp-controller="Project" class="btn btn-info btn-sm">
+                                            <i class="fas fa-eye"></i> Project Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No settings available.</p>
+                }
+            }
+            @Html.Partial("_PaginationPartial", pagination)
+        </div>
+    </div>
+</div>

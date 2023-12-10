@@ -1,0 +1,112 @@
+﻿@model IMS.ViewModels.Validation.ProjectViewModel
+@{
+    ViewData["Title"] = "Project Detail";
+    string confirmMessage = "Are you want to update this project ?";
+}
+<div class="container mt-5">
+    <h2>Project Detail</h2>
+
+    <!-- Form để thêm Project -->
+    <form asp-action="ProjectUpdate" method="post" class="needs-validation" novalidate id="formSubmit">
+        <!-- Validation Summary -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="alert alert-success">
+                <ul>
+                    <li>@ViewBag.SuccessMessage</li>
+                </ul>
+            </div>
+        }
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-danger">
+                <ul>
+                    <li>@ViewBag.ErrorMessage</li>
+                </ul>
+            </div>
+        }
+
+        <!-- Name -->
+        <div class="form-group">
+            <label for="Id">Id:</label>
+            <input type="text" class="form-control" id="Id" name="Id" asp-for="Id" value="@Model.Id" required readonly>
+        </div>
+
+        <!-- Name -->
+        <div class="form-group">
+            <label for="Name">Name*:</label>
+            @if (ViewBag.Leader)
+            {
+                <input type="text" class="form-control" id="Name" name="Name" asp-for="Name" value="@Model.Name" required>
+            }
+            else
+            {
+                <input type="text" class="form-control" id="Name" name="Name" asp-for="Name" readonly value="@Model.Name" required>
+            }
+            
+            <div class="invalid-feedback">Please enter the Name.</div>
+        </div>
+
+        <!-- Class -->
+        <div class="form-group">
+            <label for="ClassId">Class*:</label>
+            <select class="form-control" id="ClassId" name="ClassId" asp-for="ClassId" required readonly>
+                <option value="@ViewBag.Class.Id">@ViewBag.Class.Name</option>
+            </select>
+            <div class="invalid-feedback">Please select a Class.</div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+            <label for="Description">Description:</label>
+            @if (ViewBag.Leader){
+                <textarea class="form-control" id="Description" name="Description" asp-for="Description" value="@Model.Description"></textarea>
+            }else{
+                <textarea class="form-control" id="Description" name="Description" asp-for="Description" readonly value="@Model.Description"></textarea>
+            }
+        </div>
+
+        <!-- Status -->
+        <div class="form-group">
+            <label for="statusToggle">Status</label>
+            <div class="form-check form-switch">
+                <input type="hidden" name="Status" value="false" id="StatusId" />
+                @if (ViewBag.Leader)
+                {
+                    <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" onchange="changeStatus()" @((bool)Model.Status ? "checked" :"") />
+                }
+                else
+                {
+                    <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" onchange="changeStatus()" disabled @((bool)Model.Status ? "checked" :"")/>
+                }
+            </div>
+        </div>
+
+        <br />
+        <!-- Button submit -->
+        @if (ViewBag.Leader)
+        {
+            <button type="submit" class="btn btn-primary" id="btnSubmit">Update Project</button>
+        }
+    </form>
+</div>
+@Html.Partial("_ConfirmPartial", confirmMessage)
+
+<script>
+    function changeStatus() {
+        var statusToggle = document.getElementById('statusToggle');
+        var statusId = document.getElementById('StatusId');
+        statusId.value = statusToggle.checked ? "true" : "false";
+    }
+</script>

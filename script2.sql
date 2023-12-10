@@ -163,6 +163,7 @@ CREATE TABLE `Milestone` (
     `Description` TEXT NULL,
     `StartDate` DATETIME(3) NULL,
     `EndDate` DATETIME(3) NULL,
+    `ProjectId` INTEGER NULL,
     `ClassId` INTEGER NULL,
     `AssignmentId` INTEGER NULL,
 
@@ -189,7 +190,7 @@ CREATE TABLE `Project` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Name` VARCHAR(100) NOT NULL,
     `Status` BOOLEAN NULL DEFAULT true,
-    `Description` TEXT NOT NULL,
+    `Description` TEXT NULL,
     `ClassId` INTEGER NULL,
     `LeaderId` INTEGER NULL,
 
@@ -334,7 +335,7 @@ INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`,
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (6, 'student@facebook.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Iolanthe Akker', 'https://robohash.org/eosnostrumquo.png?size=100x100&set=set1', 0, '0537712440', '33107 Barby Alley', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (7, 'imatschuk6@hibu.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ingra Matschuk', 'https://robohash.org/maioresquinulla.png?size=100x100&set=set1', 1, '0241136823', null, 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (8, 'dorridge7@homestead.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Daron Orridge', null, null, '0378177525', '62366 Northport Crossing', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (9, 'mgegay8@bing.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Maggi Gegay', 'https://robohash.org/esseofficiasint.png?size=100x100&set=set1', 1, '0181626572', '22277 Granby Way', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (9, 'test@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Maggi Gegay', 'https://robohash.org/esseofficiasint.png?size=100x100&set=set1', 1, '0181626572', '22277 Granby Way', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (10, 'khanratty9@eventbrite.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Kahlil Hanratty', 'https://robohash.org/impeditsequiporro.png?size=100x100&set=set1', 0, '0415660856', null, 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (11, 'jkerswella@msn.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Jacklin Kerswell', 'https://robohash.org/ininullam.png?size=100x100&set=set1', 1, '0045353089', '16 Dayton Trail', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (12, 'dmccurdyb@opera.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Darcie McCurdy', 'https://robohash.org/utetest.png?size=100x100&set=set1', 0, '0114430360', null, 1);
@@ -519,31 +520,43 @@ Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turp
 insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (14, 'Assignment 2', null, 4);
 insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (15, 'Assignment 3', null, 5);
 
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (1, 'BSU397', 'Fusce consequat. Nulla nisl. Nunc nisl.', 1, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (2, 'LDT721', 'Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (1,'SWP392','Fusce consequat. Nulla nisl. Nunc nisl.',4,1,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (2,'LAB301','Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.\r \r Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing ',4,2,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (3,'PRM392',NULL,4,3,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (4,'PRN231',NULL,4,4,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (5,'PRN211',NULL,4,5,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (6,'PRN221',NULL,4,1,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (7,'FNM375',NULL,4,2,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (8,'DWA190','Phasellus in felis. Donec semper sapien a libero. Nam dui.\n\nProin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis. Ut at dolor quis odio consequat varius.\n\nInteger ac leo. Pellentesque ultrices mattis odio. Donec vitae nisi.',4,3,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (9,'ZOT661',NULL,4,4,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (10,'YIR967',NULL,4,5,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (11,'YKN655',NULL,4,1,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (12,'OQO359','Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.\n\nDuis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.',4,2,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (13,'DSB920','4',4,3,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (14,'UIH198',NULL,4,4,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (15,'ZCH285','Fusce consequat. Nulla nisl. Nunc nisl.\n\nDuis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.',4,5,0);
 
-Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.', 2, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (3, 'YPK507', null, 3, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (4, 'BLD988', null, 4, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (5, 'MVI063', null, 5, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (6, 'EPL988', null, 1, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (7, 'FNM375', null, 2, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (8, 'DWA190', 'Phasellus in felis. Donec semper sapien a libero. Nam dui.
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '2');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '3');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '4');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '5');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '6');
 
-Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis. Ut at dolor quis odio consequat varius.
+INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('IMS', '1', '1', '5');
+INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('NPM', '1', '1', '9');
+INSERT INTO `ims`.`project` (`Id`, `Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('ProjectVCM01', '1', '3', '12');
 
-Integer ac leo. Pellentesque ultrices mattis odio. Donec vitae nisi.', 3, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (9, 'ZOT661', null, 4, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (10, 'YIR967', null, 5, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (11, 'YKN655', null, 1, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (12, 'OQO359', 'Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.
-
-Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.', 2, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (13, 'DSB920', 'Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.', 3, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (14, 'UIH198', null, 4, 5);
-insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (15, 'ZCH285', 'Fusce consequat. Nulla nisl. Nunc nisl.
-
-Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 5, 5);
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('5', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('9', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('10', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('11', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('12', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('5', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('6', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('7', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('8', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('9', '2');
 
 insert into IMS.Permission(RoleId, PageId, CanCreate, CanRead, CanUpdate) values
 (1, 17, 1, 1, 1),
