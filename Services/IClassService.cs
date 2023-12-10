@@ -9,7 +9,8 @@
         public User GetTeacherById(int id);
         public Subject GetSubjectById(int id);
         public List<Subject> GetSubjects();
-        public int GetTeacherIdByName(string name);
+        public int GetTeacherIdByNameAndEmail(string name);
         public IEnumerable<User> GetAllTeachers();
+        public bool ClassExist(string className);
     }
 }

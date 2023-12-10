@@ -26,7 +26,7 @@ namespace IMS.Controllers
             Dictionary<string, dynamic> filter = new Dictionary<string, dynamic>(), search = new Dictionary<string, dynamic>();
             if (filterByTeacher != null && !filterByTeacher.Equals("All"))
             {
-                int teacherid = _classService.GetTeacherIdByName(filterByTeacher);
+                int teacherid = _classService.GetTeacherIdByNameAndEmail(filterByTeacher);
                 filter.Add("TeacherId", teacherid);
             }
             if (filterbyStatus != null && !filterbyStatus.Equals("All"))
@@ -95,18 +95,39 @@ namespace IMS.Controllers
 
         }
         [HttpPost("Create")]
-        public IActionResult Create(ClassViewModel classViewModel)
+        public IActionResult Create(ClassViewModel classViewModel, string teacherInput)
         {
+            
+
             if (!ModelState.IsValid)
             {
+                var subject2 = _classService.GetSubjects();
+                ViewBag.Subject = subject2;
                 return View();
             }
+            bool ClassExist = _classService.ClassExist(classViewModel.Name);
+            if(ClassExist) 
+            {
+                var subject4 = _classService.GetSubjects();
+                ViewBag.Subject = subject4;
+                ViewBag.ErrorMessage = " Class is already exist.";
+                return View();
+            }
+            var teacherid = _classService.GetTeacherIdByNameAndEmail(teacherInput);
+            if (teacherid == 0)
+            {
+                var subject3 = _classService.GetSubjects();
+                ViewBag.Subject = subject3;
+                ViewBag.ErrorMessage = " Teacher is not exist.";
+                return View();
+            }
+
             classViewModel.IsActive = true;
             Class Class = new Class()
             {
-                Id= classViewModel.Id,
+                Name = classViewModel.Name,
                 Description = classViewModel.Description,
-                TeacherId = classViewModel.TeacherId,
+                TeacherId = teacherid,
                 SubjectId = classViewModel.SubjectId,
                 IsActive = classViewModel.IsActive
             };
