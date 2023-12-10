@@ -36,7 +36,7 @@ namespace IMS.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseMySQL("server=localhost;uid=root;pwd=123456789;database=IMS");
+                optionsBuilder.UseMySQL("server=localhost;uid=root;pwd=123456;database=IMS");
             }
         }
 
@@ -284,7 +284,7 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.PageId, "Permission_PageId_fkey");
 
-                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_PageId_idx");
+                entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_Page_idx");
 
                 entity.HasIndex(e => new { e.RoleId, e.PageId }, "Permission_RoleId_PageId_key")
                     .IsUnique();
@@ -351,11 +351,9 @@ namespace IMS.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
-                entity.Property(e => e.EnglishName).HasMaxLength(100);
+                entity.Property(e => e.Name).HasMaxLength(100);
 
                 entity.Property(e => e.Status).HasDefaultValueSql("'1'");
-
-                entity.Property(e => e.VietnameseName).HasMaxLength(100);
 
                 entity.HasOne(d => d.Class)
                     .WithMany(p => p.Projects)

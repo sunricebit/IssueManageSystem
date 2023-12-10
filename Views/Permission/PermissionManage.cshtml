@@ -25,27 +25,22 @@
                 <thead>
                     <tr>
                         <th></th>
-                        @{
-                            var orderedRoles = roles.OrderBy(r => r);
-                        }
-                        @foreach (var role in orderedRoles)
+                        @foreach (var role in roles)
                         {
                             <th>@role</th>
                         }
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var permission in Model)
+                    @foreach (var pageAccess in Model.First().PagesAcess)
                     {
                         <tr>
-                            <td>@permission.Page</td>
-                            @{
-                                var orderedRolesAccess = permission.RolesAcess.OrderBy(roleAccess => roleAccess.Key);
-                            }
-                            @foreach (var roleAccess in orderedRolesAccess)
-                            {
+                            <td><strong>@pageAccess.Page</strong></td>
+                            @foreach(var permission in Model){
                                 <td>
-                                    <input type="checkbox" @(roleAccess.Value ? "checked" : "") /> Can Access
+                                    <input type="checkbox" @(permission.PagesAcess.FirstOrDefault(pa => pa.Page == pageAccess.Page).CanAccess ? "checked" : "") /> Can Access <br />
+                                    <input type="checkbox" @(permission.PagesAcess.FirstOrDefault(pa => pa.Page == pageAccess.Page).CanAdd ? "checked" : "") /> Can Create <br />
+                                    <input type="checkbox" @(permission.PagesAcess.FirstOrDefault(pa => pa.Page == pageAccess.Page).CanUpdate ? "checked" : "") /> Can Update <br />
                                 </td>
                             }
                         </tr>
@@ -64,28 +59,80 @@
 <script>
     function getPermissionData() {
         var permissionData = [];
+        var pagesList = [];
+        var tableData = [];
+        var rolesList = [];
 
-        // Duyệt qua từng hàng trong tbody
-        $("#permissionTable tbody tr").each(function () {
-            var pageValue = $(this).find("td:first").text();
-            var rolesAccess = {};
+        // Lặp qua từng cột của header để lấy danh sách role
+        $('#permissionTable thead tr th').each(function () {
 
-            // Duyệt qua từng ô checkbox trong hàng
-            $(this).find("td input[type=checkbox]").each(function (index) {
-                var roleValue = $("#permissionTable thead th:eq(" + (index + 1) + ")").text();
-                var canAccess = $(this).prop("checked");
-
-                rolesAccess[roleValue] = canAccess;
-            });
-
-            // Tạo đối tượng PermissionViewModel và thêm vào danh sách
-            var permissionViewModel = {
-                Page: pageValue,
-                RolesAcess: rolesAccess
-            };
-
-            permissionData.push(permissionViewModel);
+            var role = $(this).text();
+            // Kiểm tra nếu giá trị role không có hoặc rỗng, bỏ qua
+            if (role.trim() !== '') {
+                rolesList.push(role);
+            }
         });
+
+        // Lặp qua từng dòng trong tbody của bảng để lấy danh sách page
+        $('#permissionTable tbody tr').each(function () {
+            var page = $(this).find('td:first strong').text();
+
+            // Kiểm tra nếu giá trị page không có hoặc rỗng, bỏ qua
+            if (page.trim() !== '') {
+                pagesList.push(page);
+            }
+        });
+
+        // Lặp qua từng dòng trong tbody để xây dựng mảng hai chiều
+        $('#permissionTable tbody tr').each(function () {
+            var rowData = [];
+            $(this).find('td').each(function () {
+                var cellData = $(this);
+                rowData.push(cellData);
+            });
+            tableData.push(rowData);
+        });
+        var numColumns = tableData[0].length;
+        console.log(numColumns);
+
+        // Lặp qua từng cột trong tbody để tạo danh sách PermissionViewModel
+        for (var colIndex = 1; colIndex < numColumns; colIndex++) {
+            var role = rolesList[colIndex - 1];
+            var pageAccessList = [];
+
+            // Lặp qua từng ô dữ liệu của dòng (từ cột thứ 2 trở đi)
+            for (var rowIndex = 0; rowIndex < tableData.length; rowIndex++) {
+                var cellData = tableData[rowIndex][colIndex];
+
+                // Lấy giá trị page từ danh sách pages
+                var page = pagesList[rowIndex];
+
+                // Lấy dữ liệu từ checkbox trong cell
+                var canAccess = $(cellData).find('input:eq(0)').prop('checked');
+                var canCreate = $(cellData).find('input:eq(1)').prop('checked');
+                var canUpdate = $(cellData).find('input:eq(2)').prop('checked');
+
+                // Tạo đối tượng PageAccess
+                var pageAccess = {
+                    Page: page,
+                    CanAccess: canAccess,
+                    CanAdd: canCreate,
+                    CanUpdate: canUpdate
+                };
+                // Thêm vào danh sách
+                pageAccessList.push(pageAccess);
+            }
+
+            // Thêm vào danh sách PermissionViewModel
+            var permission = {
+                Role: role,
+                PagesAcess: pageAccessList
+            };
+            console.log(permission);
+            // Thêm vào danh sách
+            permissionData.push(permission);
+        }
+
         console.log(permissionData);
         return permissionData;
     }
@@ -94,12 +141,11 @@
         var permissionData = getPermissionData();
 
         $.ajax({
-            url: '/Permission/Update', // Thay đổi thành đường dẫn thực tế của bạn
+            url: '/Permission/Update', 
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(permissionData),
             success: function (data) {
-                console.log(data);
             },
             error: function (error) {
                 console.log(error);

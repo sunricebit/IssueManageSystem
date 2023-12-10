@@ -2,7 +2,7 @@
 {
     public class PermissionViewModel
     {
-        public string Page { get; set; }
-        public Dictionary<string, bool> RolesAcess { get; set; }
+        public string Role { get; set; }
+        public List<PageAccess> PagesAcess { get; set; }
     }
 }
