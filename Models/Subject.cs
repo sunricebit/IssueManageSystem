@@ -16,7 +16,10 @@ namespace IMS.Models
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
         public bool? IsActive { get; set; }
+        public int SubjectManagerId { get; set; }
+        public DateTime CreatedAt { get; set; }
 
+        public virtual User SubjectManager { get; set; } = null!;
         public virtual ICollection<Assignment> Assignments { get; set; }
         public virtual ICollection<Class> Classes { get; set; }
     }

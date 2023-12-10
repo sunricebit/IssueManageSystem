@@ -8,5 +8,7 @@
         public void SendResetPassword(string email, string hash);
         public void SendPassword(string email, string password);
         public string SendRandomPassword(string emailReceiver);
+
+        public void SendMailContact(string email,string body);
     }
 }

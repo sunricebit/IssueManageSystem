@@ -32,7 +32,6 @@ namespace IMS.Controllers
         public IActionResult UpdatePermission([FromBody]List<PermissionViewModel> permissionViewModels)
         {
             _permissionDAO.UpdatePermission(permissionViewModels);
-            ViewBag.SuccessMessage = "Update Successful";
             return RedirectToAction("PermissionManage");
         }
     }
