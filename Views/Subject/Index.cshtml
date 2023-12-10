@@ -3,6 +3,12 @@
 
 @{
     ViewData["Title"] = "Subject List";
+
+    var errorMessage = intermediate.Error;
+    if (!string.IsNullOrEmpty(errorMessage))
+    {
+        intermediate.Error = "";
+    }
 }
 
 <div class="container-fluid mt-5">
@@ -99,6 +105,7 @@
         <div class="modal-content">
             @using (Html.BeginForm("AddSubject", "Subject", new { page = Model.PageIndex, search = Model.Additional.Search, type = Model.Additional.Type }, FormMethod.Post))
             {
+                    
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">New subject</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup()"></button>
@@ -137,10 +144,10 @@
                         @Html.ValidationMessageFor(model => model.Additional.SubjectManagerId, "", new { @class = "text-danger" })
                     </div>
 
-                    @if (!string.IsNullOrEmpty(@intermediate.Error))
+                    @if (!string.IsNullOrEmpty(@errorMessage))
                     {
                         <div class="text-danger text-center mt-3">
-                            @intermediate.Error
+                            @errorMessage
                         </div>
                     }
 
@@ -157,7 +164,7 @@
 <script>
 
 
-    var error = "@intermediate.Error";
+    var error = '@errorMessage';
 
     if (sessionStorage.getItem("checked") === null) {
         sessionStorage.setItem("checked", "false")

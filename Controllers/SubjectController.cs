@@ -150,7 +150,7 @@ namespace IMS.Controllers
             }
             catch
             {
-                errorHelper.Error = "Somethine error";
+                errorHelper.Error = "Something error";
 
             }
             return RedirectToAction("Index", new { page = page, search = search, type = type });

@@ -1,5 +1,4 @@
-﻿using System;
-namespace IMS.Common
+﻿namespace IMS.Common
 {
     public class ErrorHelper
     {
