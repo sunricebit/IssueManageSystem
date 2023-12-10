@@ -241,6 +241,8 @@ namespace IMS.Controllers
             if (pageIndex > totalPages) pageIndex = 1;
             assignments = assignments.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
+            var data = assignments.ToList();
+
             return View(new AssignmentViewModel() { Assignments = assignments.ToList(), Search = search, PageIndex = pageIndex, PageSize = pageSize, TotalPages = totalPages, ItemCount = itemCount });
         }
 

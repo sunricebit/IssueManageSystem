@@ -86,7 +86,7 @@
                             Id = assignment.Id,
                             Name = assignment.Name,
                             Description = assignment.Description,
-                            IsActive = assignment.IsActive,
+                            IsActive = assignment.IsActive ?? false,
                         };
 
                         <div class="modal-header">
@@ -117,7 +117,7 @@
                                 <label for="isActive" class="control-label mb-1">Description</label>
                                 <div class="input-group">
                                     <span class="input-group-prepend">
-                                        <input type="checkbox" asp-for="@vm.IsActive" checked="@vm.IsActive" />
+                                        <input type="checkbox" asp-for="@vm.IsActive" />
                                         @*@Html.CheckBoxFor(model => assignment.IsActive)*@
                                     </span>
                                 </div>
