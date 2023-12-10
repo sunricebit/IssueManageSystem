@@ -9,7 +9,6 @@
     <!-- Form để thêm Setting -->
     <form asp-action="AddSetting" method="post" class="needs-validation" novalidate id="formSubmit">
         <!-- Validation Summary -->
-        @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
         @if (!ViewData.ModelState.IsValid)
         {
             <div class="alert alert-danger">
@@ -51,9 +50,16 @@
 
         <!-- Value -->
         <div class="form-group">
-            <label for="Value">Value:</label>
-            <input type="text" class="form-control" id="Value*" name="Value" asp-for="Value" required>
+            <label for="Value">Value*:</label>
+            <input type="text" class="form-control" id="Value" name="Value" asp-for="Value" required>
             <div class="invalid-feedback">Please enter the Value.</div>
+        </div>
+
+        <!-- Order -->
+        <div class="form-group">
+            <label for="Order">Order:</label>
+            <input type="text" class="form-control" id="Order" name="Order" asp-for="Order">
+            <div class="invalid-feedback">Input integer from 1 to 255</div>
         </div>
 
         <!-- Description -->
@@ -61,9 +67,27 @@
             <label for="Description">Description:</label>
             <textarea class="form-control" id="Description" name="Description" asp-for="Description"></textarea>
         </div>
+
+        <!-- Status -->
+        <div class="form-group">
+            <label for="statusToggle">Status</label>
+            <div class="form-check form-switch">
+                <input type="hidden" name="Status" value="false" id="StatusId" />
+                <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" onchange="changeStatus()"/>
+            </div>
+        </div>
+
         <br />
         <!-- Button submit -->
         <button type="submit" class="btn btn-primary" id="btnSubmit">Add Setting</button>
     </form>
 </div>
 @Html.Partial("_ConfirmPartial", confirmMessage)
+
+<script>
+    function changeStatus() {
+        var statusToggle = document.getElementById('statusToggle');
+        var statusId = document.getElementById('StatusId');
+        statusId.value = statusToggle.checked ? "true" : "false";
+    }
+</script>

@@ -7,7 +7,7 @@
     <h2>Update Setting</h2>
 
     <!-- Form để Update Setting -->
-    <form asp-action="SettingUpdate" method="post" class="needs-validation"  novalidate id="formSubmit">
+    <form asp-action="SettingUpdate" method="post" class="needs-validation" novalidate id="formSubmit">
         <!-- Validation Summary -->
         @if (!ViewData.ModelState.IsValid)
         {
@@ -78,21 +78,46 @@
         }
         else
         {
-            <div class="form-group" >
+            <div class="form-group">
                 <label for="Value">Value*:</label>
                 <input type="text" class="form-control" id="Value" name="Value" asp-for="Value" required value="@Model.Value">
                 <div class="invalid-feedback">Please enter the Value.</div>
             </div>
         }
-        
+
+        <!-- Order -->
+        <div class="form-group">
+            <label for="Order">Order:</label>
+            <input type="text" class="form-control" id="Order" name="Order" asp-for="Order">
+            <div class="invalid-feedback">Input integer from 1 to 255</div>
+        </div>
+
         <!-- Description -->
         <div class="form-group">
             <label for="Description">Description:</label>
             <textarea class="form-control" id="Description" name="Description" asp-for="Description" value="@Model.Description"></textarea>
         </div>
+
+        <!-- Status -->
+        <div class="form-group">
+            <label for="statusToggle">Status</label>
+            <div class="form-check form-switch">
+                <input type="hidden" name="Status" value="false" id="StatusId" />
+                <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" onchange="changeStatus()" @((bool)Model.Status ? "checked" :"") />
+            </div>
+        </div>
+
         <br />
         <!-- Button submit -->
         <button type="submit" class="btn btn-primary" id="btnSubmit">Update Setting</button>
     </form>
 </div>
 @Html.Partial("_ConfirmPartial", confirmMessage)
+
+<script>
+    function changeStatus() {
+        var statusToggle = document.getElementById('statusToggle');
+        var statusId = document.getElementById('StatusId');
+        statusId.value = statusToggle.checked ? "true" : "false";
+    }
+</script>

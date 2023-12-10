@@ -4,6 +4,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Firebase.Auth;
 using Firebase.Storage;
 using IMS.Models;
+using IMS.ViewModels.Permission;
 using IMS.ViewModels.User;
 using Microsoft.AspNetCore.Mvc;
 using System.Configuration;

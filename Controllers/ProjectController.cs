@@ -51,7 +51,7 @@ namespace IMS.Controllers
             ViewBag.SearchValue = searchByName;
             ViewBag.ProjectList = paginate.GetListPaginate(projects);
             ViewBag.Action = "Index";
-            ViewBag.User = "student@gmail.com";
+            ViewBag.User = user.Email;
             ViewBag.Pagination = paginate.GetPagination();
             return View();
         }

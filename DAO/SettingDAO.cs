@@ -113,6 +113,8 @@
                 {
                     tempSetting.Value = setting.Value;
                     tempSetting.Type = setting.Type;
+                    tempSetting.Status = setting.Status;
+                    tempSetting.Order = setting.Order;
                     _context.SaveChanges();
                 }
             }
