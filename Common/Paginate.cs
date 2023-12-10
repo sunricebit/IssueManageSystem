@@ -188,19 +188,20 @@ namespace IMS.Common
         //    return _context.Set<T>().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
         //}
 
-        //public IEnumerable<T> GetListPaginate(IEnumerable<T> listObject)
-        //{
-        //    int countObject = listObject.Count();
-        //    if (countObject % pageSize > 0)
-        //    {
-        //        this.numberOfPage = listObject.Count() / pageSize + 1;
-        //    }
-        //    else
-        //    {
-        //        this.numberOfPage = countObject / pageSize;
-        //    }
-        //    return listObject.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-        //}
+        public List<T> GetListPaginate(List<T> listObject)
+        {
+            int countObject = listObject.Count();
+            if (countObject % pageSize > 0)
+            {
+                this.numberOfPage = listObject.Count() / pageSize + 1;
+            }
+            else
+            {
+                this.numberOfPage = countObject / pageSize;
+            }
+            return listObject.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        }
+
 
         public Pagination GetPagination()
         {

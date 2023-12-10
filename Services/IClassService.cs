@@ -1,4 +1,6 @@
-﻿namespace IMS.Services
+﻿using Microsoft.AspNetCore.Razor.Language.Intermediate;
+
+namespace IMS.Services
 {
     public interface IClassService
     {
@@ -11,5 +13,6 @@
         public List<Subject> GetSubjects();
         public int GetTeacherIdByName(string name);
         public IEnumerable<User> GetAllTeachers();
+        public IEnumerable<Class> GetClassesByStudent(int studentId);
     }
 }
