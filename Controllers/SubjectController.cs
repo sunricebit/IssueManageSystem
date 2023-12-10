@@ -341,7 +341,7 @@ namespace IMS.Controllers
                 assignment.Name = vm.Name;
                 assignment.Description = vm.Description;
                 assignment.IsActive = vm.IsActive;
-
+                errorHelper.Success = "Update assignment successfully";
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)
