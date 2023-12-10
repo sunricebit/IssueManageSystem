@@ -13,6 +13,7 @@
     <PackageReference Include="FirebaseStorage.net" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.23" />
     <PackageReference Include="NGitLab" Version="6.43.1" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="MailKit" Version="4.3.0" />
@@ -22,7 +23,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.11" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Services\" />
@@ -31,6 +32,8 @@
     <None Remove="Views\Home\" />
     <None Remove="Views\Auth\" />
     <None Remove="Extensions\" />
+    <None Remove="Views\Subject\" />
+    <None Remove="ViewModels\Subject\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\Auth\" />
@@ -40,5 +43,8 @@
     <Folder Include="Extensions\" />
     <Folder Include="wwwroot\img\" />
     <Folder Include="wwwroot\Avatars\" />
+    <Folder Include="Views\Subject\" />
+    <Folder Include="ViewModels\Subject\" />
+    <Folder Include="ViewModels\Subject\" />
   </ItemGroup>
 </Project>

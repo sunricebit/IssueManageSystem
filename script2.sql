@@ -9,10 +9,12 @@ CREATE TABLE `Setting` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Type` VARCHAR(20) NOT NULL,
     `Value` VARCHAR(50) NOT NULL,
+    `Order` TINYINT NOT NULL,
+    `Status` BOOL NOT NULL,
     `Description` VARCHAR(400) NULL,
 
-    INDEX `Setting_Type_Value_idx`(`Type`, `Value`),
     INDEX `Setting_Id_idx`(`Id`),
+    INDEX `Setting_Type_Value_idx`(`Type`, `Value`),
     UNIQUE INDEX `Setting_Type_Value_key`(`Type`, `Value`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -37,14 +39,26 @@ CREATE TABLE `Post` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
     `Description` TEXT NULL,
+    `Excerpt` TEXT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `UpdatedAt` DATETIME(3) NULL,
     `IsPublic` BOOLEAN NOT NULL DEFAULT false,
-    `ImageUrl` VARCHAR(100) NULL,
+    `ImageUrl` VARCHAR(300) NULL,
     `AuthorId` INTEGER NOT NULL,
     `CategoryId` INTEGER NULL,
 
     INDEX `Post_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Report` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Content` VARCHAR(300) NOT NULL,
+    `ReporterId` INTEGER NOT NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `PostId` INTEGER NOT NULL,
+
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -55,7 +69,7 @@ CREATE TABLE `User` (
     `Password` VARCHAR(64) NOT NULL,
     `RoleId` INTEGER NOT NULL,
     `Name` VARCHAR(50) NOT NULL,
-    `Avatar` VARCHAR(250) NULL,
+    `Avatar` VARCHAR(300) NULL,
     `Gender` BOOLEAN NULL,
     `Phone` VARCHAR(15) NULL,
     `Address` VARCHAR(191) NULL,
@@ -72,10 +86,11 @@ CREATE TABLE `User` (
 -- CreateTable
 CREATE TABLE `Assignment` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `Code` VARCHAR(50) NOT NULL,
     `Name` VARCHAR(100) NOT NULL,
     `Description` TEXT NULL,
     `SubjectId` INTEGER NULL,
+    `IsActive` BOOLEAN NOT NULL DEFAULT true,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `Assignment_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
@@ -88,7 +103,8 @@ CREATE TABLE `Class` (
     `Description` VARCHAR(300) NULL,
     `TeacherId` INTEGER NULL,
     `SubjectId` INTEGER NULL,
-    `Status` BOOLEAN NULL,
+    `IsActive` BOOLEAN NOT NULL DEFAULT false,
+
     INDEX `Class_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -162,18 +178,16 @@ CREATE TABLE `Permission` (
     `CanCreate` BOOLEAN NOT NULL DEFAULT false,
     `CanRead` BOOLEAN NOT NULL DEFAULT false,
     `CanUpdate` BOOLEAN NOT NULL DEFAULT false,
-    `CanDelete` BOOLEAN NOT NULL DEFAULT false,
 
-    INDEX `Permission_RoleId_Page_idx`(`RoleId`, `PageId`),
-    UNIQUE INDEX `Permission_RoleId_Page_key`(`RoleId`, `PageId`),
+    INDEX `Permission_RoleId_PageId_idx`(`RoleId`, `PageId`),
+    UNIQUE INDEX `Permission_RoleId_PageId_key`(`RoleId`, `PageId`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Project` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
-    `EnglishName` VARCHAR(100) NOT NULL,
-    `VietnameseName` VARCHAR(100) NOT NULL,
+    `Name` VARCHAR(100) NOT NULL,
     `Status` BOOLEAN NULL DEFAULT true,
     `Description` TEXT NOT NULL,
     `ClassId` INTEGER NULL,
@@ -199,6 +213,8 @@ CREATE TABLE `Subject` (
     `Name` VARCHAR(100) NOT NULL,
     `Description` TEXT NULL,
     `IsActive` BOOLEAN NOT NULL DEFAULT true,
+    `SubjectManagerId` INTEGER NOT NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `Subject_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
@@ -215,6 +231,12 @@ ALTER TABLE `Post` ADD CONSTRAINT `Post_CategoryId_fkey` FOREIGN KEY (`CategoryI
 
 -- AddForeignKey
 ALTER TABLE `Post` ADD CONSTRAINT `Post_AuthorId_fkey` FOREIGN KEY (`AuthorId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Report` ADD CONSTRAINT `Report_ReporterId_fkey` FOREIGN KEY (`ReporterId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Report` ADD CONSTRAINT `Report_PostId_fkey` FOREIGN KEY (`PostId`) REFERENCES `Post`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -265,10 +287,10 @@ ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_AssignmentId_fkey` FOREIGN KEY
 ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Permission` ADD CONSTRAINT `Permission_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Permission` ADD CONSTRAINT `Permission_PageId_fkey` FOREIGN KEY (`PageId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Permission` ADD CONSTRAINT `Permission_PageId_fkey` FOREIGN KEY (`PageId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `Permission` ADD CONSTRAINT `Permission_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Project` ADD CONSTRAINT `Project_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -282,58 +304,59 @@ ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_ProjectId_fkey` FORE
 -- AddForeignKey
 ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
-INSERT INTO `IMS`.`Setting` (`Type`, `Value`)
-VALUES ('ROLE', 'Admin'),
-       ('ROLE', 'Subject Manager'),
-       ('ROLE', 'Class Manager'),
-       ('ROLE', 'Marketer Manager'),
-       ('ROLE', 'Teacher'),
-       ('ROLE', 'Student'),
-       ('POST_CATEGORY', 'Art and Culture'),
-       ('POST_CATEGORY', 'Travel and Adventure'),
-       ('POST_CATEGORY', 'Science and Technology'),
-       ('POST_CATEGORY', 'Health and Lifestyle'),
-       ('POST_CATEGORY', 'Learning and Personal Development'),
-       ('POST_CATEGORY', 'Family Life'),
-       ('CONTACT_TYPE', 'Networking'),
-       ('CONTACT_TYPE', 'IT Career Development'),
-       ('CONTACT_TYPE', 'Financial Aid and Scholarships'),
-       ('CONTACT_TYPE', 'Faculty and Research'),
-       ('CONTACT_TYPE', 'International Students'),
-       ('PAGE_LINK', '/Setting/SettingList');
+-- AddForeignKey
+ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+INSERT INTO `IMS`.`Setting` (`Type`, `Value`, `Order`, `Status`)
+VALUES ('ROLE', 'Admin', 1, 1),
+       ('ROLE', 'Manager', 1, 1),
+       ('ROLE', 'Marketer', 1, 1),
+       ('ROLE', 'Teacher', 1, 1),
+       ('ROLE', 'Student', 1, 1),
+       ('POST_CATEGORY', 'Art and Culture', 1, 1),
+       ('POST_CATEGORY', 'Travel and Adventure', 1, 1),
+       ('POST_CATEGORY', 'Science and Technology', 1, 1),
+       ('POST_CATEGORY', 'Health and Lifestyle', 1, 1),
+       ('POST_CATEGORY', 'Learning and Personal Development', 1, 1),
+       ('POST_CATEGORY', 'Family Life', 1, 1),
+       ('CONTACT_TYPE', 'Networking', 1, 1),
+       ('CONTACT_TYPE', 'IT Career Development', 1, 1),
+       ('CONTACT_TYPE', 'Financial Aid and Scholarships', 1, 1),
+       ('CONTACT_TYPE', 'Faculty and Research', 1, 1),
+       ('CONTACT_TYPE', 'International Students', 1, 1),
+       ('PAGE_LINK', '/Setting/SettingList', 1, 1);
        
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (2, 'subject@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 2, 'Queenie Suff', 'https://robohash.org/consectetursuntet.png?size=100x100&set=set1', null, '0654960037', '36459 Nevada Trail', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (3, 'class@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 3, 'Jeremie Bethel', 'https://robohash.org/voluptatibusconsequaturin.png?size=100x100&set=set1', 1, '0720320267', '09 Hudson Terrace', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (4, 'marketer@gmail.', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 4, 'Noella Quaintance', 'https://robohash.org/sedquodquis.png?size=100x100&set=set1', 0, '0176636839', '4522 Sycamore Avenue', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (5, 'teacher@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Bucky Ferrettini', 'https://robohash.org/liberoreiciendisvelit.png?size=100x100&set=set1', null, '0542942149', '16 Warbler Parkway', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (6, 'student@facebook.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Iolanthe Akker', 'https://robohash.org/eosnostrumquo.png?size=100x100&set=set1', 0, '0537712440', '33107 Barby Alley', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (7, 'imatschuk6@hibu.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Ingra Matschuk', 'https://robohash.org/maioresquinulla.png?size=100x100&set=set1', 1, '0241136823', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (8, 'dorridge7@homestead.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Daron Orridge', null, null, '0378177525', '62366 Northport Crossing', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (9, 'mgegay8@bing.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Maggi Gegay', 'https://robohash.org/esseofficiasint.png?size=100x100&set=set1', 1, '0181626572', '22277 Granby Way', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (10, 'khanratty9@eventbrite.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Kahlil Hanratty', 'https://robohash.org/impeditsequiporro.png?size=100x100&set=set1', 0, '0415660856', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (11, 'jkerswella@msn.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Jacklin Kerswell', 'https://robohash.org/ininullam.png?size=100x100&set=set1', 1, '0045353089', '16 Dayton Trail', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (12, 'dmccurdyb@opera.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Darcie McCurdy', 'https://robohash.org/utetest.png?size=100x100&set=set1', 0, '0114430360', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (13, 'atolumelloc@yale.edu', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Adelice Tolumello', 'https://robohash.org/ipsamnequelaborum.png?size=100x100&set=set1', 0, '0155192798', '9651 Nova Drive', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (14, 'mdubbled@sogou.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Marcelo Dubble', 'https://robohash.org/iustonullaqui.png?size=100x100&set=set1', 0, '0714674650', '021 Aberg Lane', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (15, 'rschulze@state.tx.us', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Ruthy Schulz', null, 0, '0346589718', '9 Marcy Hill', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (16, 'mannottf@trellian.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Marten Annott', 'https://robohash.org/necessitatibusquiculpa.png?size=100x100&set=set1', 1, '0948897513', '52802 School Parkway', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (17, 'mbridgewaterg@webs.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Marcella Bridgewater', 'https://robohash.org/nesciuntofficiisconsequuntur.png?size=100x100&set=set1', 1, '0741841275', '06067 Fallview Park', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (18, 'wmandevilleh@latimes.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Westley Mandeville', 'https://robohash.org/nisivelitperspiciatis.png?size=100x100&set=set1', 1, '0145591733', '05 Northview Junction', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (19, 'awinningi@google.com.au', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Alena Winning', null, 0, '0298745665', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (20, 'ntinghillj@marriott.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Natalya Tinghill', null, 0, '0529296287', '0379 Scott Lane', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (21, 'dmilingtonk@guardian.co.uk', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Druci Milington', 'https://robohash.org/etquiomnis.png?size=100x100&set=set1', 0, '0563458391', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (22, 'dmacguinessl@geocities.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Debora MacGuiness', null, 1, '0158369774', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (23, 'efleethamm@wsj.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Ethelred Fleetham', null, null, '0625333168', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (24, 'rseabornen@dyndns.org', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Ring Seaborne', null, 0, '0264063417', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (25, 'narthyo@squarespace.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Nicole Arthy', 'https://robohash.org/expeditaperferendisodit.png?size=100x100&set=set1', null, '0868364777', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (26, 'aarnoldip@cisco.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Almeta Arnoldi', 'https://robohash.org/quisquamaliquidet.png?size=100x100&set=set1', 0, '0256102363', '784 Pond Circle', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (27, 'drydingsq@wikia.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Duncan Rydings', 'https://robohash.org/etuttempora.png?size=100x100&set=set1', 1, '0150387157', '5 Holmberg Alley', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (28, 'rder@g.co', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Rex De Meyer', null, 0, '0478593443', null, 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (29, 'esimcoxs@opensource.org', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Ellynn Simcox', 'https://robohash.org/consequaturetadipisci.png?size=100x100&set=set1', 1, '0266914275', '1282 Red Cloud Circle', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (30, 'fmeiningert@irs.gov', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Forester Meininger', 'https://robohash.org/laboreexercitationemratione.png?size=100x100&set=set1', 1, '0617649138', '62 Lakewood Gardens Junction', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (31, 'dscawnu@economist.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Daisy Scawn', null, 1, '0972010267', '55565 Pine View Court', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (32, 'mharmev@shop-pro.jp', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 6, 'Mireille Harme', null, 0, '0568924091', '127 Northfield Plaza', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (2, 'manager@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 2, 'Queenie Suff', 'https://robohash.org/consectetursuntet.png?size=100x100&set=set1', null, '0654960037', '36459 Nevada Trail', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (3, 'marketer@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 3, 'Jeremie Bethel', 'https://robohash.org/voluptatibusconsequaturin.png?size=100x100&set=set1', 1, '0720320267', '09 Hudson Terrace', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (4, 'teacher@gmail.', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 4, 'Noella Quaintance', 'https://robohash.org/sedquodquis.png?size=100x100&set=set1', 0, '0176636839', '4522 Sycamore Avenue', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (5, 'student@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Bucky Ferrettini', 'https://robohash.org/liberoreiciendisvelit.png?size=100x100&set=set1', null, '0542942149', '16 Warbler Parkway', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (6, 'student@facebook.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Iolanthe Akker', 'https://robohash.org/eosnostrumquo.png?size=100x100&set=set1', 0, '0537712440', '33107 Barby Alley', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (7, 'imatschuk6@hibu.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ingra Matschuk', 'https://robohash.org/maioresquinulla.png?size=100x100&set=set1', 1, '0241136823', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (8, 'dorridge7@homestead.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Daron Orridge', null, null, '0378177525', '62366 Northport Crossing', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (9, 'mgegay8@bing.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Maggi Gegay', 'https://robohash.org/esseofficiasint.png?size=100x100&set=set1', 1, '0181626572', '22277 Granby Way', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (10, 'khanratty9@eventbrite.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Kahlil Hanratty', 'https://robohash.org/impeditsequiporro.png?size=100x100&set=set1', 0, '0415660856', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (11, 'jkerswella@msn.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Jacklin Kerswell', 'https://robohash.org/ininullam.png?size=100x100&set=set1', 1, '0045353089', '16 Dayton Trail', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (12, 'dmccurdyb@opera.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Darcie McCurdy', 'https://robohash.org/utetest.png?size=100x100&set=set1', 0, '0114430360', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (13, 'atolumelloc@yale.edu', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Adelice Tolumello', 'https://robohash.org/ipsamnequelaborum.png?size=100x100&set=set1', 0, '0155192798', '9651 Nova Drive', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (14, 'mdubbled@sogou.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Marcelo Dubble', 'https://robohash.org/iustonullaqui.png?size=100x100&set=set1', 0, '0714674650', '021 Aberg Lane', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (15, 'rschulze@state.tx.us', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ruthy Schulz', null, 0, '0346589718', '9 Marcy Hill', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (16, 'mannottf@trellian.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Marten Annott', 'https://robohash.org/necessitatibusquiculpa.png?size=100x100&set=set1', 1, '0948897513', '52802 School Parkway', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (17, 'mbridgewaterg@webs.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Marcella Bridgewater', 'https://robohash.org/nesciuntofficiisconsequuntur.png?size=100x100&set=set1', 1, '0741841275', '06067 Fallview Park', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (18, 'wmandevilleh@latimes.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Westley Mandeville', 'https://robohash.org/nisivelitperspiciatis.png?size=100x100&set=set1', 1, '0145591733', '05 Northview Junction', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (19, 'awinningi@google.com.au', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Alena Winning', null, 0, '0298745665', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (20, 'ntinghillj@marriott.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Natalya Tinghill', null, 0, '0529296287', '0379 Scott Lane', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (21, 'dmilingtonk@guardian.co.uk', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Druci Milington', 'https://robohash.org/etquiomnis.png?size=100x100&set=set1', 0, '0563458391', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (22, 'dmacguinessl@geocities.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Debora MacGuiness', null, 1, '0158369774', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (23, 'efleethamm@wsj.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ethelred Fleetham', null, null, '0625333168', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (24, 'rseabornen@dyndns.org', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ring Seaborne', null, 0, '0264063417', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (25, 'narthyo@squarespace.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Nicole Arthy', 'https://robohash.org/expeditaperferendisodit.png?size=100x100&set=set1', null, '0868364777', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (26, 'aarnoldip@cisco.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Almeta Arnoldi', 'https://robohash.org/quisquamaliquidet.png?size=100x100&set=set1', 0, '0256102363', '784 Pond Circle', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (27, 'drydingsq@wikia.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Duncan Rydings', 'https://robohash.org/etuttempora.png?size=100x100&set=set1', 1, '0150387157', '5 Holmberg Alley', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (28, 'rder@g.co', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Rex De Meyer', null, 0, '0478593443', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (29, 'esimcoxs@opensource.org', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ellynn Simcox', 'https://robohash.org/consequaturetadipisci.png?size=100x100&set=set1', 1, '0266914275', '1282 Red Cloud Circle', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (30, 'fmeiningert@irs.gov', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Forester Meininger', 'https://robohash.org/laboreexercitationemratione.png?size=100x100&set=set1', 1, '0617649138', '62 Lakewood Gardens Junction', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (31, 'dscawnu@economist.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Daisy Scawn', null, 1, '0972010267', '55565 Pine View Court', 1);
 
 insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (1, 'myellowlee0@rakuten.co.jp', 'Morley Yellowlee', '0579421047', 4, 14);
 insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (2, 'ldrewery1@cpanel.net', 'Lonnie Drewery', '0312487974', 4, 13);
@@ -440,37 +463,61 @@ Aenean fermentum. Donec ut mauris eget massa tempor convallis. Nulla neque liber
 Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.', 1, null, 4, 12);
 
 
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (1, 'MAE101', 'Mathematics for Engineering', 1, null);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (2, 'CEA201', 'Computer Organization and Architecture', 1, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (1, 'MAE101', 'Mathematics for Engineering', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (2, 'CEA201', 'Computer Organization and Architecture', 1, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
 
 Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.
 
-Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.');
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (3, 'CSI101', 'Connecting to Computer Science', 1, null);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (4, 'PRF192', 'Programming Fundamentals', 1, 'Fusce consequat. Nulla nisl. Nunc nisl.
+Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (3, 'CSI101', 'Connecting to Computer Science', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (4, 'PRF192', 'Programming Fundamentals', 1, 'Fusce consequat. Nulla nisl. Nunc nisl.
 
-Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.');
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description) values (5, 'SSG101', 'Working in Group Skills', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (5, 'SSG101', 'Working in Group Skills', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
 
-Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.');
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
 
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (1, 'ASS1', 'Assignment 1', null, 1);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (2, 'ASS2', 'Assignment 2', null, 2);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (3, 'ASS3', 'Assignment 3', 'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 3);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (4, 'ASS1', 'Assignment 1', null, 4);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (5, 'ASS2', 'Assignment 2', null, 5);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (6, 'ASS3', 'Assignment 3', null, 1);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (7, 'ASS1', 'Assignment 1', null, 2);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (8, 'ASS2', 'Assignment 2', null, 3);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (9, 'ASS3', 'Assignment 3', null, 4);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (10, 'ASS1', 'Assignment 1', null, 5);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (11, 'ASS2', 'Assignment 2', null, 1);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (12, 'ASS3', 'Assignment 3', null, 2);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (13, 'ASS1', 'Assignment 1', 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (6, 'PRJ321', 'Web-Based Java Applications', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
+
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (7, 'NWC202', 'Computer Networking', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
+
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (8, 'SWE102', 'Introduction to Software Engineering', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
+
+Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
+
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (9, 'JPD121', 'Elementary Japanese 1.2', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (10, 'LAB221', 'Desktop Java Lab', 0, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (11, 'JPD131', 'Elementary Japanese 2.1', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (12, 'LAB231', 'Web Java Lab', 0, null, 2);
+
+
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (13, 'PRN292', '.NET and C#', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (14, 'SWR301', 'Software Requirements', 0, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (15, 'SWQ391', 'Software Quality Assurance and Testing', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (16, 'OJS201', 'On the job training	', 1, null, 2);
+
+
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (1, 'Assignment 1', null, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (2, 'Assignment 2', null, 2);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (3, 'Assignment 3', 'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 3);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (4, 'Assignment 1', null, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (5, 'Assignment 2', null, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (6, 'Assignment 3', null, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (7, 'Assignment 1', null, 2);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (8, 'Assignment 2', null, 3);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (9, 'Assignment 3', null, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (10, 'Assignment 1', null, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (11, 'Assignment 2', null, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (12, 'Assignment 3', null, 2);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (13, 'Assignment 1', 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
 
 Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.', 3);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (14, 'ASS2', 'Assignment 2', null, 4);
-insert into `IMS`.`Assignment` (Id, Code, Name, Description, SubjectId) values (15, 'ASS3', 'Assignment 3', null, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (14, 'Assignment 2', null, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (15, 'Assignment 3', null, 5);
 
 insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (1, 'BSU397', 'Fusce consequat. Nulla nisl. Nunc nisl.', 1, 5);
 insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (2, 'LDT721', 'Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.
@@ -498,10 +545,9 @@ insert into `IMS`.`Class` (Id, Name, Description, SubjectId, TeacherId) values (
 
 Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 5, 5);
 
-insert into `IMS`.`Permission` (`RoleId`, `PageId` ,`CanRead`)
-value ('1','18',1),
-('2','18',1),
-('3','18',1),
-('4','18',1),
-('5','18',1),
-('6','18',1);
+insert into IMS.Permission(RoleId, PageId, CanCreate, CanRead, CanUpdate) values
+(1, 17, 1, 1, 1),
+(2, 17, 0, 0, 0),
+(3, 17, 0, 0, 0),
+(4, 17, 0, 0, 0),
+(5, 17, 0, 0, 0);

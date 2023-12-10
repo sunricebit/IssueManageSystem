@@ -1,4 +1,6 @@
-﻿namespace IMS.Services
+﻿using IMS.ViewModels.Permission;
+
+namespace IMS.Services
 {
     public class PermissionService : IPermissionService
     {
@@ -9,7 +11,7 @@
             _context = context;
         }
 
-        public bool CheckPermission(string page, string role)
+        public bool CheckAccess(string page, string role)
         {
             Setting tempPage = _context.Settings.FirstOrDefault(s => s.Value == page);
             Setting tempRole = _context.Settings.FirstOrDefault(s => s.Value == role);
@@ -35,11 +37,35 @@
                 {
                     RoleId = role.Id,
                     PageId = pageId,
-                    CanRead = role.Value.Equals(RoleUser.Admin) ? true : false,
+                    CanRead = true,
+                    CanUpdate = role.Value.Equals(RoleUser.Admin) ? true : false,
+                    CanCreate = role.Value.Equals(RoleUser.Admin) ? true : false,
                 };
                 _context.Permissions.Add(p);
             }
             _context.SaveChanges();
+        }
+
+        public PermissionViewModel GetPermissionViewModel(int roleId)
+        {
+            Setting setting = _context.Settings.FirstOrDefault(s => s.Id == roleId);
+            var query = _context.Permissions.Include(x => x.Page).Include(x => x.Role)
+                .Where(x => x.RoleId == roleId).ToList();
+            PermissionViewModel permissionVM = query
+            .GroupBy(p => p.RoleId)
+            .Select(group => new PermissionViewModel
+            {
+                Role = group.First().Role.Value,
+                PagesAcess = group.Select(p => new PageAccess
+                {
+                    Page = p.Page.Value,
+                    CanAccess = p.CanRead,
+                    CanAdd = p.CanCreate,
+                    CanUpdate = p.CanUpdate,
+                }).ToList()
+            })
+            .First();
+            return permissionVM;
         }
 
         public bool IsExist(string page)

@@ -1,4 +1,5 @@
 using IMS.ViewModels.Auth;
+using IMS.ViewModels.Permission;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -158,7 +159,8 @@ namespace IMS.Controllers
 
         [Route("sign-in")]
         [HttpPost]
-        public IActionResult SignIn(SignInViewModel vm, [FromServices] IHashService hashService)
+        public IActionResult SignIn(SignInViewModel vm, [FromServices] IHashService hashService, 
+            [FromServices] IPermissionService permissionService)
         {
             if (!ModelState.IsValid) return View();
             var user = _context.Users.Include(s => s.Role).FirstOrDefault(user => user.Email == vm.Email);
@@ -182,6 +184,11 @@ namespace IMS.Controllers
             }
 
             HttpContext.Session.SetUser(user);
+
+            // Get permission of user
+            PermissionViewModel permissionVM = permissionService.GetPermissionViewModel(user.RoleId);
+            string permissionString = JsonSerializer.Serialize(permissionVM);
+            HttpContext.Session.SetString("Permission", permissionString);
 
             ModelState.Clear();
             return Redirect("/BlankDashboard");

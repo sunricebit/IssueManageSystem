@@ -17,6 +17,8 @@ namespace IMS.Models
         public int Id { get; set; }
         public string Type { get; set; } = null!;
         public string Value { get; set; } = null!;
+        public sbyte Order { get; set; }
+        public bool Status { get; set; }
         public string? Description { get; set; }
 
         public virtual ICollection<Contact> Contacts { get; set; }

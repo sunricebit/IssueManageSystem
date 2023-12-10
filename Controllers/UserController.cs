@@ -87,9 +87,6 @@ namespace IMS.Controllers
             return View();
         }
 
-
-
-
         [HttpGet("Details/{id}")]
         public IActionResult Details(int id)
         {

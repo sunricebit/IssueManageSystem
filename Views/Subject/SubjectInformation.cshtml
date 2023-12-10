@@ -1,0 +1,62 @@
+﻿@model AddSubjectViewModel;
+
+@{
+    Layout = "~/Views/Shared/SubjectDetailTab.cshtml";
+}
+
+@using (Html.BeginForm("SubjectInformation", "Subject", FormMethod.Post))
+{
+    <div class="row">
+        <div class="col-6">
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.Code, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                @Html.TextBoxFor(model => model.Code, new { @class = "form-control", @readonly = "readonly" })
+                @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.Name, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.Description, new { @class = "control-label mb-1" })
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.IsActive, new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-prepend">
+                        @Html.CheckBoxFor(model => model.IsActive)
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.SubjectManagerId, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                @Html.DropDownListFor(model => model.SubjectManagerId, ViewBag.SubjectManagers as SelectList, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.SubjectManagerId, "", new { @class = "text-danger" })
+            </div>
+
+            @if (!string.IsNullOrEmpty(ViewBag.Success))
+            {
+                <div class="text-success text-center mb-3">
+                    @ViewBag.Success
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(ViewBag.Error))
+            {
+                <div class="text-danger text-center mb-3">
+                    @ViewBag.Error
+                </div>
+            }
+
+            <button type="submit" class="btn btn-primary w-100">Save</button>
+
+        </div>
+    </div>
+}

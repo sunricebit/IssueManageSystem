@@ -13,8 +13,7 @@ namespace IMS.Models
         }
 
         public int Id { get; set; }
-        public string EnglishName { get; set; } = null!;
-        public string VietnameseName { get; set; } = null!;
+        public string Name { get; set; } = null!;
         public bool? Status { get; set; }
         public string Description { get; set; } = null!;
         public int? ClassId { get; set; }

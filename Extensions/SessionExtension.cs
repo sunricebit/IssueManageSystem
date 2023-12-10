@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using IMS.ViewModels.Permission;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace IMS.Extensions
@@ -21,6 +22,15 @@ namespace IMS.Extensions
             if (userJsonString == null) return null;
             return JsonSerializer.Deserialize<User>(userJsonString);
         }
+
+        public static PermissionViewModel? GetPermission(this ISession session)
+        {
+            string? userJsonString = session.GetString("User")!;
+            if (userJsonString == null) return null;
+            var permissionVM = session.GetString("Permission");
+            return JsonSerializer.Deserialize<PermissionViewModel>(permissionVM);
+        }
+
     }
 
 }
