@@ -15,6 +15,10 @@ namespace IMS.Services
         {
             return _context.Settings.Where(u => u.Type == "ROLE").ToList();
         }
+        public IEnumerable<User> GetTeacher() 
+        {
+            return _context.Users.Where(u => u.RoleId == 5).ToList();
+        }
         public User GetUserByEmail(string email)
         {
             return _context.Users.FirstOrDefault(u => u.Email == email);

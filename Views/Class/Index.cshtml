@@ -1,0 +1,141 @@
+﻿@using IMS.ViewModels.Paginate;
+@{
+    ViewData["Title"] = "CLass List";
+    Pagination pagination = ViewBag.Pagination;
+}
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center">
+
+        <h1 class="mt-4">Class List</h1>
+        <div class="row">
+            <div class="col-md-auto">
+                <form asp-controller="Class" asp-action="Import" method="post" enctype="multipart/form-data">
+                    <label for="fileInput" class="btn btn-outline-success">
+                        <i class="fas fa-upload"></i> Import
+                    </label>
+                    <input type="file" id="fileInput" name="file" style="display: none;">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+
+            <div class="col-md-auto">
+                <a class="btn btn-outline-primary" asp-controller="Class" asp-action="Export">
+                    <i class="fas fa-download"></i> Export
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-table me-1"></i>
+                Class Table
+            </div>
+            <div class="col-md-auto">
+                <a class="btn btn-primary" asp-controller="Class" asp-action="Create">
+                    <i class="fas fa-plus"></i> New Class
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="mb-3 row">
+
+                <form asp-controller="Class" asp-action="Index" method="get" id="FilterAndSearchForm">
+                    <div class="row">
+                        <input type="hidden" id="pageNumber" name="pageNumber" />
+                        <div class="col-md-4 mb-3">
+                            <label for="roleFilter" class="form-label">Filter by Teacher:</label>
+                            <select id="roleFilter" class="form-select" name="filterByTeacher">
+                                <option value="">Select Teacher</option>
+
+                                @foreach (var teacher in ViewBag.TeacherValue)
+                                {
+                                    <option value="@teacher.Name">@teacher.Name</option>
+                                }
+                                <option value="ALL">All Teacher</option>
+
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="StatusFilter" class="form-label">Filter by Status:</label>
+                            <select id="StatusFilter" class="form-select" name="filterbyStatus">
+                                <option value=>Select Status</option>
+                                <option value=true>Active</option>
+                                <option value=false>Inactive</option>
+                                <option value=>All Status</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="searchInput" class="form-label">Search:</label>
+
+                            <input type="text" id="keyword" name="searchByValue" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                            <button type="submit" class="btn btn-primary">Search</button>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <table style="border-width: 1px;  border-color: #e0e0e0" class="table  table-bordered " id="sorttable-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th onclick="sortTable(0)">Name</th>
+                        <th>Description</th>
+                        <th onclick="sortTable(1)">Teacher</th>
+                        <th>Subject</th>
+                        <th>Number of student</th>
+                        <th>Status</th>
+                        <th class="sortable">Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <!-- Loop through your list of classes -->
+                    @foreach (var classItem in ViewBag.ClassList)
+                    {
+                        <tr>
+                            <td>@classItem.Name</td>
+                            <td>@classItem.Description</td>
+                            <td>@(classItem.Teacher != null ? classItem.Teacher.Name : "Dont have teacher")</td>
+                            <td>@(classItem.Subject != null ? classItem.Subject.Name : "Dont have subject")</td>
+                            <td>@(classItem.Students != null ? classItem.Students.Count : 0)</td>
+                            @if (@classItem.IsActive == true)
+                            {
+                                <td>
+                                    <form asp-action="ToggleStatus" asp-route-id="@classItem.Id" method="post">
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            Active
+                                        </button>
+                                    </form>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <form asp-action="ToggleStatus" asp-route-id="@classItem.Id" method="post">
+                                        <button type="submit" class="btn btn-secondary btn-sm">
+                                            Inactive
+                                        </button>
+                                    </form>
+                                </td>
+                            }
+                            <td>
+                                <div class="btn-group" role="group" aria-label="Class Actions">
+                                    <!-- Add your action buttons here, e.g., details, edit, delete -->
+                                    <a asp-action="Details" asp-route-id="@classItem.Id" asp-controller="Class" class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i> Details
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @Html.Partial("_PaginationPartial", pagination)
+        </div>
+    </div>
+</div>
+

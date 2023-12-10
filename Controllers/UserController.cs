@@ -21,13 +21,11 @@ namespace IMS.Controllers
         private static string AuthEmail = "abc@gmail.com";
         private static string AuthPassword = "123456";
         private readonly IUserService userService;
-        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _env;
         private readonly IMailService _mailService;
         private readonly IHashService _hashService;
-        public UserController(IUserService service, Microsoft.AspNetCore.Hosting.IHostingEnvironment env, IMailService mailService, IHashService hashService)
+        public UserController(IUserService service, IMailService mailService, IHashService hashService)
         {
             userService = service;
-            _env = env;
             _mailService = mailService;
             _hashService = hashService;
         }
@@ -35,7 +33,7 @@ namespace IMS.Controllers
         public IActionResult Index(int? pageNumber, bool? filterbyStatus, string? searchByValue, string? filterbyRole)
         {
             int tempPageNumber = pageNumber ?? 1;
-            int tempPageSize = 10;
+            int tempPageSize = 5;
             Paginate<Models.User> paginate = new Paginate<Models.User>(tempPageNumber, tempPageSize);
             Dictionary<string, dynamic> filter = new Dictionary<string, dynamic>(), search = new Dictionary<string, dynamic>();
 
@@ -74,7 +72,18 @@ namespace IMS.Controllers
             var role = userService.GetRole();
             ViewBag.Roles = role;
 
+            //string currentDirectory = Directory.GetCurrentDirectory();
+            //string avatarsDirectory = Path.Combine(currentDirectory, "wwwroot", "Avatars");
 
+            //DirectoryInfo directoryInfo = new DirectoryInfo(avatarsDirectory);
+
+            //if (directoryInfo.Exists)
+            //{
+            //    foreach (FileInfo file in directoryInfo.EnumerateFiles())
+            //    {
+            //        file.Delete();
+            //    }
+            //}
             return View();
         }
 
@@ -129,7 +138,7 @@ namespace IMS.Controllers
 
                 }
                 var fileStream2 = new FileStream(filePath, FileMode.Open);
-                var downloadLink = await Upload(fileStream2, avatarFile.FileName);
+                var downloadLink = await UploadFromFirebase(fileStream2, avatarFile.FileName);
 
                 userView.Avatar = downloadLink;
             }
@@ -141,8 +150,8 @@ namespace IMS.Controllers
                 userView.Avatar = "https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fdefault_avatar.jpg?alt=media&token=c9ec5062-d46b-4009-a04a-4fbeb5532005";
             }
             userView.Status = true;
-            userView.Password = _hashService.HashPassword("123456789");
-            // userView.Password = _mailService.SendRandomPassword(userView.Email);
+          //  userView.Password = _hashService.HashPassword("123456789");
+            userView.Password = _mailService.SendRandomPassword(userView.Email);
             Models.User user = new Models.User()
             {
                 RoleId = userView.RoleId,
@@ -154,6 +163,7 @@ namespace IMS.Controllers
                 Avatar = userView.Avatar,
                 Status = userView.Status
             };
+           
             userService.AddUser(user);
 
             var roles = userService.GetRole();
@@ -161,7 +171,7 @@ namespace IMS.Controllers
 
             return RedirectToAction("Index");
         }
-        public async Task<string> Upload(FileStream stream, string filename)
+        public async Task<string> UploadFromFirebase(FileStream stream, string filename)
         {
             var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
             var a = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
@@ -187,6 +197,30 @@ namespace IMS.Controllers
 
                 Console.WriteLine("Exception was thrown : {0}", ex);
                 return null;
+            }
+        }
+        public async Task DeleteFromFirebase(string filename)
+        {
+            try
+            {
+                var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
+                var a = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
+
+                var cancellation = new CancellationTokenSource();
+                var storage = new FirebaseStorage(
+                    Bucket,
+                    new FirebaseStorageOptions
+                    {
+                        AuthTokenAsyncFactory = () => Task.FromResult(a.FirebaseToken),
+                        ThrowOnCancel = true
+                    }
+                );
+                var oldAvatarPath = $"User/{filename}";
+                await storage.Child(oldAvatarPath).DeleteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred during deletion: {0}", ex);
             }
         }
 
@@ -292,6 +326,7 @@ namespace IMS.Controllers
 
         public async Task<IActionResult> Update(UserViewModel? userView, IFormFile avatarFile)
         {
+           
 
             if (avatarFile != null && avatarFile.Length > 0)
             {
@@ -305,12 +340,16 @@ namespace IMS.Controllers
 
                 }
                 var fileStream2 = new FileStream(filePath, FileMode.Open);
-                var downloadLink = await Upload(fileStream2, avatarFile.FileName);
-
+                var downloadLink = await UploadFromFirebase(fileStream2, avatarFile.FileName);
+                if (userView.Avatar != null && userView.Avatar != "https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fdefault_avatar.jpg?alt=media&token=c9ec5062-d46b-4009-a04a-4fbeb5532005")
+                {
+                    await DeleteFromFirebase(userView.Avatar);
+                }
+                
                 userView.Avatar = downloadLink;
             }
-
-
+           
+     
 
             Models.User user = userService.GetUser(userView.Id);
             user.Email = userView.Email;
@@ -327,16 +366,22 @@ namespace IMS.Controllers
             user.Gender = userView.Gender;
 
             userService.UpdateUser(user);
-            //   ViewBag.SuccessMessage = "Update user success!";
-
-
             return RedirectToAction("Index");
         }
-
-        [HttpPost("Delete")]
-        public IActionResult Delete(int id)
+        [HttpPost("UpdateStatus")]
+        public IActionResult ToggleStatus(int id)
         {
-            userService.DeleteUser(id);
+            var user = userService.GetUser(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            user.Status = !user.Status;
+       
+            userService.UpdateUser(user);
+
             return RedirectToAction("Index");
         }
 
