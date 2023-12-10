@@ -7,23 +7,7 @@
     <div class="d-flex justify-content-between align-items-center">
 
         <h1 class="mt-4">Class List</h1>
-        <div class="row">
-            <div class="col-md-auto">
-                <form asp-controller="Class" asp-action="Import" method="post" enctype="multipart/form-data">
-                    <label for="fileInput" class="btn btn-outline-success">
-                        <i class="fas fa-upload"></i> Import
-                    </label>
-                    <input type="file" id="fileInput" name="file" style="display: none;">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-            </div>
-
-            <div class="col-md-auto">
-                <a class="btn btn-outline-primary" asp-controller="Class" asp-action="Export">
-                    <i class="fas fa-download"></i> Export
-                </a>
-            </div>
-        </div>
+       
 
     </div>
 
