@@ -92,10 +92,25 @@ namespace IMS.Controllers
             if (!ModelState.IsValid) return View();
 
             var user = _context.Users.FirstOrDefault(user => user.Email == vm.Email);
-            if (user != null)
+            if(user!=null && user.Status == false)
+            {
+                ViewBag.Success = "This account has been blocked, please choose another account";
+            }
+
+            if (user != null && user.Status == true)
             {
                 ViewBag.Error = "Email already registered. Try another one";
                 return View();
+            }
+
+            if(user != null && user.Status == null)
+            {
+                user.ConfirmToken = hashService.RandomHash();
+                await _context.SaveChangesAsync();
+                ViewBag.Success = "Success! Your registration is complete. Check your email for confirmation";
+                mailService.SendMailConfirm(user.Email, user.ConfirmToken!);
+                ModelState.Clear();
+                return View(new SignUpViewModel());
             }
 
             var role = _context.Settings.FirstOrDefault(s => s.Type == "ROLE" && s.Value == "Student");
