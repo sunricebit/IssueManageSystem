@@ -10,7 +10,7 @@ CREATE TABLE `Setting` (
     `Type` VARCHAR(20) NOT NULL,
     `Value` VARCHAR(50) NOT NULL,
     `Order` TINYINT NOT NULL,
-    `Status` BOOL NOT NULL,
+    `Status` BOOLEAN NOT NULL,
     `Description` VARCHAR(400) NULL,
 
     INDEX `Setting_Id_idx`(`Id`),
@@ -123,6 +123,7 @@ CREATE TABLE `Issue` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
     `Description` TEXT NOT NULL,
+    `Status` ENUM('R', 'D', 'Q', 'T') NOT NULL DEFAULT 'R',
     `MilestoneId` INTEGER NULL,
     `ProjectId` INTEGER NULL,
     `AuthorId` INTEGER NOT NULL,
@@ -286,6 +287,9 @@ ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_AssignmentId_fkey` FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Permission` ADD CONSTRAINT `Permission_PageId_fkey` FOREIGN KEY (`PageId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
