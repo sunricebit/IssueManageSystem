@@ -25,6 +25,7 @@ namespace IMS.Models
         public virtual DbSet<Milestone> Milestones { get; set; } = null!;
         public virtual DbSet<Permission> Permissions { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
+        public virtual DbSet<PrismaMigration> PrismaMigrations { get; set; } = null!;
         public virtual DbSet<Project> Projects { get; set; } = null!;
         public virtual DbSet<Report> Reports { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
@@ -166,6 +167,10 @@ namespace IMS.Models
 
                 entity.Property(e => e.Description).HasColumnType("text");
 
+                entity.Property(e => e.Status)
+                    .HasColumnType("enum('R','D','Q','T')")
+                    .HasDefaultValueSql("'R'");
+
                 entity.Property(e => e.Title).HasColumnType("text");
 
                 entity.HasOne(d => d.Assignee)
@@ -261,6 +266,8 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.Id, "Milestone_Id_idx");
 
+                entity.HasIndex(e => e.ProjectId, "Milestone_ProjectId_fkey");
+
                 entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.EndDate).HasColumnType("datetime(3)");
@@ -280,6 +287,12 @@ namespace IMS.Models
                     .HasForeignKey(d => d.ClassId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("Milestone_ClassId_fkey");
+
+                entity.HasOne(d => d.Project)
+                    .WithMany(p => p.Milestones)
+                    .HasForeignKey(d => d.ProjectId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("Milestone_ProjectId_fkey");
             });
 
             modelBuilder.Entity<Permission>(entity =>
@@ -341,6 +354,42 @@ namespace IMS.Models
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("Post_CategoryId_fkey");
+            });
+
+            modelBuilder.Entity<PrismaMigration>(entity =>
+            {
+                entity.ToTable("_prisma_migrations", "IMS");
+
+                entity.Property(e => e.Id)
+                    .HasMaxLength(36)
+                    .HasColumnName("id");
+
+                entity.Property(e => e.AppliedStepsCount).HasColumnName("applied_steps_count");
+
+                entity.Property(e => e.Checksum)
+                    .HasMaxLength(64)
+                    .HasColumnName("checksum");
+
+                entity.Property(e => e.FinishedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasColumnName("finished_at");
+
+                entity.Property(e => e.Logs)
+                    .HasColumnType("text")
+                    .HasColumnName("logs");
+
+                entity.Property(e => e.MigrationName)
+                    .HasMaxLength(255)
+                    .HasColumnName("migration_name");
+
+                entity.Property(e => e.RolledBackAt)
+                    .HasColumnType("datetime(3)")
+                    .HasColumnName("rolled_back_at");
+
+                entity.Property(e => e.StartedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasColumnName("started_at")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
             });
 
             modelBuilder.Entity<Project>(entity =>
