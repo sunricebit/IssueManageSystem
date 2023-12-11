@@ -545,7 +545,7 @@ INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '6');
 
 INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('IMS', '1', '1', '5');
 INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('NPM', '1', '1', '9');
-INSERT INTO `ims`.`project` (`Id`, `Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('ProjectVCM01', '1', '3', '12');
+INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('ProjectVCM01', '1', '3', '12');
 
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('5', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('9', '1');
