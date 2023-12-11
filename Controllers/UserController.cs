@@ -152,7 +152,7 @@ namespace IMS.Controllers
             }
             userView.Status = true;
           //  userView.Password = _hashService.HashPassword("123456789");
-            userView.Password = _mailService.SendRandomPassword(userView.Email);
+            userView.Password = await _mailService.SendRandomPassword(userView.Email);
             Models.User user = new Models.User()
             {
                 RoleId = userView.RoleId,
