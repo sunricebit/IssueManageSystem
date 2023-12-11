@@ -95,6 +95,7 @@ namespace IMS.Controllers
             if(user!=null && user.Status == false)
             {
                 ViewBag.Success = "This account has been blocked, please choose another account";
+                return View();
             }
 
             if (user != null && user.Status == true)
