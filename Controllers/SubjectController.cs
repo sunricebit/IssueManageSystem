@@ -79,6 +79,7 @@ namespace IMS.Controllers
         }
 
         [Route("/subjects")]
+        [CustomAuthorize]
         public IActionResult Index(int? page, string? search, string? type, [FromServices] Intermediate intermediate, [FromServices] ErrorHelper errorHelper)
         {
 
@@ -334,7 +335,6 @@ namespace IMS.Controllers
         {
             try
             {
-
                 var assignment = _context.Assignments.SingleOrDefault(ass => ass.Id == vm.Id);
                 if (assignment == null) return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
 
