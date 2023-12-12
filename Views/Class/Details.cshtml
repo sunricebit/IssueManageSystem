@@ -34,7 +34,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="name">Class Name*</label>
-                                        <input type="text" asp-for="Name" class="form-control" value="@Model.Name" required />
+                                        <input type="text" name="Name" asp-for="Name" class="form-control" value="@Model.Name" required />
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -111,6 +111,37 @@
 
     }
 </script>
+    <script>
+        function validateForm() {
+            var nameInput = document.getElementById('Name');
+            var emailInput = document.getElementById('Email');
+            var nameError = document.getElementById('nameError');
+            var emailError = document.getElementById('emailError');
+
+            // Reset previous errors
+            nameError.innerHTML = "";
+            emailError.innerHTML = "";
+
+            // Validate Name (non-empty)
+            if (nameInput.value.trim() === "") {
+                nameError.innerHTML = "Name is required.";
+                return false; // Prevent form submission
+            }
+
+            // Validate Email (non-empty and valid format)
+            var emailRegex = ;
+            if (emailInput.value.trim() === "") {
+                emailError.innerHTML = "Email is required.";
+                return false; // Prevent form submission
+            } else if (!emailRegex.test(emailInput.value)) {
+                emailError.innerHTML = "Invalid email format.";
+                return false; // Prevent form submission
+            }
+
+            // Form is valid
+            return true;
+        }
+    </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script src="~/js/scripts.js"></script>
 </body>

@@ -272,8 +272,8 @@ namespace IMS.Controllers
                                 Phone = Phone,
                                 Address = Address,
                                 RoleId = userService.GetRoleId(Role),
-                                Password = _hashService.HashPassword("123456789"),
-                                Gender = true
+                                Password = _mailService.SendRandomPassword(email),
+                            Gender = true
                             };
 
 
