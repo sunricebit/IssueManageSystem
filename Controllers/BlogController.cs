@@ -23,7 +23,7 @@ namespace IMS.Controllers
             List<PostDAO> authorDuplicate = new List<PostDAO>();
            
             ViewBag.Author = new SelectList(author, "Author.Name", "Author.Name");
-            if (searchTerm == null)
+            if (searchTerm == null || searchTerm == "")
             {
                 List<PostDAO> postList = new List<PostDAO>();
                 if (filterAuthor== "Author" && filterCat== "Category")
@@ -218,7 +218,7 @@ namespace IMS.Controllers
             }
             var randomPostsLienQuan = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p=>p.Category.Value==post.Category.Value)
             .OrderBy(p => Guid.NewGuid()) // Sắp xếp ngẫu nhiên bằng cách sử dụng Guid.NewGuid()
-            .Take(5)
+            .Take(3)
             .ToList();
             var randomPosts = _context.Posts.Include(p => p.Author).Include(p => p.Category).OrderBy(p => Guid.NewGuid()) // Sắp xếp ngẫu nhiên bằng cách sử dụng Guid.NewGuid()
             .Take(5)
@@ -232,6 +232,7 @@ namespace IMS.Controllers
                     CreatedAt = post.CreatedAt,
                     Excerpt =post.Excerpt,
                     ImageUrl = post.ImageUrl,
+                    UpdatedAt=post.UpdatedAt,
                     AuthorName = post.Author.Name,
                     CategoryName = post.Category.Value,
 
