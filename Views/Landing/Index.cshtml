@@ -38,7 +38,7 @@
                     <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
                     <li class="nav-item"><a class="nav-link" id="abc" href="#services">Services</a></li>
                     <li class="nav-item"><a class="nav-link" id="Team" href="#team">Team</a></li>
-                    <li class="nav-item"><a class="nav-link" id="BlogList" href="#">BlogList</a></li>
+                    <li class="nav-item"><a class="nav-link" id="BlogList" href="blog">BlogList</a></li>
                     <li class="nav-item"><a class="nav-link" id="Contact" href="#contact">Contact</a></li>
                         <li class="nav-item"><a class="nav-link" href="auth/sign-in">Login</a></li>
                     <li class="nav-item"><a class="nav-link" href="auth/sign-up">Register</a></li>
@@ -241,13 +241,20 @@
 
 
                <!-- Footer-->
-        <footer class="footer py-4">
-            <div class="container">
-                <div class="row align-items-center">
-                   G1 Team
+        <footer class="py-4 bg-light mt-auto" style="position:relative">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Group 1</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </footer>
+                <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none" id="_messageError" class="alert alert-danger"></div>
+                <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none" id="_messageSuccess" class="alert alert-success"></div>
+            </footer>
 
         <!-- Button trigger modal -->
 @*<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">

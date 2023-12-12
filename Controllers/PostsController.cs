@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using IMS.Models;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Bibliography;
 using Firebase.Auth;
 using Firebase.Storage;
 using IMS.ViewModels.Post;
-using System.Composition;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 
@@ -38,26 +29,26 @@ namespace IMS.Controllers
             int? id = HttpContext.Session.GetUser()?.Id;
 
             var user = _context.Users.Include(u => u.Role).Where(u => u.Role.Type == "ROLE").SingleOrDefault(u => u.Id == id);
-            ViewBag.CheckAccount = user.Role.Value;
+            //ViewBag.CheckAccount = user.Role.Value;
             if (checkCreate == "Create successful!")
             {
                 ViewBag.Success = "Create successful!";
                 checkCreate = "";
             }
-            if (id==null)
-            {
-                return NotFound();
-            }
-            else
-            {
+            //if (id==null)
+            //{
+            //    return NotFound();
+            //}
+            //else
+            //{
                 ViewBag.Search = searchTerm;
                 var cate = _context.Settings.Where(c => c.Type
                 == "POST_CATEGORY").ToList();
                 ViewBag.Setting = new SelectList(cate, "Value", "Value");
 
                 
-                if (user.Role.Value == "Admin" || user.Role.Value == "Marketer Manager")
-                {
+                //if (user.Role.Value == "Admin" || user.Role.Value == "Marketer Manager")
+                //{
                     if (searchTerm == null)
                     {
                         if (filterCat == "Category")
@@ -96,48 +87,48 @@ namespace IMS.Controllers
                     }
 
 
-                }
-                else
-                {
-                    if (searchTerm == null)
-                    {
-                        if (filterCat == "Category")
-                        {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p=>p.Author.Id==id).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
-                        }
-                        else
-                        {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                            Where(p => p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.Author.Id == id).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
-                        }
+                //}
+                //else
+                //{
+                //    if (searchTerm == null)
+                //    {
+                //        if (filterCat == "Category")
+                //        {
+                //            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p=>p.Author.Id==id).ToList();
+                //            Pagination(page, pageSize, postList, searchTerm);
+                //        }
+                //        else
+                //        {
+                //            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
+                //            Where(p => p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.Author.Id == id).ToList();
+                //            Pagination(page, pageSize, postList, searchTerm);
+                //        }
 
-                    }
-                    else
-                    {
-                        if (filterCat == "Category")
-                        {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                           Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper())
-                       || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper())).Where(p => p.Author.Id == id).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
+                //    }
+                //    else
+                //    {
+                //        if (filterCat == "Category")
+                //        {
+                //            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
+                //           Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper())
+                //       || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper())).Where(p => p.Author.Id == id).ToList();
+                //            Pagination(page, pageSize, postList, searchTerm);
 
-                        }
-                        else
-                        {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                             Where(p => (p.Title.ToUpper().Contains(searchTerm.ToUpper())
-                         || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper()))
-                         && p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.Author.Id == id).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
+                //        }
+                //        else
+                //        {
+                //            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
+                //             Where(p => (p.Title.ToUpper().Contains(searchTerm.ToUpper())
+                //         || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper()))
+                //         && p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.Author.Id == id).ToList();
+                //            Pagination(page, pageSize, postList, searchTerm);
 
-                        }
-                    }
+                //        }
+                //    }
 
 
-                }
-            }
+                //}
+            //}
            
 
             return View();
@@ -194,14 +185,15 @@ namespace IMS.Controllers
         {
             var cate = _context.Settings.Where(c => c.Type == "POST_CATEGORY").ToList();
             ViewBag.Setting = new SelectList(cate, "Value", "Value");
-            return View();
+            return  RedirectToAction(nameof(Index)); 
         }
 
         // POST: Posts/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
+        //[ValidationInput(false)]
         public async Task<IActionResult> Create(Models.Post post, IFormFile? imgFile, string category)
         {
             int? id = HttpContext.Session.GetUser()?.Id;
@@ -225,14 +217,17 @@ namespace IMS.Controllers
 
                     post.ImageUrl = downloadLink;
                 }
-                if (id!=null)
-                {
+                //if (id!=null)
+                //{
                     var postViewModel = new IMS.Models.Post
                     {
                         Title = post.Title,
                         Description = post.Description,
                         ImageUrl = post.ImageUrl,
-                        AuthorId = (int)id,
+                        AuthorId = 1,
+                        //AuthorId = (int)id,
+                        Excerpt=post.Excerpt,
+                        UpdatedAt=DateTime.Now,
                         CategoryId = categoryData.Id,
                         IsPublic = post.IsPublic,
                     };
@@ -240,10 +235,10 @@ namespace IMS.Controllers
                     await _context.SaveChangesAsync();
                     checkCreate = "Create successful!";
                     return RedirectToAction(nameof(Index));
-                }
+                //}
                
             }
-                return View(post);
+            return View(post);
         }
 
         public async Task DeleteFromFirebase(string filename)
@@ -349,7 +344,6 @@ namespace IMS.Controllers
                     {
                         postUpdate.Title = post.Title;
                         postUpdate.Description = post.Description;
-                        postUpdate.CreatedAt = (DateTime)post.CreatedAt;
                         postUpdate.ImageUrl = post.ImageUrl;
                         postUpdate.Author.Name = post.Author;
                         postUpdate.CategoryId = cate.Id;
@@ -360,7 +354,6 @@ namespace IMS.Controllers
                     {
                         postUpdate.Title = post.Title;
                         postUpdate.Description = post.Description;
-                        postUpdate.CreatedAt = (DateTime)post.CreatedAt;
                         postUpdate.Author.Name = post.Author;
                         postUpdate.CategoryId = cate.Id;
                         postUpdate.IsPublic = post.IsPublic;
