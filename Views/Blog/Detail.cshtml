@@ -1,0 +1,170 @@
+﻿@model IMS.DAO.PostDAO
+@{
+    Layout = "~/Views/Shared/_layoutBlog.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    @*<link rel="stylesheet" href="~/css/landing.css">*@
+    <link rel="stylesheet" href="~/css/post.css">
+    <!--
+
+    TemplateMo 556 Catalog-Z
+
+    https://templatemo.com/tm-556-catalog-z
+
+    -->
+
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #phandungyen {
+        position: fixed;
+        right:200px;
+        top:100px;
+    }
+
+    #phandichuyen {
+    }
+    #mainNav {
+        position: fixed;
+        background-color: white;
+        height: 80px ;
+    }
+
+    #bodydichuyen {
+        margin-top: 100px;
+   }
+
+    /* Thêm một khu vực nút để kiểm tra việc cuộn */
+    #buttonMove {
+        margin-top: 700px;
+    }
+</style>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav" >
+        <div class="container">
+            <a class="navbar-brand" href="#page-top">IMS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                Menu
+                <i class="fas fa-bars ms-1"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" id="abc" href="/landing#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" id="Team" href="/landing#team">Team</a></li>
+                    <li class="nav-item"><a class="nav-link" style="color: #ffc800;" id="BlogList" href="/blog">BlogList</a></li>
+                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" id="Contact" href="/landing#contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" href="auth/sign-in">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" href="auth/sign-up">Register</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="d-flex justify-content-center" id="bodydichuyen">
+        <div class="tm-hero tm-text m-3" style="width:50%;" id="phandichuyen">
+            <div class="d-flex" style="justify-content:space-between; margin-bottom:20px;">
+                <span class="tm-text" style="color:#009999">@Model.CategoryName</span>
+                <span class="tm-text-gray-light">Author: @Model.AuthorName</span>
+            </div>
+            <h2>
+               @Model.Title
+            </h2>
+            <p>@Model.Excerpt</p>
+            <div>
+                @Html.Raw(Model.Description)
+            </div>
+            </div>
+        <div class="m-3" id="phandungyen">
+            <h5 style="color: #ffc800; box-shadow: 0 1px #ffc800;">Liên Quan</h5>
+            <div>
+                @foreach (var blog in @ViewBag.RandomLienQuan)
+                {
+                    <div style="margin-bottom:25px; box-shadow: 0 1px #CCC;">
+                        @if (@blog.ImageUrl == null)
+                    {
+                            <figure class="effect-ming tm-video-item" style="width: 200px; height: 120px;">
+                                <img src="~/img/pastel-aesthetic-6pgnuy5ocxtm1r29.jpg" alt="Image" class="img-fluid" style="width: 200px; height: 120px; object-fit: cover;">
+                            <figcaption class="d-flex align-items-center justify-content-center">
+                                <h2>View</h2>
+                                    <a asp-action="Detail" asp-route-id="@blog.Id">View more</a>
+                            </figcaption>
+                            </figure>
+                        }
+                        else
+                        {
+                             <figure class="effect-ming tm-video-item" style="width: 200px; height: 120px;">
+                            <img src="@blog.ImageUrl" alt="Image" class="img-fluid" style="width: 200px; height: 120px; object-fit: cover;">
+                            <figcaption class="d-flex align-items-center justify-content-center">
+                                <h2>View</h2>
+                                <a asp-action="Detail" asp-route-id="@blog.Id">View more</a>
+                            </figcaption>
+                        </figure>
+                        }
+                       
+                        <div class="d-grid justify-content-between tm-text-gray" style="width: 200px;">
+                            <h5 class="tm-text" style="color:#009999">@blog.Title</h5>
+                            <span class="tm-text-gray-light">Author: @blog.Author.Name</span>
+                            <span class="tm-text-gray-light">Category: @blog.Category.Value</span>
+                        </div>
+                    </div>
+                }
+                
+              
+            </div>
+        </div>
+    </div>
+    <div style="width: 50%;margin-left: 25%;" >
+         <h5 style="color: #ffc800; box-shadow: 0 1px #ffc800;">Tin tức khác</h5>
+         <div style="width: 100%">
+            @foreach (var blog in @ViewBag.Random)
+            {
+                <div style="margin-bottom:25px; box-shadow: 0 1px #CCC; display:flex;">
+                    @if (@blog.ImageUrl == null)
+                    {
+                        <figure class="effect-ming tm-video-item" style="width: 200px; height: 120px;">
+                            <img src="~/img/pastel-aesthetic-6pgnuy5ocxtm1r29.jpg" alt="Image" class="img-fluid" style="width: 200px; height: 120px; object-fit: cover;">
+                            <figcaption class="d-flex align-items-center justify-content-center">
+                                <h2>View</h2>
+                                <a asp-action="Detail" asp-route-id="@blog.Id">View more</a>
+                            </figcaption>
+                        </figure>
+                    }
+                    else
+                    {
+                        <figure class="effect-ming tm-video-item" style="width: 200px; height: 120px;">
+                            <img src="@blog.ImageUrl" alt="Image" class="img-fluid" style="width: 200px; height: 120px; object-fit: cover;">
+                            <figcaption class="d-flex align-items-center justify-content-center">
+                                <h2>View</h2>
+                                <a asp-action="Detail" asp-route-id="@blog.Id">View more</a>
+                            </figcaption>
+                        </figure>
+                    }
+
+                    <div class="d-grid justify-content-between tm-text-gray" style="margin-left:20px; width: -webkit-fill-available">
+                        <h5 class="tm-text" style="color:#009999">@blog.Title</h5>
+                        <span class="tm-text">@blog.Excerpt</span>
+                        <span class="tm-text-gray-light">Author: @blog.Author.Name</span>
+                        <span class="tm-text-gray-light">Category: @blog.Category.Value</span>
+                    </div>
+                </div>
+            }
+
+         </div>
+       
+    </div>
+   
+    <script src="js/plugins.js"></script>
+    <script>
+
+    </script>
+</body>
+</html>

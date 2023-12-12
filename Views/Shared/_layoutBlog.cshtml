@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - IMS</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+
+</head>
+
+<body class="sb-nav-fixed">
+
+        <div id="layoutSidenav_content">
+            <main style="margin-left:50px; width:90%">
+                @RenderBody()
+            </main>
+            <footer class="py-4 bg-light mt-auto" style="position:relative">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Group 1</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
+                </div>
+                <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none" id="_messageError" class="alert alert-danger"></div>
+                <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none" id="_messageSuccess" class="alert alert-success"></div>
+            </footer>
+        </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

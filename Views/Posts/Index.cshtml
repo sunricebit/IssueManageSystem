@@ -3,7 +3,6 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
 <div style="display: flex;flex-direction: column;">
     <div>
         <div class="d-flex justify-content-between " style="float:right">
@@ -95,12 +94,12 @@
                 </td>
                 <td class="d-flex">
                     <a class="btn btn-outline-success" style="height:fit-content;" asp-action="Edit" asp-route-id="@item.Id">Details</a>
-                    @if (@ViewBag.CheckAccount == "Admin" || @ViewBag.CheckAccount == "Marketer Manager")
+                   @* @if (@ViewBag.CheckAccount == "Admin" || @ViewBag.CheckAccount == "Marketer Manager")
                     {
                         <div class="d-flex"> <p>|</p>
                             <p class="btn btn-outline-success" style="width:100px" onclick="openReport('popupReport', @item.Id)">Report</p>
                             </div>
-                    }
+                    }*@
                    
                     
                    
@@ -173,7 +172,10 @@
                                 <input asp-for="Title" id="titleInput" class="form-control" />
                                 <span id="titleError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
                             </div>
-
+                            <div class="form-group mb-4">
+                            <label asp-for="Excerpt" class="control-label">Excerpt*</label>
+                            <input asp-for="Excerpt"  class="form-control" />
+                        </div>
                             <div class="form-group mb-4 ">
                                 <label asp-for="IsPublic" class="form-check-label">
                                     Public
@@ -193,7 +195,7 @@
                             </div>
                             <div class="form-group form-group-textarea mb-md-0 mb-4" style="height:100%">
                                 <label asp-for="Description" class="control-check-label">Description*</label>
-                                <textarea asp-for="Description" id="descriptionInput" class="form-control" style="height:220px"></textarea>
+                                <textarea asp-for="Description" id="descriptionInput" class="descriptionInput form-control" style="height:220px"></textarea>
                                 <span id="descriptionError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
                             </div>
                         </div>
@@ -204,7 +206,7 @@
                     </div>
                     <div class="d-flex" style="justify-content: space-between;">
                         <div></div>
-                        <input type="button" value="Save" onclick="validateAndSubmit()" style="background-color: #43A047;border: none; color:white;border-radius:5px;margin-top:10px;  height:40px;" id="saveButton" />
+                        <input type="submit" value="Save" @*onclick="validateAndSubmit()"*@ style="background-color: #43A047;border: none; color:white;border-radius:5px;margin-top:10px;  height:40px;" id="saveButton" />
                     </div>
                      </form>
 
@@ -276,7 +278,10 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="~/plugin/ckeditor/ckeditor.js"></script>
 <script>
+    CKEDITOR.replace('descriptionInput')
+    
     function openPopup(popupView) {
         var popup = document.getElementById(popupView);
         popup.style.display = 'block';
@@ -285,7 +290,6 @@
         var popup = document.getElementById(popupView);
         popup.style.display = 'none';
     }
-  
     function openReport(popupView, postIdCheckReport) {
         $.ajax({
             url: 'https://localhost:7104/LoadPopupReport',
