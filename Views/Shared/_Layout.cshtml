@@ -36,7 +36,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/IMS.styles.css" asp-append-version="true" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/23.2.4/material.css" />
+    <script src="https://cdn.syncfusion.com/ej2/23.2.4/dist/ej2.min.js"></script>
 </head>
 
 <body class="sb-nav-fixed">
@@ -167,6 +168,7 @@
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    @Html.EJS().ScriptManager()
 </body>
 
 </html>

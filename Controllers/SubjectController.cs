@@ -79,6 +79,7 @@ namespace IMS.Controllers
         }
 
         [Route("/subjects")]
+        [CustomAuthorize]
         public IActionResult Index(int? page, string? search, string? type, [FromServices] Intermediate intermediate, [FromServices] ErrorHelper errorHelper)
         {
 
@@ -270,7 +271,7 @@ namespace IMS.Controllers
                 int totalPages = (int)Math.Ceiling((double)itemCount / pageSize);
 
                 if (pageIndex > totalPages) pageIndex = 1;
-                assignments = assignments.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+                assignments = assignments.Skip((pageIndex - 1) * pageSize).Take(pageSize).OrderBy(a => a.CreatedAt);
 
                 return View(new AssignmentViewModel() { Assignments = assignments.ToList(), Search = search, PageIndex = pageIndex, PageSize = pageSize, TotalPages = totalPages, ItemCount = itemCount });
             }
@@ -334,7 +335,6 @@ namespace IMS.Controllers
         {
             try
             {
-
                 var assignment = _context.Assignments.SingleOrDefault(ass => ass.Id == vm.Id);
                 if (assignment == null) return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
 

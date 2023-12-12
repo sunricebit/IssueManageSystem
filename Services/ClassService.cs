@@ -94,6 +94,11 @@ namespace IMS.Services
         {
             return _context.Subjects.ToList();
         }
+
+        public IEnumerable<Class> GetClassesByStudent(int studentId)
+        {
+            return _context.Users.Include(u => u.ClassesNavigation).FirstOrDefault(u => u.Id == studentId).ClassesNavigation;
+        }
     }
 }
             

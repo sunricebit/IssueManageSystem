@@ -1,5 +1,7 @@
-﻿using IMS.ViewModels.Permission;
+﻿using IMS.Services;
+using IMS.ViewModels.Permission;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace IMS.Controllers
 {
@@ -29,9 +31,14 @@ namespace IMS.Controllers
 
         [Route("Update"), HttpPost]
         [CustomAuthorize]
-        public IActionResult UpdatePermission([FromBody]List<PermissionViewModel> permissionViewModels)
+        public IActionResult UpdatePermission([FromBody]List<PermissionViewModel> permissionViewModels, [FromServices] IPermissionService permissionService)
         {
             _permissionDAO.UpdatePermission(permissionViewModels);
+            // Get permission of user
+            User user = HttpContext.Session.GetUser();
+            PermissionViewModel permissionVM = permissionService.GetPermissionViewModel(user.RoleId);
+            string permissionString = JsonSerializer.Serialize(permissionVM);
+            HttpContext.Session.SetString("Permission", permissionString);
             return RedirectToAction("PermissionManage");
         }
     }

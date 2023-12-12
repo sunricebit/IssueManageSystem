@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using IMS.Models;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Bibliography;
 using Firebase.Auth;
 using Firebase.Storage;
 using IMS.ViewModels.Post;
-using System.Composition;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 
@@ -44,7 +35,7 @@ namespace IMS.Controllers
                 ViewBag.Success = "Create successful!";
                 checkCreate = "";
             }
-            if (id==null)
+            if (id == null)
             {
                 return NotFound();
             }
@@ -55,7 +46,7 @@ namespace IMS.Controllers
                 == "POST_CATEGORY").ToList();
                 ViewBag.Setting = new SelectList(cate, "Value", "Value");
 
-                
+
                 if (user.Role.Value == "Admin" || user.Role.Value == "Marketer Manager")
                 {
                     if (searchTerm == null)
@@ -103,7 +94,7 @@ namespace IMS.Controllers
                     {
                         if (filterCat == "Category")
                         {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p=>p.Author.Id==id).ToList();
+                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p => p.Author.Id == id).ToList();
                             Pagination(page, pageSize, postList, searchTerm);
                         }
                         else
@@ -138,7 +129,7 @@ namespace IMS.Controllers
 
                 }
             }
-           
+
 
             return View();
         }
@@ -194,13 +185,13 @@ namespace IMS.Controllers
         {
             var cate = _context.Settings.Where(c => c.Type == "POST_CATEGORY").ToList();
             ViewBag.Setting = new SelectList(cate, "Value", "Value");
-            return View();
+            return  RedirectToAction(nameof(Index)); 
         }
 
         // POST: Posts/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Models.Post post, IFormFile? imgFile, string category)
         {
@@ -225,14 +216,17 @@ namespace IMS.Controllers
 
                     post.ImageUrl = downloadLink;
                 }
-                if (id!=null)
+                if (id != null)
                 {
                     var postViewModel = new IMS.Models.Post
                     {
                         Title = post.Title,
                         Description = post.Description,
                         ImageUrl = post.ImageUrl,
+                        //AuthorId = 1,
                         AuthorId = (int)id,
+                        Excerpt =post.Excerpt,
+                        UpdatedAt=DateTime.Now,
                         CategoryId = categoryData.Id,
                         IsPublic = post.IsPublic,
                     };
@@ -241,10 +235,36 @@ namespace IMS.Controllers
                     checkCreate = "Create successful!";
                     return RedirectToAction(nameof(Index));
                 }
-               
+
             }
-                return View(post);
+            return View(post);
         }
+
+        public async Task DeleteFromFirebase(string filename)
+        {
+            try
+            {
+                var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
+                var a = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
+
+                var cancellation = new CancellationTokenSource();
+                var storage = new FirebaseStorage(
+                    Bucket,
+                    new FirebaseStorageOptions
+                    {
+                        AuthTokenAsyncFactory = () => Task.FromResult(a.FirebaseToken),
+                        ThrowOnCancel = true
+                    }
+                );
+                var oldAvatarPath = $"User/{filename}";
+                await storage.Child(oldAvatarPath).DeleteAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception occurred during deletion: {0}", ex);
+            }
+        }
+
 
         // GET: Posts/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -261,6 +281,7 @@ namespace IMS.Controllers
             var cate = _context.Settings.Where(c => c.Type == "POST_CATEGORY").Where(c=>c.Value!=post.Category.Value).ToList();
             var report = _context.Reports.Where(r => r.PostId == post.Id).Include(r=>r.Reporter).ToList();
             ViewBag.Setting = new SelectList(cate, "Value", "Value");
+            
             var postViewModel = new IMS.ViewModels.Post.Post
             {
                 Title = post.Title,
@@ -303,6 +324,11 @@ namespace IMS.Controllers
 
                 }
                 var fileStream2 = new FileStream(filePath, FileMode.Open);
+                var postOld = _context.Posts.SingleOrDefault(p=>p.Id== id);
+                if (postOld.ImageUrl != null && postOld.ImageUrl != "https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fdefault_avatar.jpg?alt=media&token=c9ec5062-d46b-4009-a04a-4fbeb5532005")
+                {
+                    await DeleteFromFirebase(postOld.ImageUrl);
+                }
                 var downloadLink = await Upload(fileStream2, imgFile.FileName);
 
                 post.ImageUrl = downloadLink;
@@ -317,7 +343,6 @@ namespace IMS.Controllers
                     {
                         postUpdate.Title = post.Title;
                         postUpdate.Description = post.Description;
-                        postUpdate.CreatedAt = (DateTime)post.CreatedAt;
                         postUpdate.ImageUrl = post.ImageUrl;
                         postUpdate.Author.Name = post.Author;
                         postUpdate.CategoryId = cate.Id;
@@ -328,7 +353,6 @@ namespace IMS.Controllers
                     {
                         postUpdate.Title = post.Title;
                         postUpdate.Description = post.Description;
-                        postUpdate.CreatedAt = (DateTime)post.CreatedAt;
                         postUpdate.Author.Name = post.Author;
                         postUpdate.CategoryId = cate.Id;
                         postUpdate.IsPublic = post.IsPublic;
@@ -422,7 +446,7 @@ namespace IMS.Controllers
 
 
         [HttpPost]
-        public IActionResult DeleteAvatar(int id)
+        public async Task<IActionResult> DeleteImageAsync(int id)
         {
             try
             {
@@ -432,12 +456,7 @@ namespace IMS.Controllers
 
                 if (imgToDelete.ImageUrl != null)
                 {
-                    // Xóa file avatar
-                    //var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Avatars", avatarToDelete.Avatar);
-                    //System.IO.File.Delete(filePath);
-
-                    // Xóa avatar trong cơ sở dữ liệu
-                    // Cập nhật thông tin avatar trong cơ sở dữ liệu
+                    await DeleteFromFirebase(imgToDelete.ImageUrl);
                     imgToDelete.ImageUrl = null;
                     _context.SaveChanges();
                 }

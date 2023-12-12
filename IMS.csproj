@@ -24,6 +24,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
+    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="23.2.4" />
+    <PackageReference Include="Syncfusion.Licensing" Version="23.2.4" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Services\" />
@@ -42,7 +44,6 @@
     <Folder Include="Views\Auth\" />
     <Folder Include="Extensions\" />
     <Folder Include="wwwroot\img\" />
-    <Folder Include="wwwroot\Avatars\" />
     <Folder Include="Views\Subject\" />
     <Folder Include="ViewModels\Subject\" />
     <Folder Include="ViewModels\Subject\" />

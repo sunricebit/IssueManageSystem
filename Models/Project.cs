@@ -9,13 +9,14 @@ namespace IMS.Models
         {
             IssueSettings = new HashSet<IssueSetting>();
             Issues = new HashSet<Issue>();
+            Milestones = new HashSet<Milestone>();
             Students = new HashSet<User>();
         }
 
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public bool? Status { get; set; }
-        public string Description { get; set; } = null!;
+        public string? Description { get; set; }
         public int? ClassId { get; set; }
         public int? LeaderId { get; set; }
 
@@ -23,6 +24,7 @@ namespace IMS.Models
         public virtual User? Leader { get; set; }
         public virtual ICollection<IssueSetting> IssueSettings { get; set; }
         public virtual ICollection<Issue> Issues { get; set; }
+        public virtual ICollection<Milestone> Milestones { get; set; }
 
         public virtual ICollection<User> Students { get; set; }
     }
