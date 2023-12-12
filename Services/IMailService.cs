@@ -7,7 +7,7 @@
         public void SendMailConfirm(string email, string hash);
         public void SendResetPassword(string email, string hash);
         public void SendPassword(string email, string password);
-        public string SendRandomPassword(string emailReceiver);
+        public Task<string> SendRandomPassword(string emailReceiver);
 
         public void SendMailContact(string email,string body);
     }

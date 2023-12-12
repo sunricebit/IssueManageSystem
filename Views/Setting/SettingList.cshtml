@@ -69,10 +69,9 @@
                     <table class="table table-bordered" id="sortable-table">
                         <thead>
                             <tr>
-                                <th onclick="sortTable(0)" class="sortable">Id</th>
-                                <th onclick="sortTable(1)" class="sortable">Type</th>
-                                <th onclick="sortTable(2)" class="sortable">Value</th>
-                                <th onclick="sortTable(3)" class="sortable">Order</th>
+                                <th onclick="sortTable(0)" class="sortable">Type</th>
+                                <th onclick="sortTable(1)" class="sortable">Value</th>
+                                <th onclick="sortTable(2)" class="sortable">Order</th>
                                 <th class="sortable">Status</th>
                                 <th class="sortable">Action</th>
                             </tr>
@@ -81,7 +80,6 @@
                             @foreach (var setting in ViewBag.SettingList)
                             {
                                 <tr>
-                                    <td>@setting.Id</td>
                                     <td>@setting.Type</td>
                                     <td>@setting.Value</td>
                                     <td>@setting.Order</td>

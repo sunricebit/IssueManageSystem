@@ -8,6 +8,9 @@ namespace IMS.Models
         public Setting()
         {
             Contacts = new HashSet<Contact>();
+            IssueProcesses = new HashSet<Issue>();
+            IssueStatuses = new HashSet<Issue>();
+            IssueTypes = new HashSet<Issue>();
             PermissionPages = new HashSet<Permission>();
             PermissionRoles = new HashSet<Permission>();
             Posts = new HashSet<Post>();
@@ -22,6 +25,9 @@ namespace IMS.Models
         public string? Description { get; set; }
 
         public virtual ICollection<Contact> Contacts { get; set; }
+        public virtual ICollection<Issue> IssueProcesses { get; set; }
+        public virtual ICollection<Issue> IssueStatuses { get; set; }
+        public virtual ICollection<Issue> IssueTypes { get; set; }
         public virtual ICollection<Permission> PermissionPages { get; set; }
         public virtual ICollection<Permission> PermissionRoles { get; set; }
         public virtual ICollection<Post> Posts { get; set; }

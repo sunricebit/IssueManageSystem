@@ -14,7 +14,7 @@ namespace IMS.Services
         private readonly string password;
         private readonly string url;
 
-        public MailService(IConfiguration configuration,IHashService service)
+        public MailService(IConfiguration configuration, IHashService service)
         {
             Configuration = configuration;
             HashService = service;
@@ -25,11 +25,9 @@ namespace IMS.Services
             password = Configuration["MailSetting:Password"];
             url = Configuration["MailSetting:Url"];
         }
-        
 
 
-
-        public void SendMailConfirm(string emailReceiver, string hash)
+        public async void SendMailConfirm(string emailReceiver, string hash)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Admin", "tunahe140525@fpt.edu.vn"));
@@ -38,14 +36,14 @@ namespace IMS.Services
             message.Body = new TextPart("plain") { Text = url + "/auth/confirm/" + hash };
 
             using var client = new SmtpClient();
-            client.Connect(host, port, useSsl);
-            client.Authenticate(emailSender, password);
-            client.Send(message);
-            client.Disconnect(true);
+            await client.ConnectAsync(host, port, useSsl);
+            await client.AuthenticateAsync(emailSender, password);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
         }
-        
 
-        public void SendResetPassword(string emailReceiver, string hash)
+
+        public async void SendResetPassword(string emailReceiver, string hash)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Admin", emailSender));
@@ -54,17 +52,18 @@ namespace IMS.Services
             message.Body = new TextPart("plain") { Text = url + "/auth/reset-password/" + hash };
 
             using var client = new SmtpClient();
-            client.Connect(host, port, useSsl);
-            client.Authenticate(emailSender, password);
-            client.Send(message);
-            client.Disconnect(true);
+            await client.ConnectAsync(host, port, useSsl);
+            await client.AuthenticateAsync(emailSender, password);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
         }
-        public string SendRandomPassword(string emailReceiver)
+
+        public async Task<string> SendRandomPassword(string emailReceiver)
         {
-            
+
             var randomPassword = HashService.RandomStringGenerator(10);
 
-            
+
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Admin", "tunahe140525@fpt.edu.vn"));
             message.To.Add(new MailboxAddress(emailReceiver, emailReceiver));
@@ -75,15 +74,14 @@ namespace IMS.Services
             };
 
             using var client = new SmtpClient();
-            client.Connect(host, port, useSsl);
-            client.Authenticate(emailSender, password);
-            client.Send(message);
-            client.Disconnect(true);
+            await client.ConnectAsync(host, port, useSsl);
+            await client.AuthenticateAsync(emailSender, password);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
 
-            
             var passwordHash = HashService.HashPassword(randomPassword);
             return passwordHash;
-           
+
         }
 
         public string? GetDomain(string email)
@@ -110,22 +108,22 @@ namespace IMS.Services
             }
         }
 
-        public void SendPassword(string email, string password)
+        public async void SendPassword(string email, string password)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Admin", emailSender));
             message.To.Add(new MailboxAddress(email, email));
             message.Subject = "Account Activated";
-            message.Body = new TextPart("plain") { Text = "Your email is: " + email + "\n" + "Your password :" + password};
+            message.Body = new TextPart("plain") { Text = "Your email is: " + email + "\n" + "Your password :" + password };
 
             using var client = new SmtpClient();
-            client.Connect(host, port, useSsl);
-            client.Authenticate(emailSender, this.password);
-            client.Send(message);
-            client.Disconnect(true);
+            await client.ConnectAsync(host, port, useSsl);
+            await client.AuthenticateAsync(emailSender, this.password);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
         }
 
-        public void SendMailContact(string email, string body)
+        public async void SendMailContact(string email, string body)
         {
             var message = new MimeMessage();
             message.From.Add(new MailboxAddress("Admin", "tunahe140525@fpt.edu.vn"));
@@ -136,10 +134,10 @@ namespace IMS.Services
                 Text = body
             };
             using var client = new SmtpClient();
-            client.Connect(host, port, useSsl);
-            client.Authenticate(emailSender, password);
-            client.Send(message);
-            client.Disconnect(true);
+            await client.ConnectAsync(host, port, useSsl);
+            await client.AuthenticateAsync(emailSender, password);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
         }
     }
 }

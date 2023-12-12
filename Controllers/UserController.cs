@@ -1,4 +1,5 @@
 ﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.VariantTypes;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Firebase.Auth;
@@ -30,7 +31,9 @@ namespace IMS.Controllers
             _mailService = mailService;
             _hashService = hashService;
         }
-        [HttpGet]
+
+        [HttpGet, Route("Index")]
+        [CustomAuthorize]
         public IActionResult Index(int? pageNumber, bool? filterbyStatus, string? searchByValue, string? filterbyRole)
         {
             int tempPageNumber = pageNumber ?? 1;
@@ -85,10 +88,16 @@ namespace IMS.Controllers
             //        file.Delete();
             //    }
             //}
+
+            string page = HttpContext.Request.Path;
+            var permission = HttpContext.Session.GetPermission();
+            var pageAccess = permission.PagesAcess.FirstOrDefault(item => item.Page == page);
+            ViewBag.PageAccess = pageAccess;
             return View();
         }
 
         [HttpGet("Details/{id}")]
+        [CustomAuthorize]
         public IActionResult Details(int id)
         {
             var user = userService.GetUser(id);
@@ -113,6 +122,13 @@ namespace IMS.Controllers
                 Phone = user.Phone
 
             };
+
+            string page = HttpContext.Request.Path;
+            int lastSlashIndex = page.LastIndexOf("/");
+            page = page.Substring(0, lastSlashIndex);
+            var permission = HttpContext.Session.GetPermission();
+            var pageAccess = permission.PagesAcess.FirstOrDefault(item => item.Page == page);
+            ViewBag.PageAccess = pageAccess;
 
             return View(userViewModel);
         }
@@ -152,7 +168,7 @@ namespace IMS.Controllers
             }
             userView.Status = true;
           //  userView.Password = _hashService.HashPassword("123456789");
-            userView.Password = _mailService.SendRandomPassword(userView.Email);
+            userView.Password = await _mailService.SendRandomPassword(userView.Email);
             Models.User user = new Models.User()
             {
                 RoleId = userView.RoleId,

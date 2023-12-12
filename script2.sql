@@ -10,7 +10,7 @@ CREATE TABLE `Setting` (
     `Type` VARCHAR(20) NOT NULL,
     `Value` VARCHAR(50) NOT NULL,
     `Order` TINYINT NOT NULL,
-    `Status` BOOL NOT NULL,
+    `Status` BOOLEAN NOT NULL,
     `Description` VARCHAR(400) NULL,
 
     INDEX `Setting_Id_idx`(`Id`),
@@ -39,6 +39,7 @@ CREATE TABLE `Post` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
     `Description` LONGTEXT NULL,
+<<<<<<< HEAD
     `Excerpt` TEXT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `UpdatedAt` DATETIME(3) NULL ,
@@ -502,6 +503,8 @@ CREATE TABLE `Post` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
     `Description` LONGTEXT NULL,
+=======
+>>>>>>> a33703244314b730ba5fd8572871be43cdcaa928
     `Excerpt` TEXT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `UpdatedAt` DATETIME(3) NULL,
@@ -585,11 +588,17 @@ CREATE TABLE `ClassStudent` (
 CREATE TABLE `Issue` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
-    `Description` TEXT NOT NULL,
+    `Description` LONGTEXT NOT NULL,
     `MilestoneId` INTEGER NULL,
     `ProjectId` INTEGER NULL,
     `AuthorId` INTEGER NOT NULL,
     `AssigneeId` INTEGER NULL,
+    `TypeId` INTEGER NOT NULL,
+    `StatusId` INTEGER NOT NULL,
+    `ProcessId` INTEGER NOT NULL,
+    `ParentIssueId` INTEGER NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `UpdatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `Issue_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
@@ -601,7 +610,6 @@ CREATE TABLE `IssueSetting` (
     `Name` VARCHAR(50) NOT NULL,
     `Status` BOOLEAN NOT NULL DEFAULT true,
     `ClassId` INTEGER NULL,
-    `IssueId` INTEGER NULL,
     `ProjectId` INTEGER NULL,
 
     INDEX `IssueSetting_Id_idx`(`Id`),
@@ -721,6 +729,15 @@ ALTER TABLE `ClassStudent` ADD CONSTRAINT `ClassStudent_ClassId_fkey` FOREIGN KE
 ALTER TABLE `ClassStudent` ADD CONSTRAINT `ClassStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_TypeId_fkey` FOREIGN KEY (`TypeId`) REFERENCES `IssueSetting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_StatusId_fkey` FOREIGN KEY (`StatusId`) REFERENCES `IssueSetting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_ProcessId_fkey` FOREIGN KEY (`ProcessId`) REFERENCES `IssueSetting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Issue` ADD CONSTRAINT `Issue_AssigneeId_fkey` FOREIGN KEY (`AssigneeId`) REFERENCES `User`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -733,10 +750,10 @@ ALTER TABLE `Issue` ADD CONSTRAINT `Issue_MilestoneId_fkey` FOREIGN KEY (`Milest
 ALTER TABLE `Issue` ADD CONSTRAINT `Issue_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `IssueSetting` ADD CONSTRAINT `IssueSetting_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_ParentIssueId_fkey` FOREIGN KEY (`ParentIssueId`) REFERENCES `Issue`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `IssueSetting` ADD CONSTRAINT `IssueSetting_IssueId_fkey` FOREIGN KEY (`IssueId`) REFERENCES `Issue`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `IssueSetting` ADD CONSTRAINT `IssueSetting_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `IssueSetting` ADD CONSTRAINT `IssueSetting_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -749,6 +766,9 @@ ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_AssignmentId_fkey` FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Permission` ADD CONSTRAINT `Permission_PageId_fkey` FOREIGN KEY (`PageId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -919,7 +939,7 @@ INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '6');
 
 INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('IMS', '1', '1', '5');
 INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('NPM', '1', '1', '9');
-INSERT INTO `ims`.`project` (`Id`, `Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('ProjectVCM01', '1', '3', '12');
+INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('ProjectVCM01', '1', '3', '12');
 
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('5', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('9', '1');

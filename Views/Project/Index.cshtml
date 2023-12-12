@@ -49,10 +49,9 @@
                     <table class="table table-bordered" id="sortable-table">
                         <thead>
                             <tr>
-                                <th onclick="sortTable(0)" class="sortable">Id</th>
-                                <th onclick="sortTable(1)" class="sortable">Name</th>
-                                <th onclick="sortTable(2)" class="sortable">Class</th>
-                                <th onclick="sortTable(3)" class="sortable">Leader</th>
+                                <th onclick="sortTable(0)" class="sortable">Name</th>
+                                <th onclick="sortTable(1)" class="sortable">Class</th>
+                                <th onclick="sortTable(2)" class="sortable">Leader</th>
                                 <th class="sortable">Status</th>
                                 <th class="sortable">Action</th>
                             </tr>
@@ -61,7 +60,6 @@
                             @foreach (Project project in ViewBag.ProjectList)
                             {
                                 <tr>
-                                    <td>@project.Id</td>
                                     <td>@project.Name</td>
                                     <td>@project.Class.Name</td>
                                     <td>@project.Leader.Email</td>
