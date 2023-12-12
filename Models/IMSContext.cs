@@ -163,15 +163,25 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.MilestoneId, "Issue_MilestoneId_fkey");
 
+                entity.HasIndex(e => e.ParentIssueId, "Issue_ParentIssueId_fkey");
+
+                entity.HasIndex(e => e.ProcessId, "Issue_ProcessId_fkey");
+
                 entity.HasIndex(e => e.ProjectId, "Issue_ProjectId_fkey");
 
-                entity.Property(e => e.Description).HasColumnType("text");
+                entity.HasIndex(e => e.StatusId, "Issue_StatusId_fkey");
 
-                entity.Property(e => e.Status)
-                    .HasColumnType("enum('R','D','Q','T')")
-                    .HasDefaultValueSql("'R'");
+                entity.HasIndex(e => e.TypeId, "Issue_TypeId_fkey");
+
+                entity.Property(e => e.CreatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
 
                 entity.Property(e => e.Title).HasColumnType("text");
+
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
 
                 entity.HasOne(d => d.Assignee)
                     .WithMany(p => p.IssueAssignees)
@@ -191,11 +201,35 @@ namespace IMS.Models
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("Issue_MilestoneId_fkey");
 
+                entity.HasOne(d => d.ParentIssue)
+                    .WithMany(p => p.InverseParentIssue)
+                    .HasForeignKey(d => d.ParentIssueId)
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .HasConstraintName("Issue_ParentIssueId_fkey");
+
+                entity.HasOne(d => d.Process)
+                    .WithMany(p => p.IssueProcesses)
+                    .HasForeignKey(d => d.ProcessId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Issue_ProcessId_fkey");
+
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Issues)
                     .HasForeignKey(d => d.ProjectId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("Issue_ProjectId_fkey");
+
+                entity.HasOne(d => d.Status)
+                    .WithMany(p => p.IssueStatuses)
+                    .HasForeignKey(d => d.StatusId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Issue_StatusId_fkey");
+
+                entity.HasOne(d => d.Type)
+                    .WithMany(p => p.IssueTypes)
+                    .HasForeignKey(d => d.TypeId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("Issue_TypeId_fkey");
             });
 
             modelBuilder.Entity<IssueSetting>(entity =>
@@ -332,8 +366,6 @@ namespace IMS.Models
                 entity.Property(e => e.CreatedAt)
                     .HasColumnType("datetime(3)")
                     .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
-
-                entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.Excerpt).HasColumnType("text");
 
