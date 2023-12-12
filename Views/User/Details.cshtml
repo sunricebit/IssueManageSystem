@@ -3,6 +3,7 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -10,51 +11,55 @@
 <body>
 
     <main>
-    <div class="container-fluid px-4">
-        <h1>User Details</h1>
+        <div class="container-fluid px-4">
+            <h1>User Details</h1>
 
-        <div class="card mb-4">
-            <div class="card-body">
-                <hr>
-                <form method="post" asp-action="Update" enctype="multipart/form-data">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <hr>
+                    <form method="post" asp-action="Update" enctype="multipart/form-data">
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="d-flex align-items-center justify-content-center mb-4">
-                                <img id="selectedAvatar" src="@Model.Avatar" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" alt="User Avatar" />
-
-                                <div class="btn btn-primary btn-rounded ml-3">
-                                    <label class="form-label text-white m-0" for="avatarFile">Choose avatar</label>
-                                    <input type="file" class="form-control d-none" id="avatarFile" name="avatarFile" onchange="displaySelectedImage(event, 'selectedAvatar')" />
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center justify-content-center mb-4">
+                                    <img id="selectedAvatar" src="@Model.Avatar" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" alt="User Avatar" />
+                                    @if (pageAcess.CanUpdate)
+                                    {
+                                        <div class="btn btn-primary btn-rounded ml-3">
+                                            <label class="form-label text-white m-0" for="avatarFile">Choose avatar</label>
+                                            <input type="file" class="form-control d-none" id="avatarFile" name="avatarFile" onchange="displaySelectedImage(event, 'selectedAvatar')" />
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <input type="hidden" id="avatarUrl" name="avatarUrl" value="@Model.Avatar" />
-                    <input type="hidden" asp-for="Id" value="@Model.Id" />
+                        <input type="hidden" id="avatarUrl" name="avatarUrl" value="@Model.Avatar" />
+                        @if (pageAcess.CanUpdate)
+                        {
+                            <input type="hidden" asp-for="Id" value="@Model.Id" />
+                        }
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">Email*</label>
+                                    <input type="text" name="email" class="form-control" value="@Model.Email" @(pageAcess.CanUpdate? "" : "readonly") />
+                                </div>
 
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="email">Email*</label>
-                                <input type="text" name="email" class="form-control"  value="@Model.Email" />
-                            </div>
-
-                            <div class="form-group">
-                                <label for="name">Name*</label>
-                                <input type="text" name="name" class="form-control" value="@Model.Name" />
-                            </div>
+                                <div class="form-group">
+                                    <label for="name">Name*</label>
+                                    <input type="text" name="name" class="form-control" value="@Model.Name" @(pageAcess.CanUpdate? "" : "readonly") />
+                                </div>
 
                                 <div class="form-group">
                                     <label for="gender">Gender</label>
                                     <div>
                                         <div class="form-check form-check-inline">
-                                            <input type="radio" name="gender" class="form-check-input" value="true" @(Model.Gender == true ? "checked" : "") />
+                                            <input type="radio" name="gender" class="form-check-input" value="true" @(pageAcess.CanUpdate? "" : "disabled") @(Model.Gender == true ? "checked" : "") />
                                             <label class="form-check-label" for="male">Male</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input type="radio" name="gender" class="form-check-input" value="false" @(Model.Gender == false ? "checked" : "") />
+                                            <input type="radio" name="gender" class="form-check-input" value="false" @(pageAcess.CanUpdate? "" : "disabled") @(Model.Gender == false ? "checked" : "") />
                                             <label class="form-check-label" for="female">Female</label>
                                         </div>
                                     </div>
@@ -62,7 +67,7 @@
 
                                 <div class="form-group">
                                     <label for="RoleId">Role</label>
-                                    <select name="RoleId" class="form-control">
+                                    <select name="RoleId" class="form-control" @(pageAcess.CanUpdate? "" : "disabled")>
                                         @foreach (var role in ViewBag.Roles)
                                         {
                                             <option value="@role.Id" name="RoleId" selected="@(role.Id == Model.RoleId)" )>@role.Value</option>
@@ -70,41 +75,43 @@
                                     </select>
                                     <input type="hidden" name="RoleId" value="@Model.RoleId" />
                                 </div>
-                        </div>
+                            </div>
 
-                        <div class="col-md-6">
-                            
+                            <div class="col-md-6">
+
                                 <div class="form-group">
                                     <label for="address">Address</label>
-                                    <input type="text" name="address" class="form-control" value="@Model.Address" />
+                                    <input type="text" name="address" class="form-control" value="@Model.Address" @(pageAcess.CanUpdate? "" : "readonly") />
                                 </div>
 
                                 <div class="form-group">
                                     <label for="phone">Phone</label>
-                                    <input type="text" name="phone" class="form-control" value="@Model.Phone" />
+                                    <input type="text" name="phone" class="form-control" value="@Model.Phone" @(pageAcess.CanUpdate? "" : "readonly") />
                                 </div>
 
                                 <div class="form-group">
                                     <label for="statusToggle">Status</label>
                                     <div class="form-check form-switch">
                                         <input type="hidden" name="Status" value="false" />
-                                        <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" @(Model.Status.HasValue && Model.Status.Value ? "checked" : "") onchange="changeStatus()" />
+                                        <input type="checkbox" class="form-check-input" id="statusToggle" @(pageAcess.CanUpdate? "" : "disabled") name="Status" @(Model.Status.HasValue && Model.Status.Value ? "checked" : "") onchange="changeStatus()" />
                                     </div>
                                 </div>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <button type="submit" class="btn btn-primary">Save</button>
-                            <a href="/User" class="btn btn-primary">Back to Users</a>
-                        </div>
-                    </div>
-                </form>
+                        @if (pageAcess.CanUpdate)
+                        {
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                    <a href="/User" class="btn btn-primary">Back to Users</a>
+                                </div>
+                            </div>
+                        }
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
 
     <script>
@@ -115,11 +122,11 @@
 
             statusToggle.previousElementSibling.value = statusToggle.checked ? "true" : "false";
 
-           
-       
+
+
         }
     </script>
-    
+
     <script>
         function displaySelectedImage(event, elementId) {
             const selectedImage = document.getElementById(elementId);
