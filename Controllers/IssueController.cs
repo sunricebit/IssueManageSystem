@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 public class IssueViewModel
 {
     public string Tab { get; set; } = "all";
-    public string Search { get; set; } = "";
+    public string? Search { get; set; } = "";
 
     [Display(Name = "Project")]
     public int? ProjectId { get; set; }
@@ -124,8 +124,6 @@ namespace IMS.Controllers
             await context.SaveChangesAsync();
             errorHelper.Success = "Create issue successfully";
 
-
-
             return RedirectToAction("Index");
         }
 
@@ -136,91 +134,76 @@ namespace IMS.Controllers
         {
             var userId = HttpContext.Session.GetUser()!.Id;
 
+            //kiểm tra user có thực sự tồn tại
+            User? user = context.Users.Include(user => user.Role).SingleOrDefault(user => user.Id == userId);
+            if (user == null) return RedirectToAction("SignIn", "Auth");
 
             ViewBag.Projects = new List<Project>();
             ViewBag.Milestones = new List<Milestone>();
             ViewBag.Authors = new List<User>();
             ViewBag.Assignees = new List<User>();
 
-            // get my project joined =
-            User? user = context.Users.Include(user => user.Projects).Include(user => user.Role).SingleOrDefault(user => user.Id == userId);
-            if (user == null) return RedirectToAction("SignIn", "Auth");
-            var projectJoined = user.Projects.ToList();
-
             var roleName = user.Role.Value;
 
-            List<Milestone> milestonesJoined = new();
-
+            //lấy tất cả các project đã tham gia/
+            List<Project> projectJoined = new();
             switch (roleName)
             {
                 case "Teacher":
-                    milestonesJoined = context.Classes
-                        //.Include(cls => cls.Milestones)
-                        .Where(cls => cls.TeacherId == user.Id)
-                        .SelectMany(cls => cls.Milestones)
+                    projectJoined = context.Classes
+                        .Include(cls => cls.Projects)
+                        .ThenInclude(project => project.Students)
+                        .Where(cls => cls.TeacherId != null && cls.TeacherId == userId)
+                        .SelectMany(cls => cls.Projects)
+                        .OrderBy(project => project.Name)
                         .ToList();
                     break;
-
                 case "Student":
-                    milestonesJoined = context.Users
-                         .Include(user => user.Classes)
-                         .ThenInclude(cls => cls.Milestones)
-                         .SelectMany(user => user.Classes.SelectMany(cls => cls.Milestones))
-                         .ToList();
+                    projectJoined = context.Users
+                        .Include(t => t.ProjectsNavigation)
+                        .ThenInclude(project => project.Students)
+                        .SingleOrDefault(t => t.Id == userId)!
+                        .ProjectsNavigation
+                        .OrderBy(project=> project.Name)
+                        .ToList();
                     break;
                 default:
+                    return RedirectToAction("Index");
+            };
+            if (projectJoined.Count == 0) return View(vm);
+            ViewBag.Projects = projectJoined;
+
+            //lấy tất cả các milestone
+            List<Milestone> milestones = new();
+            switch (roleName)
+            {
+                case "Teacher":
+                    var teacher = context.Users.Include(t => t.Classes).ThenInclude(cls=>cls.Milestones).SingleOrDefault(t => t.Id == userId);
+                    if (teacher != null) milestones = teacher.Classes.SelectMany(c => c.Milestones).ToList();
                     break;
-            }
+                case "Student":
+                    var student = context.Users.Include(t => t.ClassesNavigation).ThenInclude(cls => cls.Milestones).SingleOrDefault(t => t.Id == userId);
+                    if (student != null) milestones = student.Classes.SelectMany(c => c.Milestones).ToList();
+                    break;
+                default:
+                    return RedirectToAction("Index");
+            };
 
-
-            List<Class> classes = context.Classes
-                .Include(cls => cls.Milestones)
-                .Include(cls => cls.Projects)
-                .ThenInclude(project => project.Students)
-                .Where(cls => cls.TeacherId != null && cls.TeacherId == userId)
-                .ToList();
-
-
-
-            List<Project> projects = classes
-                .SelectMany(classes => classes.Projects)
-                .OrderBy(project => project.Name)
-                .ToList();
-
-            if (projects.Count == 0) return View(vm);
-
-            List<Milestone> milestones = projects.SelectMany(project => project.Milestones).OrderBy(project => project.Title).ToList();
-            List<User> users = projects.SelectMany(project => project.Students).DistinctBy(user => user.Id).OrderBy(user => user.Name).ToList();
-
-            ViewBag.Projects = projects;
-            milestones.Insert(0, new Milestone() { Id = -1, Title = "Not yet" });
             ViewBag.Milestones = milestones;
-            ViewBag.Authors = users;
 
-            var assignees = users.Select(user => user).ToList();
+            //Get author
+            var authors = projectJoined.SelectMany(project => project.Students).DistinctBy(user => user.Id);
+            ViewBag.Authors = authors;
+
+            //Get assignees
+            var assignees = authors.Select(user => user).ToList();
             assignees.Insert(0, new User() { Id = -1, Name = "Not yet" });
             ViewBag.Assignees = assignees;
 
-            //
-            IQueryable<Issue> issues = context.Issues.AsQueryable();
 
-            switch (vm.Tab)
-            {
-                case "requirement":
-                    issues = issues.Where(issue => issue.Type.Value == "R");
-                    break;
-                case "task":
-                    issues = issues.Where(issue => issue.Type.Value == "T");
-                    break;
-                case "question":
-                    issues = issues.Where(issue => issue.Type.Value == "Q");
-                    break;
-                case "defect":
-                    issues = issues.Where(issue => issue.Type.Value == "D");
-                    break;
-            }
+            //-----------MAIN----------
+            IQueryable<Issue> issues = context.Issues.AsQueryable().Where(issue => projectJoined.Contains(issue.Project));
 
-            var data = issues.ToList();
 
             if (!string.IsNullOrEmpty(vm.Search))
             {
@@ -228,15 +211,10 @@ namespace IMS.Controllers
             }
 
             // Project
-            if (vm.ProjectId == null)
+            if (vm.ProjectId != null)
             {
-                issues = issues.Where(issue => projects.Contains(issue.Project));
+                issues = issues.Where(issue => issue.Project.Id == vm.ProjectId);
             }
-            else
-            {
-                issues = issues.Where(issue => issue.Project != null && issue.Project.Id == vm.ProjectId);
-            }
-
 
             //Milestone
             if (vm.MilestoneId != null)
@@ -254,7 +232,7 @@ namespace IMS.Controllers
             //Author
             if (vm.AuthorId != null)
             {
-                issues = issues.Where(issue => issue.Author != null && issue.Author.Id == vm.AuthorId);
+                issues = issues.Where(issue => issue.AuthorId == vm.AuthorId);
             }
 
             //Assignee
@@ -268,6 +246,22 @@ namespace IMS.Controllers
                 {
                     issues = issues.Where(issue => issue.AssigneeId != null && issue.AssigneeId == vm.AssigneeId);
                 }
+            }
+
+            switch (vm.Tab)
+            {
+                case "requirement":
+                    issues = issues.Where(issue => issue.Type.Value == "R");
+                    break;
+                case "task":
+                    issues = issues.Where(issue => issue.Type.Value == "T");
+                    break;
+                case "question":
+                    issues = issues.Where(issue => issue.Type.Value == "Q");
+                    break;
+                case "defect":
+                    issues = issues.Where(issue => issue.Type.Value == "D");
+                    break;
             }
 
             issues = issues
@@ -294,62 +288,6 @@ namespace IMS.Controllers
             vm.Issues = issues.ToList();
 
             return View(vm);
-
-
-            //List<Issue> issues = new();
-            //foreach (var project1 in projects)
-            //{
-            //    issues.AddRange(project1.Issues);
-            //}
-            //var userId = 4;
-
-            //List<Project> projects = context.Projects
-            //    .Include(project => project.Issues)
-            //    .Include(project => project.IssueSettings)
-            //    .Include(project => project.Milestones)
-            //    .Include(project => project.Students)
-            //    .Include(project => project.Leader)
-            //    .Where(project => project.Students.Any(student => student.Id == userId))
-            //    .ToList();
-
-            //List<Issue> issues = new();
-            //foreach (var project1 in projects)
-            //{
-            //    issues.AddRange(project1.Issues);
-            //}
-
-            //ViewBag.Projects = context.Projects.ToList();
-
-            //IQueryable<Milestone> milestoneQuery = context.Milestones.AsQueryable();
-            //List<Milestone> milestones = new();
-            //if (vm.ProjectId != 0)
-            //{
-            //    milestones = milestoneQuery.Where(m => m.ProjectId == vm.ProjectId).ToList();
-            //}
-            //else
-            //{
-            //    var milestonesTemp = milestoneQuery.ToList();
-            //    milestonesTemp.Insert(0, new Milestone() { Id = -1, Title = "Not yet" });
-            //    milestones = milestonesTemp;
-            //}
-            //ViewBag.Milestones = milestones;
-
-            //var project = context.Projects.Include(p => p.Students).SingleOrDefault(p => p.Id == vm.ProjectId);
-            //List<User> authors = new();
-            //if (project == null)
-            //{
-            //    authors = context.Users.ToList();
-            //}
-            //else
-            //{
-            //    authors = project.Students.ToList();
-            //}
-
-            //var users = context.Users.Where(teacher => teacher.Id == 4).SelectMany(teacher => teacher.Projects.SelectMany(project => project.Students)).DistinctBy(user => user.Id).ToList();
-            //ViewBag.Authors = users;
-            //ViewBag.Assignees = users;
-
-
         }
 
 
