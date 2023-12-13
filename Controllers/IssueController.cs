@@ -192,7 +192,7 @@ namespace IMS.Controllers
             ViewBag.Milestones = milestones;
 
             //Get author
-            var authors = projectJoined.SelectMany(project => project.Students).DistinctBy(user => user.Id);
+            var authors = projectJoined.SelectMany(project => project.Students).DistinctBy(user => user.Id).OrderBy(user=>user.Name);
             ViewBag.Authors = authors;
 
             //Get assignees
@@ -205,9 +205,9 @@ namespace IMS.Controllers
             IQueryable<Issue> issues = context.Issues.AsQueryable().Where(issue => projectJoined.Contains(issue.Project));
 
 
-            if (!string.IsNullOrEmpty(vm.Search))
+            if (!string.IsNullOrEmpty(vm.Search?.Trim()))
             {
-                issues = issues.Where(issue => issue.Title.ToLower().Contains(vm.Search.ToLower()));
+                issues = issues.Where(issue => issue.Title.ToLower().Contains(vm.Search.Trim().ToLower()));
             }
 
             // Project

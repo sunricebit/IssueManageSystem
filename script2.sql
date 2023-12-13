@@ -383,7 +383,7 @@ VALUES
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (2, 'manager@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 2, 'Queenie Suff', 'https://robohash.org/consectetursuntet.png?size=100x100&set=set1', null, '0654960037', '36459 Nevada Trail', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (3, 'marketer@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 3, 'Jeremie Bethel', 'https://robohash.org/voluptatibusconsequaturin.png?size=100x100&set=set1', 1, '0720320267', '09 Hudson Terrace', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (4, 'teacher@gmail.', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 4, 'Noella Quaintance', 'https://robohash.org/sedquodquis.png?size=100x100&set=set1', 0, '0176636839', '4522 Sycamore Avenue', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (4, 'teacher@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 4, 'Noella Quaintance', 'https://robohash.org/sedquodquis.png?size=100x100&set=set1', 0, '0176636839', '4522 Sycamore Avenue', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (5, 'student@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Bucky Ferrettini', 'https://robohash.org/liberoreiciendisvelit.png?size=100x100&set=set1', null, '0542942149', '16 Warbler Parkway', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (6, 'student@facebook.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Iolanthe Akker', 'https://robohash.org/eosnostrumquo.png?size=100x100&set=set1', 0, '0537712440', '33107 Barby Alley', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (7, 'imatschuk6@hibu.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ingra Matschuk', 'https://robohash.org/maioresquinulla.png?size=100x100&set=set1', 1, '0241136823', null, 1);
@@ -536,30 +536,35 @@ INSERT INTO `Milestone` (`Title`, `Description`, `StartDate`, `EndDate`, `Projec
 ('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 5, 1, NULL);
 
 
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('6', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('7', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('8', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('9', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('10', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('11', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('12', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('13', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('14', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('15', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('16', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('17', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('18', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('19', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('20', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('21', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('22', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('23', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('24', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('25', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('26', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('27', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('28', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('29', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '5');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('30', '5');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('31', '5');
 
