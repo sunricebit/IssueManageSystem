@@ -85,6 +85,9 @@ namespace IMS.Controllers
                     case "ProcessId":
                         issue.ProcessId = selectedValue;
                         break;
+                    case "MilestoneId":
+                        issue.MilestoneId = selectedValue;
+                        break;
                     case "AssigneeId":
                         issue.AssigneeId = selectedValue;
                         break;
@@ -117,6 +120,14 @@ namespace IMS.Controllers
                 .Include(issue => issue.ParentIssue)
                 .FirstOrDefault(i => i.ProjectId == projectId && i.Id == issueId);
 
+            var project = context.Projects
+                .Include(p => p.Students)
+                .Include(p => p.Class)
+                .ThenInclude(cls => cls.Milestones)
+                .SingleOrDefault(project => project.Id == projectId);
+
+            if (project == null) return RedirectToAction("NotFound", "Error");
+
             var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
             var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
             var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
@@ -126,6 +137,7 @@ namespace IMS.Controllers
 
             ViewBag.Types = types;
             ViewBag.Assignees = assignees;
+            ViewBag.Milestones = project.Class.Milestones.ToList();
             ViewBag.Statuses = statuses;
             ViewBag.Processes = processes;
             ViewBag.Issues = issues;
