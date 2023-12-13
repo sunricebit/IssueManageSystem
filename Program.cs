@@ -11,6 +11,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IClassService,ClassService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
+builder.Services.AddScoped<IChkPgAcessService, ChkPgAcessService>();
 builder.Services.AddScoped<SettingDAO>();
 builder.Services.AddScoped<PermissionDAO>();
 builder.Services.AddSingleton<ErrorHelper>();

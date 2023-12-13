@@ -32,9 +32,13 @@ namespace IMS.Controllers
             {
                 projects = _projectService.GetAllProject();
             }
-            else
+            if (user.Role.Value == RoleUser.Student) 
             {
                 projects = _projectService.GetProjectByStudent(user.Id);
+            }
+            if (user.Role.Value == RoleUser.Teacher)
+            {
+                projects = _projectService.GetProjectByTeacher(user.Id);
             }
 
             // Filter và hoặc search -> quay về trang đầu
