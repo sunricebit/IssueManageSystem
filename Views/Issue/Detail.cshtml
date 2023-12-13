@@ -27,10 +27,9 @@
 @{
     var projectId = Context.Request.RouteValues["projectId"]?.ToString();
 }
-<div class="container mt-4">
+<div class="container mt-4 h-100" style="position: relative">
     <div class="row">
         <div class="col-md-8">
-            <!-- Main content -->
             <h1 class="mb-4">@Model.Title</h1>
             <p class="text-muted">
                 <span class="fw-bold"><span class="text-secondary fw-normal">Created at</span> @GetTimeAgoString(Model.CreatedAt) <span class="text-secondary fw-normal">by</span> @Model.Author.Name</span>
@@ -76,27 +75,27 @@
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.StatusId, "Status:")
-                @Html.DropDownListFor(model => model.StatusId, new SelectList(ViewBag.Statuses, "Id", "Name"), new { @class = "form-select" })
+                @Html.DropDownListFor(model => model.StatusId, new SelectList(ViewBag.Statuses, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('StatusId', 'UpdateStatus', 'updateStatusResult')" })
             </div>
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.TypeId, "Type:")
-                @Html.DropDownListFor(model => model.TypeId, new SelectList(ViewBag.Types, "Id", "Name"), new { @class = "form-select" })
+                @Html.DropDownListFor(model => model.TypeId, new SelectList(ViewBag.Types, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('TypeId', 'UpdateType', 'updateTypeResult')" })
             </div>
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.ProcessId, "Process:")
-                @Html.DropDownListFor(model => model.ProcessId, new SelectList(ViewBag.Processes, "Id", "Name"), new { @class = "form-select" })
+                @Html.DropDownListFor(model => model.ProcessId, new SelectList(ViewBag.Processes, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('ProcessId', 'UpdateProcess', 'updateProcessResult')" })
             </div>
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.AssigneeId, "Assignee:")
-                @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Assignees, "Id", "Name"), new { @class = "form-select" })
+                @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Assignees, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('AssigneeId', 'UpdateAssignee', 'updateAssigneeResult')" })
             </div>
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.ParentIssueId, "Parent:")
-                @Html.DropDownListFor(model => model.ParentIssueId, new SelectList(ViewBag.Issues, "Id", "Title"), new { @class = "form-select" })
+                @Html.DropDownListFor(model => model.ParentIssueId, new SelectList(ViewBag.Issues, "Id", "Title"), new { @class = "form-select", onchange = "updateDropdown('ParentIssueId', 'UpdateParentIssue', 'updateParentIssueResult')" })
             </div>
 
             <h5 class="mb-3">Related Issues</h5>
@@ -107,4 +106,73 @@
             </ul>
         </div>
     </div>
+
+    <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none" id="_messageError" class="alert alert-danger"></div>
+    <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none" id="_messageSuccess" class="alert alert-success"></div>
 </div>
+
+<div id="updateStatusResult"></div>
+<div id="updateTypeResult"></div>
+<div id="updateProcessResult"></div>
+<div id="updateAssigneeResult"></div>
+<div id="updateParentIssueResult"></div>
+
+<script>
+    function updateDropdown(dropdownId, updateAction, resultId) {
+        var selectedValue = $("#" + dropdownId).val();
+        var issueId = @Model.Id;
+
+        $.ajax({
+            type: "POST",
+            url: "/Issue/UpdateStatus",
+            data: { issueId: issueId, type: dropdownId, selectedValue: selectedValue },
+            success: function (result) {
+                var message = ""
+                if (result.success) {
+                    message = "The " + dropdownId.slice(0, -2).toLowerCase() + " update successfully!!"
+                    showSuccessMessage(message)
+                } else {
+                    message = "The " + dropdownId.slice(0, -2).toLowerCase() + " update failed!!"
+                    showErrorMessage(message)
+                }
+            },
+            error: function () {
+                message = "The " + dropdownId.slice(0, -2).toLowerCase() + " updated failed!!"
+                showErrorMessage(message)
+            }
+        });
+    }
+
+    var errorTimeout
+
+    function showErrorMessage(message) {
+        var notification = document.getElementById("_messageError");
+        notification.innerHTML = message;
+        notification.style.display = 'block';
+
+        function closeNotification() {
+            notification.innerHTML = "";
+            notification.style.display = 'none';
+        }
+
+        if (errorTimeout) clearTimeout(errorTimeout);
+        errorTimeout = setTimeout(closeNotification, 5000);
+    }
+
+    var successTimeout
+
+    function showSuccessMessage(message) {
+        var notification = document.getElementById("_messageSuccess");
+        notification.innerHTML = message;
+        notification.style.display = 'block';
+
+        function closeNotification() {
+            notification.innerHTML = "";
+            notification.style.display = 'none';
+        }
+
+        if (successTimeout) clearTimeout(successTimeout);
+        successTimeout = setTimeout(closeNotification, 5000);
+    }
+
+</script>

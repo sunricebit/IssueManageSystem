@@ -65,6 +65,35 @@ namespace IMS.Controllers
             context = _context;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> UpdateStatus(int issueId, string type, int selectedValue)
+        {
+            var issue = context.Issues.SingleOrDefault(issue => issue.Id == issueId);
+            if (issue == null) return RedirectToAction("NotFound", "Error");
+            switch (type)
+            {
+                case "StatusId":
+                    issue.StatusId = selectedValue;
+                    break;
+                case "TypeId":
+                    issue.TypeId = selectedValue;
+                    break;
+                case "ProcessId":
+                    issue.ProcessId = selectedValue;
+                    break;
+                case "AssigneeId":
+                    issue.AssigneeId = selectedValue;
+                    break;
+                case "ParentIssueId":
+                    issue.ParentIssueId = selectedValue;
+                    break;
+                default:
+                    return RedirectToAction("NotFound", "Error");
+            }
+            await context.SaveChangesAsync();
+            return Json(new { success = true, message = "Status updated successfully" });
+        }
+
         [Route("{projectId}/issues/{issueId:int}")]
         public IActionResult Detail(int projectId, int issueId)
         {
