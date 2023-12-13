@@ -26,11 +26,17 @@
 
 @{
     var projectId = Context.Request.RouteValues["projectId"]?.ToString();
+    var issueId = Context.Request.RouteValues["issueId"]?.ToString();
 }
 <div class="container mt-4 h-100" style="position: relative">
     <div class="row">
         <div class="col-md-8">
-            <h1 class="mb-4">@Model.Title</h1>
+            <div class="d-flex justify-content-between">
+
+                <h1 class="mb-4">@Model.Title</h1>
+                <a href="/@projectId/issues/@issueId/edit" class="btn btn-primary">Edit</a>
+
+            </div>
             <p class="text-muted">
                 <span class="fw-bold"><span class="text-secondary fw-normal">Created at</span> @GetTimeAgoString(Model.CreatedAt) <span class="text-secondary fw-normal">by</span> @Model.Author.Name</span>
             </p>

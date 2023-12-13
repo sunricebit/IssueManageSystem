@@ -1,3 +1,4 @@
+using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -68,31 +69,38 @@ namespace IMS.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateStatus(int issueId, string type, int selectedValue)
         {
-            var issue = context.Issues.SingleOrDefault(issue => issue.Id == issueId);
-            if (issue == null) return RedirectToAction("NotFound", "Error");
-
-            switch (type)
+            try
             {
-                case "StatusId":
-                    issue.StatusId = selectedValue;
-                    break;
-                case "TypeId":
-                    issue.TypeId = selectedValue;
-                    break;
-                case "ProcessId":
-                    issue.ProcessId = selectedValue;
-                    break;
-                case "AssigneeId":
-                    issue.AssigneeId = selectedValue;
-                    break;
-                case "ParentIssueId":
-                    issue.ParentIssueId = selectedValue;
-                    break;
-                default:
-                    return RedirectToAction("NotFound", "Error");
+                var issue = context.Issues.SingleOrDefault(issue => issue.Id == issueId);
+                if (issue == null) return RedirectToAction("NotFound", "Error");
+
+                switch (type)
+                {
+                    case "StatusId":
+                        issue.StatusId = selectedValue;
+                        break;
+                    case "TypeId":
+                        issue.TypeId = selectedValue;
+                        break;
+                    case "ProcessId":
+                        issue.ProcessId = selectedValue;
+                        break;
+                    case "AssigneeId":
+                        issue.AssigneeId = selectedValue;
+                        break;
+                    case "ParentIssueId":
+                        issue.ParentIssueId = selectedValue;
+                        break;
+                    default:
+                        return RedirectToAction("NotFound", "Error");
+                }
+                await context.SaveChangesAsync();
+                return Json(new { success = true, type, message = type[..^2] + " updated successfully" });
             }
-            await context.SaveChangesAsync();
-            return Json(new { success = true, type, message = type[..^2] + " updated successfully" });
+            catch
+            {
+                return Json(new { success = false, type, message = type[..^2] + " updated fail" });
+            }
         }
 
         [Route("{projectId}/issues/{issueId:int}")]
@@ -101,7 +109,6 @@ namespace IMS.Controllers
             var issue = context.Issues
                 .Include(issue => issue.Type)
                 .Include(issue => issue.Status)
-                .Include(issue => issue.Process)
                 .Include(issue => issue.Process)
                 .Include(issue => issue.Milestone)
                 .Include(issue => issue.Author)
@@ -128,6 +135,72 @@ namespace IMS.Controllers
             return View(issue);
         }
 
+        [Route("{projectId}/issues/{issueId:int}/edit")]
+        public IActionResult Edit(int projectId, int issueId)
+        {
+            var issue = context.Issues
+                .Include(issue => issue.Type)
+                .Include(issue => issue.Status)
+                .Include(issue => issue.Process)
+                .Include(issue => issue.Milestone)
+                .Include(issue => issue.Author)
+                .Include(issue => issue.Assignee)
+                .Include(issue => issue.InverseParentIssue)
+                .Include(issue => issue.ParentIssue)
+                .FirstOrDefault(i => i.ProjectId == projectId && i.Id == issueId);
+
+            var project = context.Projects
+                .Include(p => p.Students)
+                .Include(p => p.Class)
+                .ThenInclude(cls => cls.Milestones)
+                .SingleOrDefault(project => project.Id == projectId);
+
+            if (project == null) return RedirectToAction("NotFound", "Error");
+
+
+            var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
+            var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
+            var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
+            var issues = context.Issues.Where(issue => issue.ProjectId == projectId && issue.Id != issueId);
+            var assignees = context.Projects.Include(project => project.Students).FirstOrDefault(project => project.Id == projectId)!.Students.ToList();
+
+            ViewBag.Types = types;
+            ViewBag.Assignees = assignees;
+            ViewBag.Milestones = project.Class.Milestones.ToList();
+            ViewBag.Statuses = statuses;
+            ViewBag.Processes = processes;
+            ViewBag.Issues = issues;
+
+            if (issue == null) return RedirectToAction("Index");
+            return View(issue);
+        }
+
+        [Route("{projectId}/issues/{issueId:int}/edit")]
+        [HttpPost]
+        public async Task<IActionResult> Edit(Issue issue, int projectId, int issueId, [FromServices] ErrorHelper errorHelper)
+        {
+            try
+            {
+                var issueToUpdate = await context.Issues.FirstOrDefaultAsync(x => x.Id == issueId);
+                if (issueToUpdate == null) return RedirectToAction("NotFound", "Error");
+
+                issueToUpdate.Title = issue.Title;
+                issueToUpdate.TypeId = issue.TypeId;
+                issueToUpdate.Description = issue.Description;
+                issueToUpdate.AssigneeId = issue.AssigneeId;
+                issueToUpdate.MilestoneId = issue.MilestoneId;
+                issueToUpdate.StatusId = issue.StatusId;
+                issueToUpdate.ProcessId = issue.ProcessId;
+                issueToUpdate.ParentIssueId = issue.ParentIssueId;
+                await context.SaveChangesAsync();
+                errorHelper.Success = "Update issue successfull";
+            }
+            catch
+            {
+                errorHelper.Error = "Update issue faild";
+            }
+            return RedirectToAction("Detail", new { projectId, issueId });
+        }
 
         [Route("{projectId}/issues/new")]
         public IActionResult Create(int projectId)
@@ -160,35 +233,43 @@ namespace IMS.Controllers
             return View(vm);
         }
 
-
         [Route("{projectId}/issues/new")]
         [HttpPost]
         [CustomAuthorize]
         public async Task<IActionResult> Create(NewIssue vm, int projectId, [FromServices] ErrorHelper errorHelper)
         {
-            var project = context.Projects.SingleOrDefault(project => project.Id == projectId);
-            if (project == null) return RedirectToAction("NotFound", "Error");
-
-            int userId = HttpContext.Session.GetUser()!.Id;
-            Issue issue = new()
+            try
             {
-                Title = vm.Title,
-                Description = vm.Description,
-                TypeId = vm.TypeId,
-                StatusId = vm.StatusId,
-                ProcessId = vm.ProcessId,
-                MilestoneId = vm.MilestoneId,
-                ProjectId = project.Id,
-                AuthorId = userId,
-                AssigneeId = vm.AssigneeId,
-                ParentIssueId = vm.IssueParentId
-            };
+                var project = context.Projects.SingleOrDefault(project => project.Id == projectId);
+                if (project == null) return RedirectToAction("NotFound", "Error");
 
-            context.Issues.Add(issue);
-            await context.SaveChangesAsync();
-            errorHelper.Success = "Create issue successfully";
+                int userId = HttpContext.Session.GetUser()!.Id;
+                Issue issue = new()
+                {
+                    Title = vm.Title,
+                    Description = vm.Description,
+                    TypeId = vm.TypeId,
+                    StatusId = vm.StatusId,
+                    ProcessId = vm.ProcessId,
+                    MilestoneId = vm.MilestoneId,
+                    ProjectId = project.Id,
+                    AuthorId = userId,
+                    AssigneeId = vm.AssigneeId,
+                    ParentIssueId = vm.IssueParentId
+                };
 
+                context.Issues.Add(issue);
+                await context.SaveChangesAsync();
+                errorHelper.Success = "Create issue successfully";
+            }
+            catch
+            {
+                errorHelper.Error = "Create issue faild";
+
+            }
             return RedirectToAction("Index");
+
+
         }
 
 
@@ -352,24 +433,6 @@ namespace IMS.Controllers
             vm.Issues = issues.ToList();
 
             return View(vm);
-        }
-
-
-
-
-        [HttpGet]
-        public IActionResult GetProjectByName(string? search)
-        {
-            if (search == null) return Json("no-item");
-            var project = context.Projects.Where(project => project.Name.ToLower().Contains(search.ToLower())).Select(p => new { p.Id, p.Name }).ToList();
-            return Json(project);
-        }
-
-        public IActionResult GetMilestones(int projectId)
-        {
-            var project = context.Projects.Include(project => project.Milestones).SingleOrDefault(project => project.Id == projectId);
-            if (project == null) RedirectToAction("Index");
-            return Json(project!.Milestones);
         }
     }
 }
