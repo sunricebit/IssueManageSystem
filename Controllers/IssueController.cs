@@ -21,8 +21,6 @@ public class IssueViewModel
     public int TotalPages { get; set; }
     public List<Issue> Issues { get; set; } = new();
 
-    [Display(Name = "Project")]
-    [Required]
     public int ProjectIdToNewIssue { get; set; }
 }
 
@@ -59,7 +57,6 @@ namespace IMS.Controllers
         [Route("issues")]
         public IActionResult Index(IssueViewModel vm)
         {
-
             var userId = 4;
 
             ViewBag.Projects = new List<Project>();
@@ -235,8 +232,8 @@ namespace IMS.Controllers
 
         }
 
-        [HttpPost]
-        public IActionResult Check(IssueViewModel vm)
+        [Route("{projecId}/issues/new")]
+        public IActionResult Check(int projecId)
         {
             return RedirectToAction("Index");
         }

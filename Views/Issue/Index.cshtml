@@ -31,16 +31,16 @@
 
 @using (Html.BeginForm("Index", "Issue", FormMethod.Get))
 {
+
+
     <div class="d-flex justify-content-between align-items-center">
         <h3>Issues</h3>
         <div class="d-flex align-items-center" style="gap: 12px">
             <input type="text" class="form-control" placeholder="Searh issue title" name="search" />
-            <div class="col-3">
-                <div class="form-group mb-3">
-                    @Html.LabelFor(model => model.ProjectIdToNewIssue, new { @class = "control-label mb-1" })
-                    @Html.DropDownListFor(model => model.ProjectIdToNewIssue, new SelectList(ViewBag.Projects, "Id", "Name"), new { @class = "form-control", @id = "project" })
-                </div>
+            <div class="d-flex align-items-center">
+                @Html.DropDownListFor(model => model.ProjectIdToNewIssue, new SelectList(ViewBag.Projects, "Id", "Name"), new { @class = "form-control", @id = "projectIdToNew", @style = "min-width: 250px"})
             </div>
+            <button type="button" class="btn btn-primary" style="min-width: 110px" onclick="newIssue()">New issue</button>
         </div>
     </div>
     <ul class="nav nav-tabs mt-4">
@@ -150,8 +150,6 @@
 }
 
 <!-- Button trigger modal -->
-
-
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -170,3 +168,15 @@
         </div>
     </div>
 </div>
+
+<script>
+
+    function newIssue() {
+        var any = document.getElementById("projectIdToNew");
+        var value = any.value;
+
+        var projectid = parseInt(any.value);
+        window.location.href = "/" + projectid + "/issues/new"
+
+    }
+   </script>
