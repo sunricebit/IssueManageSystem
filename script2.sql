@@ -71,6 +71,7 @@ CREATE TABLE `User` (
     `Name` VARCHAR(50) NOT NULL,
     `Avatar` VARCHAR(300) NULL,
     `Gender` BOOLEAN NULL,
+    `Description` VARCHAR(255) NULL,
     `Phone` VARCHAR(15) NULL,
     `Address` VARCHAR(191) NULL,
     `Status` BOOLEAN NULL,
@@ -363,6 +364,21 @@ INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`)
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (30,'PAGE_LINK','abc',1,1,NULL);
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (31,'PAGE_LINK','/Subject/Index',0,0,NULL);
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (32,'PAGE_LINK','/UserProfile/User',0,0,NULL);
+
+INSERT INTO `IMS`.`IssueSetting` (`Type`,`Value`,`Name`)
+VALUES
+        ('TYPE', 'R','Requirement'),
+        ('TYPE', 'T','Task'),
+        ('TYPE', 'Q','Q&A'),
+        ('TYPE', 'D','Defect'),
+        ('STATUS', 'Todo','Todo'),
+        ('STATUS', 'Process','Process'),
+        ('STATUS', 'Test','Test'),
+        ('STATUS', 'Done','Done'),
+        ('PROCESS', 'Process Name 1','Process Name 1'),
+        ('PROCESS', 'Process Name 1','Process Name 1'),
+        ('PROCESS', 'Process Name 1','Process Name 1'),
+        ('PROCESS', 'Process Name 1','Process Name 1');
 
        
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);
