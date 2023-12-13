@@ -18,10 +18,10 @@ namespace IMS.Models
         public string GroupName { get; set; } = null!;
         public bool? Status { get; set; }
         public string? Description { get; set; }
-        public int? ClassId { get; set; }
+        public int ClassId { get; set; }
         public int? LeaderId { get; set; }
 
-        public virtual Class? Class { get; set; }
+        public virtual Class Class { get; set; } = null!;
         public virtual User? Leader { get; set; }
         public virtual ICollection<IssueSetting> IssueSettings { get; set; }
         public virtual ICollection<Issue> Issues { get; set; }
