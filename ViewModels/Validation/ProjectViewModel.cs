@@ -9,6 +9,6 @@
         public bool? Status { get; set; }
         public string? Description { get; set; }
         [Required(ErrorMessage = "Class is required")]
-        public int? ClassId { get; set; }
+        public int ClassId { get; set; }
     }
 }

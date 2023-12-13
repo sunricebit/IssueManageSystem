@@ -10,7 +10,10 @@
         public string? AuthorName { get; set; }
         public int? CategoryId { get; set; }
         public string? CategoryName { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public bool IsPublic { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public List<Report>? Reports { get; set; }
 
     }
 }

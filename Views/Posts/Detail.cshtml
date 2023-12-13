@@ -1,0 +1,136 @@
+﻿@model IMS.DAO.PostDAO
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+    <h1>Post Details</h1>
+    <hr />
+
+    <div class="d-flex">
+        <a asp-action="Index" class="btn btn-outline-success" style="height:fit-content">Back to List</a> |
+    <a asp-action="Detail" asp-route-id="@Model.Id" class="btn btn-outline-success" style="height:fit-content">Detail</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-success" style="height:fit-content">Edit</a>
+        @if (@ViewBag.CheckAccount == "Admin" || @ViewBag.CheckAccount == "Marketer Manager")
+        {
+            <p>|</p>  <p class="btn btn-outline-success" style="width:100px" onclick="openPopup('popupReport')">Report</p>
+        }
+    </div>
+    <div class="d-flex justify-content-center" >
+        <div class="tm-hero tm-text m-3" style="width:60%;" >
+            <div class="d-flex" style="justify-content:space-between; margin-bottom:20px;">
+                <span class="tm-text" style="color:#009999">@Model.CategoryName</span>
+            <span class="tm-text">@Model.UpdatedAt?.ToString("dddd, dd/MM/yyyy, HH:mm (GMT+7)")</span>
+            </div>
+            <h2>
+                @Model.Title
+            </h2>
+            <p>@Model.Excerpt</p>
+            <div>
+                @Html.Raw(Model.Description)
+            </div>
+        <span class="tm-text" style="font-weight:bold; display:flex;justify-content:flex-end">Author: @Model.AuthorName</span>
+        </div>
+       
+    </div>
+<!---popupReport--->
+<div class="modal" tabindex="-1" id="popupReport" style="background-color:#2220208c">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup('popupReport')"></button>
+            </div>
+            <!-- Nội dung của popup delete -->
+            @if (@Model.Reports != null)
+            {
+                <div class="modal-body" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Name
+                                </th>
+                                <th>
+                                    CreateDate
+                                </th>
+                                <th>
+                                    Content
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Reports)
+                            {
+                                <tr>
+                                    <td>@item.Reporter.Name</td>
+                                    <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <p class="content-cell d-flex" style="width:fit-content"
+                                   onmouseover="showFullContent('@item.Content', event)" onmouseout="hideContent()">@item.Content</p>
+                                    </td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p>Post report is empty!</p>
+            }
+
+            <div class="modal-footer">
+
+                <input type="submit" value="Close" onclick="closePopup('popupReport')" style="background-color: gray;border-radius: 3px; margin-top:9px" />
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="popup-container" id="popupContainer" style="max-width: 300px"></div>
+    <script src="js/plugins.js"></script>
+    <script>
+    function openPopup(popupView) {
+        var popup = document.getElementById(popupView);
+        popup.style.display = 'block';
+    }
+
+    function closePopup(popupView) {
+        var popup = document.getElementById(popupView);
+        popup.style.display = 'none';
+    }
+
+    function showFullContent(content, event) {
+        var popupContainer = document.getElementById('popupContainer');
+        var contentCell = event.target.querySelector('.content-cell');
+
+        // Đặt nội dung của popup container
+        popupContainer.innerHTML = content;
+
+        // Đặt vị trí và hiển thị popup container
+        popupContainer.style.left = (event.clientX + window.scrollX) + 'px';
+        popupContainer.style.top = (event.clientY + window.scrollY) + 'px';
+        popupContainer.style.display = 'block';
+    }
+
+    function hideContent() {
+        var popupContainer = document.getElementById('popupContainer');
+
+        // Ẩn popup container khi di chuột ra
+        popupContainer.style.display = 'none';
+    }
+
+     document.addEventListener('DOMContentLoaded', function () {
+        var elements = document.querySelectorAll('.content-cell');
+        elements.forEach(function (element) {
+            var content = element.textContent.trim();
+            var maxLength = 100;
+            if (content.length > maxLength) {
+                element.textContent = content.substring(0, maxLength) + '...';
+                //element.title = content; // Hiển thị toàn bộ nội dung khi di chuột qua
+            }
+        });
+    });
+    </script>

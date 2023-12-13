@@ -1,0 +1,118 @@
+﻿@model IMS.Models.Post
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>Create Post</h1>
+<hr />
+<a asp-action="Index" class="btn btn-outline-success" style="height:fit-content">Back to List</a>
+<div class="row">
+    <form asp-action="Create" style="width:90%; margin:25px" method="post" id="form" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="col-md-8">
+                <div class="form-group mb-4 d-flex">
+                    <img id="selectedImg" src="~/img/addImage.png" style="width: 52px;border-radius: 8px;" alt="User Avatar" />
+                    <div class="btn btn-outline-success " id="changeImg" style=" height:fit-content;margin-top:7px">
+                        <label class="form-label text-green m-0" for="imgFile">Choose Image</label>
+                        <input type="file" class="form-control d-none" id="imgFile" name="imgFile" onchange="displaySelectedImage(event, 'selectedImg')" />
+                    </div>
+
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="Title" class="control-label">Title*</label>
+                    <input asp-for="Title" id="titleInput" class="form-control" />
+                    <span id="titleError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
+                </div>
+                <div class="form-group mb-4">
+                    <label asp-for="Excerpt" class="control-label">Excerpt*</label>
+                <input asp-for="Excerpt" id="excerptInput" class="form-control" />
+                <span id="excerptError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
+            </div>
+            <div class="form-group mb-4 d-flex">
+                <label asp-for="IsPublic" class="form-check-label m-2">
+                        Public
+                    </label>
+                <div class="form-check m-2">
+                    <input asp-for="IsPublic" class="form-check-input" type="radio" value="true" />
+                    <label class="form-check-label">Yes</label>
+                </div>
+
+                <div class="form-check m-2">
+                    <input asp-for="IsPublic" class="form-check-input" type="radio" checked value="false" />
+                    <label class="form-check-label">No</label>
+                </div>
+                </div>
+
+                <div class="form-group mb-4">
+
+                    <select id="selectCate" name="category" id="category" asp-items="ViewBag.Setting" class="form-control">
+                        <option value="Category*" class="form-control">Category*</option>
+                    </select>
+                    <span id="selectError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
+                </div>
+                <div class="form-group form-group-textarea mb-md-0 mb-4" style="height:100%">
+                    <label asp-for="Description" class="control-check-label">Description*</label>
+                    <textarea asp-for="Description" id="descriptionInput" class="descriptionInput form-control" style="height:220px"></textarea>
+                    <span id="descriptionError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
+                </div>
+            <div class="form-group mb-4" style="display: flex;justify-content: space-between;">
+                    <div></div>
+                    <input type="button" value="Save" onclick="validateAndSubmit()" style="background-color: #43A047;border: none; color:white;border-radius:5px;margin-top:10px;  height:40px;" id="saveButton" />
+                </div>
+            </div>
+        
+    </form>
+
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/plugin/ckeditor/ckeditor.js"></script>
+<script>
+     CKEDITOR.replace('descriptionInput', {
+       
+         width: ['100%'], height: ['600px']
+    })
+     function validateAndSubmit() {
+        // Lấy giá trị từ thẻ select
+        var selectInput = document.getElementById("selectCate").value;
+        var descriptionInput = CKEDITOR.instances['descriptionInput'].getData();
+        var excerptInput = document.getElementById("excerptInput").value;
+        var titleInput = document.getElementById("titleInput").value;
+        var selectError = $("#selectError")
+        var descriptionError = $("#descriptionError")
+        var excerptError = $("#excerptError")
+        var titleError = $("#titleError")
+        // Reset trạng thái và thông báo lỗi trước mỗi lần kiểm tra
+        $("#selectCate").removeClass("input-validation-error");
+        selectError.text("");
+        $("#descriptionInput").removeClass("input-validation-error");
+        descriptionError.text("");
+        $("#titleInput").removeClass("input-validation-error");
+        titleError.text("");
+        $("#excerptInput").removeClass("input-validation-error");
+        excerptError.text("");
+
+        // Kiểm tra
+         if (titleInput == "") {
+            titleError.text("Please enter a Title.");
+        }
+        else if (excerptInput == "") {
+            excerptError.text("Please enter a Excerpt.");
+        }
+        else if (selectInput == "Category*") {
+            selectError.text("Please choose a Category.");
+        }
+        else if (descriptionInput.trim() === "") {
+            descriptionError.text("Please enter a Description.");
+        }
+        else {
+            // Validation thành công, tiếp tục submit form
+            document.forms["form"].submit();
+        }
+    }
+</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

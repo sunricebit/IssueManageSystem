@@ -68,5 +68,16 @@
             }
             return true;
         }
+
+        public List<Project> GetProjectByTeacher(int teacherId)
+        {
+            List<Project> resultList = new List<Project>();
+            User user = _context.Users.Include(u => u.Classes).ThenInclude(c => c.Projects).FirstOrDefault(u => u.Id == teacherId);
+            foreach (Class c in user.Classes)
+            {
+                resultList.AddRange(c.Projects);
+            }
+            return resultList;
+        }
     }
 }

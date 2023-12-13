@@ -63,8 +63,8 @@
                     <li class="nav-item"><a class="nav-link" style="color: #3399CC;" id="Team" href="/landing#team">Team</a></li>
                     <li class="nav-item"><a class="nav-link" style="color: #ffc800;" id="BlogList" href="/blog">BlogList</a></li>
                     <li class="nav-item"><a class="nav-link" style="color: #3399CC;" id="Contact" href="/landing#contact">Contact</a></li>
-                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" href="auth/sign-in">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" href="auth/sign-up">Register</a></li>
+                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" href="/auth/sign-in">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" href="/auth/sign-up">Register</a></li>
                 </ul>
             </div>
         </div>
@@ -73,15 +73,16 @@
         <div class="tm-hero tm-text m-3" style="width:50%;" id="phandichuyen">
             <div class="d-flex" style="justify-content:space-between; margin-bottom:20px;">
                 <span class="tm-text" style="color:#009999">@Model.CategoryName</span>
-                <span class="tm-text-gray-light">Author: @Model.AuthorName</span>
+                <span class="tm-text-gray-light">@Model.UpdatedAt?.ToString("dddd, dd/MM/yyyy, HH:mm (GMT+7)")</span>
             </div>
-            <h2>
+            <h2 >
                @Model.Title
             </h2>
             <p>@Model.Excerpt</p>
             <div>
                 @Html.Raw(Model.Description)
             </div>
+             <span class="tm-text-gray-light" style="font-weight:bold; display:flex;justify-content:flex-end">Author: @Model.AuthorName</span>
             </div>
         <div class="m-3" id="phandungyen">
             <h5 style="color: #ffc800; box-shadow: 0 1px #ffc800;">Liên Quan</h5>
