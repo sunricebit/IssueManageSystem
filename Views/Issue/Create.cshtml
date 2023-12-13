@@ -85,5 +85,11 @@
     });
     function validateAndSubmit() {
         var descriptionInput = CKEDITOR.instances['descriptionInput2'].getData();
-        document.forms["editForm2"].submit();
+        if ($("#editForm2").valid()) {
+            document.forms["editForm2"].submit();
+        }
     }</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
