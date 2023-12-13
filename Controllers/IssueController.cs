@@ -65,14 +65,48 @@ namespace IMS.Controllers
             context = _context;
         }
 
-        [Route("{projecId}/issues/new")]
-        public IActionResult Create(int projecId)
+        [Route("{projectId}/issues/{issueId:int}")]
+        public IActionResult Detail(int projectId, int issueId)
+        {
+            var issue = context.Issues
+                .Include(issue => issue.Type)
+                .Include(issue => issue.Status)
+                .Include(issue => issue.Process)
+                .Include(issue => issue.Process)
+                .Include(issue => issue.Milestone)
+                .Include(issue => issue.Author)
+                .Include(issue => issue.Assignee)
+                .Include(issue => issue.InverseParentIssue)
+                .Include(issue => issue.ParentIssue)
+                .FirstOrDefault(i => i.ProjectId == projectId && i.Id == issueId);
+
+            var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
+            var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
+            var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
+            var issues = context.Issues.Where(issue => issue.ProjectId == projectId && issue.Id != issueId);
+            var assignees = context.Projects.Include(project => project.Students).FirstOrDefault(project => project.Id == projectId)!.Students.ToList();
+
+
+            ViewBag.Types = types;
+            ViewBag.Assignees = assignees;
+            ViewBag.Statuses = statuses;
+            ViewBag.Processes = processes;
+            ViewBag.Issues = issues;
+
+
+            if (issue == null) return RedirectToAction("Index");
+            return View(issue);
+        }
+
+
+        [Route("{projectId}/issues/new")]
+        public IActionResult Create(int projectId)
         {
             var project = context.Projects
                 .Include(p => p.Students)
                 .Include(p => p.Class)
                 .ThenInclude(cls => cls.Milestones)
-                .SingleOrDefault(project => project.Id == projecId);
+                .SingleOrDefault(project => project.Id == projectId);
 
             if (project == null) return RedirectToAction("NotFound", "Error");
 
@@ -84,7 +118,7 @@ namespace IMS.Controllers
             var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
             var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
             var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
-            var issues = context.Issues.Where(issue => issue.ProcessId == projecId);
+            var issues = context.Issues.Where(issue => issue.ProjectId == projectId);
 
             ViewBag.Types = types;
             ViewBag.Assignees = project.Students.ToList();
@@ -97,12 +131,12 @@ namespace IMS.Controllers
         }
 
 
-        [Route("{projecId}/issues/new")]
+        [Route("{projectId}/issues/new")]
         [HttpPost]
         [CustomAuthorize]
-        public async Task<IActionResult> Create(NewIssue vm, int projecId, [FromServices] ErrorHelper errorHelper)
+        public async Task<IActionResult> Create(NewIssue vm, int projectId, [FromServices] ErrorHelper errorHelper)
         {
-            var project = context.Projects.SingleOrDefault(project => project.Id == projecId);
+            var project = context.Projects.SingleOrDefault(project => project.Id == projectId);
             if (project == null) return RedirectToAction("NotFound", "Error");
 
             int userId = HttpContext.Session.GetUser()!.Id;

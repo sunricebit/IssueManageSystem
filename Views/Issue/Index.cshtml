@@ -29,7 +29,7 @@
 }
 
 
-@using (Html.BeginForm("Index", "Issue", FormMethod.Get, new { @class = "my-5" , @id="myForm"}))
+@using (Html.BeginForm("Index", "Issue", FormMethod.Get, new { @class = "my-5", @id = "myForm" }))
 {
     <div class="d-flex justify-content-between align-items-center">
         <h3>Issues</h3>
@@ -48,7 +48,7 @@
             <button type="button" class="btn btn-primary" style="min-width: 110px" onclick="newIssue()">New issue</button>
         </div>
     </div>
-    @Html.HiddenFor(model => model.Tab, new {@id = "tabselect"})
+    @Html.HiddenFor(model => model.Tab, new { @id = "tabselect" })
     <ul class="nav nav-tabs mt-4">
         <li class="nav-item">
             <button type="button" onclick="tabChange('all')" class="nav-link @(Model.Tab == "all" ? "active" :"")">All</button>
@@ -113,7 +113,7 @@
                 {
                     <div class="d-flex align-items-center justify-content-between py-2">
                         <div class="d-flex flex-column" style="gap: 4px">
-                            <h5 class="mb-1">@item.Title</h5>
+                            <h5 class="mb-1" onclick="window.location.href = '/@item.Project.Id/issues/@item.Id'">@item.Title</h5>
                             <span class="fw-bold"><span class="text-secondary fw-normal">Created at</span> @GetTimeAgoString(item.CreatedAt) <span class="text-secondary fw-normal">by</span> <span>@item.Author.Name</span> <span class="text-secondary fw-normal">-</span> @(item.Project.Name) @(item.Milestone != null ? " - " + item.Milestone.Title:"" )<span></span></span>
 
                             <div class="d-flex" style="gap: 6px">
@@ -139,18 +139,18 @@
             {
                 <nav>
                     <ul class="pagination justify-content-center">
-                        <li class="page-item">
-                            <a class="page-link" href="#">Previous</a>
-                        </li>
+                        @*<li class="page-item">
+                                <a class="page-link" href="#">Previous</a>
+                            </li>*@
 
                         @for (int i = 1; i <= Model.TotalPages; i++)
                         {
                             <li class="page-item"><button type="submit" name="PageIndex" value="@i" class="page-link">@i</button></li>
                         }
 
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                        </li>
+                        @*<li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>*@
                     </ul>
                 </nav>
             }
@@ -168,7 +168,7 @@
 
     }
     function tabChange(tab) {
-        document.getElementById("tabselect").value=tab
+        document.getElementById("tabselect").value = tab
         document.forms["myForm"].submit();
     }</script>
 
