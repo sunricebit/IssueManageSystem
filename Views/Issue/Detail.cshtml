@@ -46,9 +46,11 @@
 
             @if (Model.ParentIssue != null)
             {
-                <p class="text-muted mt-4">
-                    Parent Issue: <a href="/@projectId/issues/@Model.ParentIssue.Id">@Model.ParentIssue.Title</a>
-                </p>
+                <div id="parentIssueContainer" class="mt-4">
+                    <p class="text-muted">
+                        Parent Issue: <a id="parentIssueLink" href="/@projectId/issues/@Model.ParentIssue.Id">@Model.ParentIssue.Title</a>
+                    </p>
+                </div>
             }
 
             <div class="mt-4">
@@ -121,20 +123,33 @@
             url: "/Issue/UpdateStatus",
             data: { issueId: issueId, type: dropdownId, selectedValue: selectedValue },
             success: function (result) {
-                var message = ""
                 if (result.success) {
-                    message = "The " + dropdownId.slice(0, -2).toLowerCase() + " update successfully!!"
-                    showSuccessMessage(message)
+                    showSuccessMessage(result.message)
+                    if (dropdownId === 'ParentIssueId') {
+                        updateParentIssueDisplay(dropdownId);
+                    }
                 } else {
-                    message = "The " + dropdownId.slice(0, -2).toLowerCase() + " update failed!!"
-                    showErrorMessage(message)
+                    showErrorMessage(result.message)
                 }
             },
             error: function () {
-                message = "The " + dropdownId.slice(0, -2).toLowerCase() + " updated failed!!"
-                showErrorMessage(message)
+                showErrorMessage('Something error')
             }
         });
+    }
+
+    function updateParentIssueDisplay(dropdownId) {
+        var parentIssueLink = $("#parentIssueLink");
+        var selectedOption = $("#" + dropdownId + " option:selected");
+
+        // Update parent issue link based on the selected option text
+        if (selectedOption.length > 0) {
+            parentIssueLink.attr("href", "/@projectId/issues/" + selectedOption.val());
+            parentIssueLink.text(selectedOption.text());
+        } else {
+            // If there is no selected option, hide the container
+            parentIssueLink.closest("#parentIssueContainer").hide();
+        }
     }
 
     var errorTimeout

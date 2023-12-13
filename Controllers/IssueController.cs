@@ -70,6 +70,7 @@ namespace IMS.Controllers
         {
             var issue = context.Issues.SingleOrDefault(issue => issue.Id == issueId);
             if (issue == null) return RedirectToAction("NotFound", "Error");
+
             switch (type)
             {
                 case "StatusId":
@@ -91,7 +92,7 @@ namespace IMS.Controllers
                     return RedirectToAction("NotFound", "Error");
             }
             await context.SaveChangesAsync();
-            return Json(new { success = true, message = "Status updated successfully" });
+            return Json(new { success = true, type, message = type[..^2] + " updated successfully" });
         }
 
         [Route("{projectId}/issues/{issueId:int}")]
@@ -227,7 +228,7 @@ namespace IMS.Controllers
                         .ThenInclude(project => project.Students)
                         .SingleOrDefault(t => t.Id == userId)!
                         .ProjectsNavigation
-                        .OrderBy(project=> project.Name)
+                        .OrderBy(project => project.Name)
                         .ToList();
                     break;
                 default:
@@ -241,7 +242,7 @@ namespace IMS.Controllers
             switch (roleName)
             {
                 case "Teacher":
-                    var teacher = context.Users.Include(t => t.Classes).ThenInclude(cls=>cls.Milestones).SingleOrDefault(t => t.Id == userId);
+                    var teacher = context.Users.Include(t => t.Classes).ThenInclude(cls => cls.Milestones).SingleOrDefault(t => t.Id == userId);
                     if (teacher != null) milestones = teacher.Classes.SelectMany(c => c.Milestones).ToList();
                     break;
                 case "Student":
@@ -255,7 +256,7 @@ namespace IMS.Controllers
             ViewBag.Milestones = milestones;
 
             //Get author
-            var authors = projectJoined.SelectMany(project => project.Students).DistinctBy(user => user.Id).OrderBy(user=>user.Name);
+            var authors = projectJoined.SelectMany(project => project.Students).DistinctBy(user => user.Id).OrderBy(user => user.Name);
             ViewBag.Authors = authors;
 
             //Get assignees
