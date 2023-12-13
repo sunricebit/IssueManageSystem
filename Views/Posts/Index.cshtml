@@ -3,17 +3,36 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<h1>Post List</h1>
 <div style="display: flex;flex-direction: column;">
     <div>
-        <div class="d-flex justify-content-between " style="float:right">
-            <a onclick="openPopup('popupCreate')" class="btn btn-outline-success" style="height: fit-content;margin: auto;">Create New</a>
+        <div class="d-flex " style="justify-content:space-between">
             <form asp-action="Index" method="get" class="d-flex">
                 <div class="d-flex m-2">
                     <select name="filterCat" asp-items="ViewBag.Setting"
                             class="form-control"
                             style="color: #6c757d">
                         <option value="Category" class="form-control">Category</option>
+                    </select>
+                    <button class="btn btn-outline-success">Filter</button>
+                </div>
+                
+                @if (@ViewBag.CheckAccount == "Admin" || @ViewBag.CheckAccount == "Marketer Manager")
+                {
+                    <div class="d-flex m-2">
+                        <select name="filterAuthor" asp-items="ViewBag.Author"
+                            class="form-control"
+                            style="color: #6c757d">
+                            <option value="Author" class="form-control">Author</option>
+                        </select>
+                        <button class="btn btn-outline-success">Filter</button>
+                    </div>
+                }
+                 <div class="d-flex m-2">
+                    <select name="filterPublic" class="form-control" style="color: #6c757d">
+                        <option value="All" class="form-control">All</option>
+                        <option value="Yes" class="form-control">Yes</option>
+                        <option value="No" class="form-control">No</option>
                     </select>
                     <button class="btn btn-outline-success">Filter</button>
                 </div>
@@ -24,6 +43,7 @@
                     </button>
                 </div>
             </form>
+            <a asp-action="Create" class="btn btn-outline-success d-flex" style="height: fit-content;margin-top:10px;">Create New</a>
 
         </div>
     </div>
@@ -40,9 +60,11 @@
             <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
-
             <th>
-                CreateDate
+                Excerpt
+            </th>
+            <th>
+                UpdateDate
             </th>
             <th>
                Public
@@ -69,18 +91,20 @@
                 <td>
                     @item.Title
                 </td>
-
                 <td>
-                    @item.CreatedAt.ToString("dd/MM/yyyy")
+                    @item.Excerpt
+                </td>
+                <td>
+                    @item.UpdatedAt.ToString("dd/MM/yyyy")
                 </td>
 
-                <td class="d-flex justify-content-center">
-                    <input data-post-id="@item.Id" class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" @(item.IsPublic ? "checked" : "") />
+                <td >
+                    <p data-post-id="@item.Id"  >@(item.IsPublic ? "Yes" : "No")</p>
                 </td>
                 <td>
                     @if (@item.ImageUrl != null)
                     {
-                        <img src="@item.ImageUrl" alt="Image" class="img-fluid" style="width: 100px;border-radius: 8px;">
+                        <img src="@item.ImageUrl" alt="Image" class="img-fluid" style="border-radius: 8px;">
                     }
                     else
                     {
@@ -94,7 +118,7 @@
                     @item.Category.Value
                 </td>
                 <td class="d-flex">
-                    <a class="btn btn-outline-success" style="height:fit-content;" asp-action="Edit" asp-route-id="@item.Id">Details</a>
+                    <a class="btn btn-outline-success" style="height:fit-content;" asp-action="Detail" asp-route-id="@item.Id">Details</a>
                     @if (@ViewBag.CheckAccount == "Admin" || @ViewBag.CheckAccount == "Marketer Manager")
                     {
                         <div class="d-flex"> <p>|</p>
@@ -142,78 +166,8 @@
 
         }
 
-        @*<a href="javascript:void(0);" class="btn btn-Primary tm-btn-next">Next Page</a>*@
     </div>
 </div>
-<!---popupCreate--->
-<div class="modal" tabindex="-1" id="popupCreate" style="background-color:#2220208c">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Create Post</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup('popupCreate')"></button>
-            </div>
-            <!-- Nội dung của popupCreate -->
-            <div class="row">
-                <form asp-action="Create" style="width:90%; margin:25px" method="post" id="form" enctype="multipart/form-data">
-                    @Html.AntiForgeryToken()
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="row align-items-stretch">
-                        <div >
-                            <div class="form-group mb-4 d-flex">
-                                <img id="selectedImg" src="~/img/addImage.png" style="width: 52px;border-radius: 8px;" alt="User Avatar" />
-                                <div class="btn btn-outline-success " id="changeImg" style=" height:fit-content;margin-top:7px">
-                                    <label class="form-label text-green m-0" for="imgFile">Choose Image</label>
-                                    <input type="file" class="form-control d-none" id="imgFile" name="imgFile" onchange="displaySelectedImage(event, 'selectedImg')" />
-                                </div>
-
-                            </div>
-                            <div class="form-group mb-4">
-                                <label asp-for="Title" class="control-label">Title*</label>
-                                <input asp-for="Title" id="titleInput" class="form-control" />
-                                <span id="titleError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
-                            </div>
-
-                            <div class="form-group mb-4 ">
-                                <label asp-for="IsPublic" class="form-check-label">
-                                    Public
-                                </label>
-                                <input asp-for="IsPublic" class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" />
-
-                            </div>
-
-                            <div class="form-group mb-4">
-
-                                @* Hiển thị select khi đang ở chế độ chỉnh sửa *@
-                                <select id="selectCate" name="category" id="category" asp-items="ViewBag.Setting" class="form-control">
-                                    <option value="Category*" class="form-control">Category*</option>
-                                </select>
-                                @*<input asp-for="Category" class="form-control"  readonly />*@
-                                <span id="selectError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
-                            </div>
-                            <div class="form-group form-group-textarea mb-md-0 mb-4" style="height:100%">
-                                <label asp-for="Description" class="control-check-label">Description*</label>
-                                <textarea asp-for="Description" id="descriptionInput" class="form-control" style="height:220px"></textarea>
-                                <span id="descriptionError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
-                            </div>
-                        </div>
-                        @*<div class="col-md-6">*@
-
-
-                        @*</div>*@
-                    </div>
-                    <div class="d-flex" style="justify-content: space-between;">
-                        <div></div>
-                        <input type="button" value="Save" onclick="validateAndSubmit()" style="background-color: #43A047;border: none; color:white;border-radius:5px;margin-top:10px;  height:40px;" id="saveButton" />
-                    </div>
-                     </form>
-
-            </div>
-           
-        </div>
-    </div>
-</div>
-
 <!---popupReport--->
 <div class="modal" tabindex="-1" id="popupReport" style="background-color:#2220208c">
     <div class="modal-dialog modal-dialog-centered">
@@ -276,7 +230,10 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="~/plugin/ckeditor/ckeditor.js"></script>
 <script>
+    CKEDITOR.replace('descriptionInput')
+    
     function openPopup(popupView) {
         var popup = document.getElementById(popupView);
         popup.style.display = 'block';
@@ -285,7 +242,6 @@
         var popup = document.getElementById(popupView);
         popup.style.display = 'none';
     }
-  
     function openReport(popupView, postIdCheckReport) {
         $.ajax({
             url: 'https://localhost:7104/LoadPopupReport',
@@ -410,37 +366,5 @@
         });
     });
 
-    function validateAndSubmit() {
-        // Lấy giá trị từ thẻ select
-        var selectInput = document.getElementById("selectCate").value;
-        var descriptionInput =document.getElementById("descriptionInput").value;
-        var titleInput = document.getElementById("titleInput").value;
-        var selectError = $("#selectError")
-        var descriptionError = $("#descriptionError")
-        var titleError = $("#titleError")
-        // Reset trạng thái và thông báo lỗi trước mỗi lần kiểm tra
-        $("#selectCate").removeClass("input-validation-error");
-        selectError.text("");
-        $("#descriptionInput").removeClass("input-validation-error");
-        descriptionError.text("");
-        $("#titleInput").removeClass("input-validation-error");
-        titleError.text("");
-
-        // Kiểm tra
-        if (selectInput == "Category*") {
-            selectError.text("Please choose a Category.");
-        }
-        else if (descriptionInput == "") {
-            descriptionError.text("Please enter a Description.");
-        }
-        else if (titleInput == "") {
-            titleError.text("Please enter a Title.");
-        }
-        else {
-            // Validation thành công, tiếp tục submit form
-            document.forms["form"].submit();
-            success.text("Please enter a Title.");
-            //$("form").submit/*();*/
-        }
-    }
+   
 </script>

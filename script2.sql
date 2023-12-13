@@ -38,7 +38,7 @@ CREATE TABLE `Contact` (
 CREATE TABLE `Post` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
-    `Description` TEXT NULL,
+    `Description` LONGTEXT NULL,
     `Excerpt` TEXT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `UpdatedAt` DATETIME(3) NULL,
@@ -122,12 +122,17 @@ CREATE TABLE `ClassStudent` (
 CREATE TABLE `Issue` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
-    `Description` TEXT NOT NULL,
-    `Status` ENUM('R', 'D', 'Q', 'T') NOT NULL DEFAULT 'R',
+    `Description` LONGTEXT NOT NULL,
     `MilestoneId` INTEGER NULL,
-    `ProjectId` INTEGER NULL,
+    `ProjectId` INTEGER NOT NULL,
     `AuthorId` INTEGER NOT NULL,
     `AssigneeId` INTEGER NULL,
+    `TypeId` INTEGER NOT NULL,
+    `StatusId` INTEGER NOT NULL,
+    `ProcessId` INTEGER NOT NULL,
+    `ParentIssueId` INTEGER NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `UpdatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `Issue_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
@@ -136,10 +141,11 @@ CREATE TABLE `Issue` (
 -- CreateTable
 CREATE TABLE `IssueSetting` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Type` VARCHAR(20) NOT NULL,
+    `Value` VARCHAR(100) NOT NULL,
     `Name` VARCHAR(50) NOT NULL,
     `Status` BOOLEAN NOT NULL DEFAULT true,
     `ClassId` INTEGER NULL,
-    `IssueId` INTEGER NULL,
     `ProjectId` INTEGER NULL,
 
     INDEX `IssueSetting_Id_idx`(`Id`),
@@ -262,6 +268,15 @@ ALTER TABLE `ClassStudent` ADD CONSTRAINT `ClassStudent_ClassId_fkey` FOREIGN KE
 ALTER TABLE `ClassStudent` ADD CONSTRAINT `ClassStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_TypeId_fkey` FOREIGN KEY (`TypeId`) REFERENCES `IssueSetting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_StatusId_fkey` FOREIGN KEY (`StatusId`) REFERENCES `IssueSetting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_ProcessId_fkey` FOREIGN KEY (`ProcessId`) REFERENCES `IssueSetting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Issue` ADD CONSTRAINT `Issue_AssigneeId_fkey` FOREIGN KEY (`AssigneeId`) REFERENCES `User`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -271,13 +286,13 @@ ALTER TABLE `Issue` ADD CONSTRAINT `Issue_AuthorId_fkey` FOREIGN KEY (`AuthorId`
 ALTER TABLE `Issue` ADD CONSTRAINT `Issue_MilestoneId_fkey` FOREIGN KEY (`MilestoneId`) REFERENCES `Milestone`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Issue` ADD CONSTRAINT `Issue_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_ParentIssueId_fkey` FOREIGN KEY (`ParentIssueId`) REFERENCES `Issue`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `IssueSetting` ADD CONSTRAINT `IssueSetting_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `IssueSetting` ADD CONSTRAINT `IssueSetting_IssueId_fkey` FOREIGN KEY (`IssueId`) REFERENCES `Issue`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `IssueSetting` ADD CONSTRAINT `IssueSetting_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -314,6 +329,41 @@ ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FORE
 
 -- AddForeignKey
 ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+       
+
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (1,'ROLE','Admin',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (2,'ROLE','Manager',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (3,'ROLE','Marketer',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (4,'ROLE','Teacher',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (5,'ROLE','Student',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (6,'POST_CATEGORY','Art and Culture',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (7,'POST_CATEGORY','Travel and Adventure',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (8,'POST_CATEGORY','Science and Technology',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (9,'POST_CATEGORY','Health and Lifestyle',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (10,'POST_CATEGORY','Learning and Personal Development',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (11,'POST_CATEGORY','Family Life',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (12,'CONTACT_TYPE','Networking',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (13,'CONTACT_TYPE','IT Career Development',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (14,'CONTACT_TYPE','Financial Aid and Scholarships',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (15,'CONTACT_TYPE','Faculty and Research',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (16,'CONTACT_TYPE','International Students',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (17,'PAGE_LINK','/Setting/SettingList',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (18,'PAGE_LINK','/Project/Index',0,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (19,'PAGE_LINK','/Project/ProjectDetail',0,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (20,'PAGE_LINK','/Setting/SettingDetail',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (21,'PAGE_LINK','/Setting/AddSetting',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (22,'PAGE_LINK','/Permission/PermissionManage',1,1,'');
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (23,'PAGE_LINK','/Setting/SettingUpdate',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (24,'POST_CATEGORY','Family Not Life',2,1,'');
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (25,'CONTACT_TYPE','Family N Life',7,0,'');
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (26,'PAGE_LINK','/Project/CreateProject',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (27,'PAGE_LINK','/User/Index',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (28,'PAGE_LINK','/Permission/UpdatePermission',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (29,'PAGE_LINK','/User/Details',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (30,'PAGE_LINK','abc',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (31,'PAGE_LINK','/Subject/Index',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (32,'PAGE_LINK','/UserProfile/User',0,0,NULL);
+
        
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (2, 'manager@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 2, 'Queenie Suff', 'https://robohash.org/consectetursuntet.png?size=100x100&set=set1', null, '0654960037', '36459 Nevada Trail', 1);
@@ -362,128 +412,33 @@ insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) val
 insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (13, 'mdavenhallc@narod.ru', 'Marla Davenhall', '0745924359', 4, 15);
 insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (14, 'epealingd@vistaprint.com', 'Elie Pealing', '0298591661', 1, 15);
 
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (1, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
-
-Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.
-
-Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.', 'Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.
-
-Pellentesque at nulla. Suspendisse potenti. Cras in purus eu magna vulputate luctus.
-
-Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus vestibulum sagittis sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.', 1, null, 4, 7);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (2, 'Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.
-
-Pellentesque at nulla. Suspendisse potenti. Cras in purus eu magna vulputate luctus.', 'In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet.
-
-Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.', 0, 'http://dummyimage.com/588x643.png/ff4444/ffffff', 4, 10);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (3, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
-
-Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.', 'Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.
-
-Sed ante. Vivamus tortor. Duis mattis egestas metus.', 1, 'http://dummyimage.com/533x699.png/dddddd/000000', 4, 10);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (4, 'Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.
-
-Phasellus in felis. Donec semper sapien a libero. Nam dui.', 'Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.
-
-Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.
-
-Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.', 1, 'http://dummyimage.com/448x560.png/5fa2dd/ffffff', 4, 9);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (5, 'Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.
-
-Duis bibendum. Morbi non quam nec dui luctus rutrum. Nulla tellus.
-
-In sagittis dui vel nisl. Duis ac nibh. Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus.', 'Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.', 1, null, 4, 9);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (6, 'Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.', 'Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.
-
-Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.', 1, 'http://dummyimage.com/550x664.png/cc0000/ffffff', 4, 9);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (7, 'Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi.', 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.
-
-Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.', 0, 'http://dummyimage.com/423x596.png/ff4444/ffffff', 4, 7);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (8, 'Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero.
-
-Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.', 'Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.
-
-Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.
-
-Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.', 1, null, 4, 10);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (9, 'Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.
-
-In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet.
-
-Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.', 'Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.
-
-Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.', 1, 'http://dummyimage.com/443x660.png/cc0000/ffffff', 4, 11);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (10, 'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.
-
-In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.', 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.
-
-Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.', 0, 'http://dummyimage.com/492x512.png/ff4444/ffffff', 4, 9);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (11, 'Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.
-
-Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.
-
-Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.', 'Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.
-
-Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.
-
-Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.', 0, null, 4, 12);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (12, 'Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-
-Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.
-
-Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.', 'Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero.
-
-Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.', 0, 'http://dummyimage.com/467x648.png/cc0000/ffffff', 4, 12);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (13, 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.
-
-Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.
-
-Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.
-
-Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.
-
-Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.', 0, null, 4, 10);
-insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (14, 'Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.
-
-Phasellus in felis. Donec semper sapien a libero. Nam dui.', 'Sed ante. Vivamus tortor. Duis mattis egestas metus.
-
-Aenean fermentum. Donec ut mauris eget massa tempor convallis. Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.
-
-Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.', 1, null, 4, 12);
-
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (1, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.', 'Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.Pellentesque at nulla. Suspendisse potenti. Cras in purus eu magna vulputate luctus.Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus vestibulum sagittis sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.', 1, null, 4, 7);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (2, 'Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.Pellentesque at nulla. Suspendisse potenti. Cras in purus eu magna vulputate luctus.', 'In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet.Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.', 0, 'http://dummyimage.com/588x643.png/ff4444/ffffff', 4, 10);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (3, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.', 'Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.Sed ante. Vivamus tortor. Duis mattis egestas metus.', 1, 'http://dummyimage.com/533x699.png/dddddd/000000', 4, 10);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (4, 'Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.Phasellus in felis. Donec semper sapien a libero. Nam dui.', 'Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.', 1, 'http://dummyimage.com/448x560.png/5fa2dd/ffffff', 4, 9);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (5, 'Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.Duis bibendum. Morbi non quam nec dui luctus rutrum. Nulla tellus.In sagittis dui vel nisl. Duis ac nibh. Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus.', 'Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.', 1, null, 4, 9);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (6, 'Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.', 'Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.', 1, 'http://dummyimage.com/550x664.png/cc0000/ffffff', 4, 9);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (7, 'Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi.', 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.', 0, 'http://dummyimage.com/423x596.png/ff4444/ffffff', 4, 7);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (8, 'Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero.Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.', 'Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.', 1, null, 4, 10);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (9, 'Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet.Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.', 'Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.', 1, 'http://dummyimage.com/443x660.png/cc0000/ffffff', 4, 11);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (10, 'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.', 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.', 0, 'http://dummyimage.com/492x512.png/ff4444/ffffff', 4, 9);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (11, 'Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.', 'Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.', 0, null, 4, 12);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (12, 'Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.', 'Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero.Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.', 0, 'http://dummyimage.com/467x648.png/cc0000/ffffff', 4, 12);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (13, 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.', 0, null, 4, 10);
+insert into `IMS`.`Post` (id, Title, Description, IsPublic, ImageUrl, AuthorId, CategoryId) values (14, 'Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.Phasellus in felis. Donec semper sapien a libero. Nam dui.', 'Sed ante. Vivamus tortor. Duis mattis egestas metus.Aenean fermentum. Donec ut mauris eget massa tempor convallis. Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.', 1, null, 4, 12);
 
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (1, 'MAE101', 'Mathematics for Engineering', 1, null, 2);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (2, 'CEA201', 'Computer Organization and Architecture', 1, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
-
-Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.
-
-Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (2, 'CEA201', 'Computer Organization and Architecture', 1, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.', 2);
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (3, 'CSI101', 'Connecting to Computer Science', 1, null, 2);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (4, 'PRF192', 'Programming Fundamentals', 1, 'Fusce consequat. Nulla nisl. Nunc nisl.
-
-Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 2);
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (5, 'SSG101', 'Working in Group Skills', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
-
-Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
-
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (6, 'PRJ321', 'Web-Based Java Applications', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
-
-Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
-
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (7, 'NWC202', 'Computer Networking', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
-
-Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
-
-insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (8, 'SWE102', 'Introduction to Software Engineering', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.
-
-Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
-
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (4, 'PRF192', 'Programming Fundamentals', 1, 'Fusce consequat. Nulla nisl. Nunc nisl.Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (5, 'SSG101', 'Working in Group Skills', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (6, 'PRJ321', 'Web-Based Java Applications', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (7, 'NWC202', 'Computer Networking', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (8, 'SWE102', 'Introduction to Software Engineering', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (9, 'JPD121', 'Elementary Japanese 1.2', 1, null, 2);
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (10, 'LAB221', 'Desktop Java Lab', 0, null, 2);
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (11, 'JPD131', 'Elementary Japanese 2.1', 1, null, 2);
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (12, 'LAB231', 'Web Java Lab', 0, null, 2);
-
-
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (13, 'PRN292', '.NET and C#', 1, null, 2);
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (14, 'SWR301', 'Software Requirements', 0, null, 2);
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (15, 'SWQ391', 'Software Quality Assurance and Testing', 1, null, 2);
@@ -491,164 +446,170 @@ insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManag
 
 
 insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (1, 'Assignment 1', null, 1);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (2, 'Assignment 2', null, 2);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (3, 'Assignment 3', 'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 3);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (4, 'Assignment 1', null, 4);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (5, 'Assignment 2', null, 5);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (6, 'Assignment 3', null, 1);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (7, 'Assignment 1', null, 2);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (2, 'Assignment 2', null, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (3, 'Assignment 3', null, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (4, 'Assignment 1', null, 2);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (5, 'Assignment 2', null, 2);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (6, 'Assignment 3', null, 2);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (7, 'Assignment 1', null, 3);
 insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (8, 'Assignment 2', null, 3);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (9, 'Assignment 3', null, 4);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (10, 'Assignment 1', null, 5);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (11, 'Assignment 2', null, 1);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (12, 'Assignment 3', null, 2);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (13, 'Assignment 1', 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.
-
-Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.', 3);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (14, 'Assignment 2', null, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (9, 'Assignment 3', null, 3);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (10, 'Assignment 1', null, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (11, 'Assignment 2', null, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (12, 'Assignment 3', null, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (13, 'Assignment 1', null, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (14, 'Assignment 2', null, 5);
 insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (15, 'Assignment 3', null, 5);
 
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (1,'SWP392','Fusce consequat. Nulla nisl. Nunc nisl.',4,1,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (2,'LAB301','Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.\r \r Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing ',4,2,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (3,'PRM392',NULL,4,3,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (4,'PRN231',NULL,4,4,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (5,'PRN211',NULL,4,5,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (6,'PRN221',NULL,4,1,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (7,'FNM375',NULL,4,2,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (8,'DWA190','Phasellus in felis. Donec semper sapien a libero. Nam dui.\n\nProin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis. Ut at dolor quis odio consequat varius.\n\nInteger ac leo. Pellentesque ultrices mattis odio. Donec vitae nisi.',4,3,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (9,'ZOT661',NULL,4,4,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (10,'YIR967',NULL,4,5,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (11,'YKN655',NULL,4,1,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (12,'OQO359','Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.\n\nDuis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.',4,2,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (13,'DSB920','4',4,3,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (14,'UIH198',NULL,4,4,0);
-INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (15,'ZCH285','Fusce consequat. Nulla nisl. Nunc nisl.\n\nDuis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.',4,5,0);
 
-INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '1');
-INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '2');
-INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '3');
-INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '4');
-INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '5');
-INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '6');
 
-INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('IMS', '1', '1', '5');
-INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('NPM', '1', '1', '9');
-INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES ('ProjectVCM01', '1', '3', '12');
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (1,'IS1234',NULL,4,1,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (2,'IS1235',NULL,4,2,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (3,'IS1236',NULL,4,3,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (4,'IS1237',NULL,4,4,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (5,'IS1238',NULL,4,5,0);
 
-INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('5', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('6', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('7', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('8', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('9', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('10', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('11', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('12', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('13', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('14', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('15', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('16', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('17', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('18', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('19', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('20', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('21', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('22', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('23', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('24', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('25', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('26', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('27', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('28', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('29', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('30', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('31', '1');
+
+INSERT INTO `ims`.`project` (`Name`,`GroupName`,`Status`, `ClassId`, `LeaderId`) VALUES
+('HumanResourceManagement','G1', '1', '1', '6'),
+('FinancialProject', 'G2', '1', '1', '12'),
+('CustomerManagementSystem', 'G2', '1', '1', '18'),
+('LogisticsProject', 'G2', '1', '1', '24'),
+('ECommerceApp', 'G2', '1', '1', '30');
+
+INSERT INTO `Milestone` (`Title`, `Description`, `StartDate`, `EndDate`, `ProjectId`, `ClassId`, `AssignmentId`) VALUES
+('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 1, 1, NULL),
+('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 1, 1, NULL),
+('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 1, 1, NULL),
+('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 2, 1, NULL),
+('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 2, 1, NULL),
+('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 2, 1, NULL),
+('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 3, 1, NULL),
+('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 3, 1, NULL),
+('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 3, 1, NULL),
+('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 4, 1, NULL),
+('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 4, 1, NULL),
+('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 4, 1, NULL),
+('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 5, 1, NULL),
+('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 5, 1, NULL),
+('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 5, 1, NULL);
+
+
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('6', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('7', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('8', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('9', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('10', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('11', '1');
-INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('12', '1');
-INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('5', '2');
-INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('6', '2');
-INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('7', '2');
-INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('8', '2');
-INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('9', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('12', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('13', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('14', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('15', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('16', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('17', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('18', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('19', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('20', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('21', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('22', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('23', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('24', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('25', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('26', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('27', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('28', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('29', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('30', '5');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('31', '5');
 
-insert into IMS.Permission(RoleId, PageId, CanCreate, CanRead, CanUpdate) values
-(1, 17, 1, 1, 1),
-(2, 17, 0, 0, 0),
-(3, 17, 0, 0, 0),
-(4, 17, 0, 0, 0),
-(5, 17, 0, 0, 0);
-
-
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (1,'ROLE','Admin',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (2,'ROLE','Manager',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (3,'ROLE','Marketer',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (4,'ROLE','Teacher',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (5,'ROLE','Student',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (6,'POST_CATEGORY','Art and Culture',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (7,'POST_CATEGORY','Travel and Adventure',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (8,'POST_CATEGORY','Science and Technology',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (9,'POST_CATEGORY','Health and Lifestyle',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (10,'POST_CATEGORY','Learning and Personal Development',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (11,'POST_CATEGORY','Family Life',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (12,'CONTACT_TYPE','Networking',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (13,'CONTACT_TYPE','IT Career Development',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (14,'CONTACT_TYPE','Financial Aid and Scholarships',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (15,'CONTACT_TYPE','Faculty and Research',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (16,'CONTACT_TYPE','International Students',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (17,'PAGE_LINK','/Setting/SettingList',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (18,'PAGE_LINK','/Project/Index',0,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (19,'PAGE_LINK','/Project/ProjectDetail',0,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (20,'PAGE_LINK','/Setting/SettingDetail',0,0,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (21,'PAGE_LINK','/Setting/AddSetting',0,0,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (22,'PAGE_LINK','/Permission/PermissionManage',1,1,'');
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (23,'PAGE_LINK','/Setting/SettingUpdate',0,0,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (24,'POST_CATEGORY','Family Not Life',2,1,'');
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (25,'CONTACT_TYPE','Family N Life',7,0,'');
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (26,'PAGE_LINK','/Project/CreateProject',0,0,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (27,'PAGE_LINK','/User/Index',0,0,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (28,'PAGE_LINK','/Permission/UpdatePermission',0,0,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (29,'PAGE_LINK','/User/Details',0,0,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (30,'PAGE_LINK','abc',1,1,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (31,'PAGE_LINK','/Subject/Index',0,0,NULL);
-INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (32,'PAGE_LINK','/UserProfile/User',0,0,NULL);
-
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (1,1,17,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (2,2,17,0,0,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (3,3,17,0,0,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (4,4,17,0,0,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (5,5,17,0,0,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (6,1,18,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (7,2,18,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (8,3,18,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (9,5,18,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (10,4,18,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (11,1,19,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (12,2,19,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (13,3,19,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (14,5,19,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (15,4,19,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (16,1,20,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (17,2,20,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (18,3,20,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (19,5,20,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (20,4,20,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (21,1,21,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (22,2,21,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (23,3,21,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (24,5,21,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (25,4,21,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (26,1,22,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (27,2,22,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (28,3,22,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (29,5,22,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (30,4,22,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (31,1,23,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (32,2,23,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (33,3,23,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (34,5,23,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (35,4,23,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (36,1,26,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (37,2,26,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (38,3,26,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (39,5,26,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (40,4,26,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (41,1,27,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (42,2,27,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (43,3,27,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (44,5,27,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (45,4,27,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (46,1,28,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (47,2,28,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (48,3,28,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (49,5,28,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (50,4,28,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (51,1,29,0,0,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (52,2,29,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (53,3,29,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (54,5,29,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (55,4,29,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (56,1,31,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (57,2,31,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (58,3,31,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (59,5,31,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (60,4,31,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (61,1,32,1,1,1);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (62,2,32,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (63,3,32,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (64,5,32,0,1,0);
-INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`) VALUES (65,4,32,0,1,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (1,1,17,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (2,2,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (3,3,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (4,4,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (5,5,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (6,1,18,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (7,2,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (8,3,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (9,5,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (10,4,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (11,1,19,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (12,2,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (13,3,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (14,5,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (15,4,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (16,1,20,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (17,2,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (18,3,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (19,5,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (20,4,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (21,1,21,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (22,2,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (23,3,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (24,5,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (25,4,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (26,1,22,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (27,2,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (28,3,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (29,5,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (30,4,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (31,1,23,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (32,2,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (33,3,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (34,5,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (35,4,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (36,1,26,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (37,2,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (38,3,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (39,5,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (40,4,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (41,1,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (42,2,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (43,3,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (44,5,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (45,4,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (46,1,28,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (47,2,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (48,3,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (49,5,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (50,4,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (51,1,29,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (52,2,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (53,3,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (54,5,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (55,4,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (56,1,31,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (57,2,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (58,3,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (59,5,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (60,4,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (61,1,32,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (62,2,32,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (63,3,32,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (64,5,32,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (65,4,32,0,1,0,0,0);

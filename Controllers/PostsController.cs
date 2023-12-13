@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using IMS.Models;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Bibliography;
 using Firebase.Auth;
 using Firebase.Storage;
 using IMS.ViewModels.Post;
-using System.Composition;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 
@@ -33,7 +24,7 @@ namespace IMS.Controllers
         // GET:
         // Posts
         [Route("[controller]")]
-        public async Task<IActionResult> Index(int page = 1, int pageSize = 6, string searchTerm = "", string filterCat="")
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 6, string searchTerm = "", string filterCat="", string filterAuthor = "", string filterPublic = "All")
         {
             int? id = HttpContext.Session.GetUser()?.Id;
 
@@ -44,8 +35,8 @@ namespace IMS.Controllers
                 ViewBag.Success = "Create successful!";
                 checkCreate = "";
             }
-            if (id==null)
-            {
+            if (id == null)
+            {https://localhost:7104/Posts
                 return NotFound();
             }
             else
@@ -54,91 +45,105 @@ namespace IMS.Controllers
                 var cate = _context.Settings.Where(c => c.Type
                 == "POST_CATEGORY").ToList();
                 ViewBag.Setting = new SelectList(cate, "Value", "Value");
-
-                
+                var author = _context.Posts.Include(p => p.Author).GroupBy(p => p.Author.Name)
+            .Select(group => group.First()).Distinct().ToList();
+                ViewBag.Author = new SelectList(author, "Author.Name", "Author.Name");
+                var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).ToList();
+                Pagination(page, pageSize, postList, searchTerm);
                 if (user.Role.Value == "Admin" || user.Role.Value == "Marketer Manager")
                 {
-                    if (searchTerm == null)
+                    if (searchTerm == null|| searchTerm == "")
                     {
-                        if (filterCat == "Category")
+                        if (filterCat != "Category" && !string.IsNullOrEmpty(filterCat))
                         {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
-                        }
-                        else
-                        {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                            Where(p => p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).ToList();
-                            
-                            Pagination(page, pageSize, postList, searchTerm);
+                            postList = postList.Where(p => p.Category.Value==filterCat).ToList();
                         }
 
+                        if (filterAuthor != "Author" && !string.IsNullOrEmpty(filterAuthor))
+                        {
+                            postList = postList.Where(p => p.Author.Name==filterAuthor).ToList();
+                        }
+
+                        if (filterPublic != "All")
+                        {
+                            bool isPublic = filterPublic == "Yes";
+                            postList = postList.Where(p => p.IsPublic == isPublic).ToList();
+                        }
+
+                        Pagination(page, pageSize, postList, searchTerm);
                     }
                     else
                     {
-                        if (filterCat == "Category")
+                        postList = postList.Where(p => p.Excerpt.ToUpper().Contains(searchTerm.ToUpper()) || p.Title.ToUpper().Contains(searchTerm.ToUpper())).ToList();
+                        if (filterCat != "Category" && !string.IsNullOrEmpty(filterCat))
                         {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                           Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper())
-                       || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper())).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
-
+                            postList = postList.Where(p => p.Category.Value == filterCat).ToList();
                         }
-                        else
+
+                        if (filterAuthor != "Author" && !string.IsNullOrEmpty(filterAuthor))
                         {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                             Where(p => (p.Title.ToUpper().Contains(searchTerm.ToUpper())
-                         || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper()))
-                         && p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
-
+                            postList = postList.Where(p => p.Author.Name == filterAuthor).ToList();
                         }
+
+                        if (filterPublic != "All")
+                        {
+                            bool isPublic = filterPublic == "Yes";
+                            postList = postList.Where(p => p.IsPublic == isPublic).ToList();
+                        }
+
+                        Pagination(page, pageSize, postList, searchTerm);
                     }
 
 
                 }
                 else
                 {
-                    if (searchTerm == null)
+                     postList = postList.Where(p => p.AuthorId == id).ToList();
+                    if (searchTerm == null||searchTerm == "")
                     {
-                        if (filterCat == "Category")
+                        if (filterCat != "Category" && !string.IsNullOrEmpty(filterCat))
                         {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p=>p.Author.Id==id).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
-                        }
-                        else
-                        {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                            Where(p => p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.Author.Id == id).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
+                            postList = postList.Where(p => p.Category.Value == filterCat).ToList();
                         }
 
+                        if (filterAuthor != "Author" && !string.IsNullOrEmpty(filterAuthor))
+                        {
+                            postList = postList.Where(p => p.Author.Name == filterAuthor).ToList();
+                        }
+
+                        if (filterPublic != "All")
+                        {
+                            bool isPublic = filterPublic == "Yes";
+                            postList = postList.Where(p => p.IsPublic == isPublic).ToList();
+                        }
+
+                        Pagination(page, pageSize, postList, searchTerm);
                     }
                     else
                     {
-                        if (filterCat == "Category")
+                        postList = postList.Where(p => p.Excerpt.ToUpper().Contains(searchTerm.ToUpper()) || p.Title.ToUpper().Contains(searchTerm.ToUpper())).ToList();
+                        if (filterCat != "Category" && !string.IsNullOrEmpty(filterCat))
                         {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                           Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper())
-                       || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper())).Where(p => p.Author.Id == id).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
-
+                            postList = postList.Where(p => p.Category.Value == filterCat).ToList();
                         }
-                        else
+
+                        if (filterAuthor != "Author" && !string.IsNullOrEmpty(filterAuthor))
                         {
-                            var postList = _context.Posts.Include(p => p.Author).Include(p => p.Category).
-                             Where(p => (p.Title.ToUpper().Contains(searchTerm.ToUpper())
-                         || p.Author.Name.ToUpper().Contains(searchTerm.ToUpper()))
-                         && p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.Author.Id == id).ToList();
-                            Pagination(page, pageSize, postList, searchTerm);
-
+                            postList = postList.Where(p => p.Author.Name == filterAuthor).ToList();
                         }
+
+                        if (filterPublic != "All")
+                        {
+                            bool isPublic = filterPublic == "Yes";
+                            postList = postList.Where(p => p.IsPublic == isPublic).ToList();
+                        }
+
+                        Pagination(page, pageSize, postList, searchTerm);
                     }
-
 
                 }
             }
-           
+
 
             return View();
         }
@@ -194,13 +199,13 @@ namespace IMS.Controllers
         {
             var cate = _context.Settings.Where(c => c.Type == "POST_CATEGORY").ToList();
             ViewBag.Setting = new SelectList(cate, "Value", "Value");
-            return View();
+            return  View(); 
         }
 
         // POST: Posts/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost()]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Models.Post post, IFormFile? imgFile, string category)
         {
@@ -225,14 +230,17 @@ namespace IMS.Controllers
 
                     post.ImageUrl = downloadLink;
                 }
-                if (id!=null)
+                if (id != null)
                 {
                     var postViewModel = new IMS.Models.Post
                     {
                         Title = post.Title,
                         Description = post.Description,
                         ImageUrl = post.ImageUrl,
+                        //AuthorId = 1,
                         AuthorId = (int)id,
+                        Excerpt =post.Excerpt,
+                        UpdatedAt=DateTime.Now,
                         CategoryId = categoryData.Id,
                         IsPublic = post.IsPublic,
                     };
@@ -241,9 +249,9 @@ namespace IMS.Controllers
                     checkCreate = "Create successful!";
                     return RedirectToAction(nameof(Index));
                 }
-               
+
             }
-                return View(post);
+            return View(post);
         }
 
         public async Task DeleteFromFirebase(string filename)
@@ -271,7 +279,36 @@ namespace IMS.Controllers
             }
         }
 
+        public async Task<IActionResult> Detail(int? id)
+        {
+            int? idAccount = HttpContext.Session.GetUser()?.Id;
+            if (id == null || _context.Posts == null)
+            {
+                return NotFound();
+            }
+            var user = _context.Users.Include(u => u.Role).Where(u => u.Role.Type == "ROLE").SingleOrDefault(u => u.Id == idAccount);
+            ViewBag.CheckAccount = user.Role.Value;
 
+            var post = _context.Posts.Include(p => p.Author).Include(p => p.Category).SingleOrDefault(p => p.Id == id);
+            var report = _context.Reports.Where(r => r.PostId == post.Id).Include(r => r.Reporter).ToList();
+            var postViewModel = new PostDAO
+            {
+                Id= id,
+                Title = post.Title,
+                Description = post.Description,
+                Excerpt=post.Excerpt,
+                UpdatedAt = post.UpdatedAt,
+                ImageUrl = post.ImageUrl,
+                AuthorName = post.Author.Name,
+                CategoryName = post.Category.Value,
+                Reports = report,
+            };
+            if (post == null)
+            {
+                return NotFound();
+            }
+            return View(postViewModel);
+        }
         // GET: Posts/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -288,14 +325,16 @@ namespace IMS.Controllers
             var report = _context.Reports.Where(r => r.PostId == post.Id).Include(r=>r.Reporter).ToList();
             ViewBag.Setting = new SelectList(cate, "Value", "Value");
             
-            var postViewModel = new IMS.ViewModels.Post.Post
+            var postViewModel = new PostDAO
             {
+                Id= id,
                 Title = post.Title,
                 Description = post.Description,
                 CreatedAt = post.CreatedAt,
+                Excerpt =post.Excerpt,
                 ImageUrl = post.ImageUrl,
-                Author = post.Author.Name,
-                Category = post.Category.Value,
+                AuthorName = post.Author.Name,
+                CategoryName = post.Category.Value,
                 IsPublic= post.IsPublic,
                 Reports= report,
             };
@@ -312,7 +351,7 @@ namespace IMS.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, IMS.ViewModels.Post.Post post,string category, IFormFile? imgFile)
+        public async Task<IActionResult> Edit(int id, PostDAO post,string category, IFormFile? imgFile)
         {
             if (id != post.Id)
             {
@@ -340,8 +379,7 @@ namespace IMS.Controllers
                 post.ImageUrl = downloadLink;
             }
             var cate = _context.Settings.SingleOrDefault(c => c.Value == category);
-            if (ModelState.IsValid)
-            {
+            
                 try
                 {
                     IMS.Models.Post postUpdate = _context.Posts.Include(p => p.Author).Include(p => p.Category).SingleOrDefault(p => p.Id == id);
@@ -349,9 +387,10 @@ namespace IMS.Controllers
                     {
                         postUpdate.Title = post.Title;
                         postUpdate.Description = post.Description;
-                        postUpdate.CreatedAt = (DateTime)post.CreatedAt;
                         postUpdate.ImageUrl = post.ImageUrl;
-                        postUpdate.Author.Name = post.Author;
+                        postUpdate.UpdatedAt = DateTime.Now;
+                        postUpdate.Excerpt = post.Excerpt;
+                        postUpdate.Author.Name = post.AuthorName;
                         postUpdate.CategoryId = cate.Id;
                         postUpdate.IsPublic = post.IsPublic;
                         _context.SaveChanges();
@@ -360,8 +399,9 @@ namespace IMS.Controllers
                     {
                         postUpdate.Title = post.Title;
                         postUpdate.Description = post.Description;
-                        postUpdate.CreatedAt = (DateTime)post.CreatedAt;
-                        postUpdate.Author.Name = post.Author;
+                        postUpdate.Excerpt = post.Excerpt;
+                        postUpdate.UpdatedAt = DateTime.Now;
+                        postUpdate.Author.Name = post.AuthorName;
                         postUpdate.CategoryId = cate.Id;
                         postUpdate.IsPublic = post.IsPublic;
                         _context.SaveChanges();
@@ -370,18 +410,11 @@ namespace IMS.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PostExists(post.Id))
-                    {
                         return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
                 }
-                return RedirectToAction(nameof(Edit));
-            }
-            return RedirectToAction(nameof(Edit));
+                return RedirectToAction("Detail", "Posts", new { id = id });
+
+           
         }
 
        

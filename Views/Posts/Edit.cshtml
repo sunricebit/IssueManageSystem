@@ -1,4 +1,4 @@
-﻿@model IMS.ViewModels.Post.Post
+﻿@model IMS.DAO.PostDAO
 
 
 @{
@@ -22,12 +22,13 @@
     }
 </style>
 
-<h4>Detail Post</h4>
+<h1>Edit Post</h1>
 <hr />
 
 <div class="d-flex">
     <a asp-action="Index" class="btn btn-outline-success" style="height:fit-content">Back to List</a> |
-    <p class="btn btn-outline-success" style="width:50px" onclick="toggleEditing()" >Edit</p>
+    <a asp-action="Detail" asp-route-id="@Model.Id" class="btn btn-outline-success" style="height:fit-content">Detail</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-success" style="height:fit-content">Edit</a>
     @if (@ViewBag.CheckAccount == "Admin" || @ViewBag.CheckAccount == "Marketer Manager")
     {
           <p>|</p>  <p class="btn btn-outline-success" style="width:100px" onclick="openPopup('popupReport')">Report</p>
@@ -41,13 +42,13 @@
         <div class="col-md-4 d-flex">
             @if(Model.ImageUrl!= null){
                 <img id="selectedImg" src="@Model.ImageUrl" style="width: 100px;border-radius: 8px;" alt="User Avatar" />
-                <div style="display:inline-block">
-                    <div class="btn btn-outline-success m-1" id="changeImg" style="display: none">
+                <div class="row" style="margin-left:10px;">
+                    <div class="btn btn-outline-success " style="height:fit-content;width:fit-content; margin-right:10px;" id="changeImg" >
                     <label class="form-label text-green m-0" for="imgFile">Choose Img</label>
 
                     <input type="file" class="form-control d-none" id="imgFile" name="imgFile" onchange="displaySelectedImage(event, 'selectedImg')" />
                     </div>
-                    <div class="btn btn-outline-success m-1" id="deleteImg">
+                    <div class="btn btn-outline-success" style="height:fit-content;width:fit-content" id="deleteImg">
                         <label class="form-label text-green m-0"  onclick="openPopup('popupDelete')">Delete Img</label>
                     </div>
                 </div>
@@ -56,7 +57,7 @@
             else
             {
                 <img id="selectedImg" src="~/img/addImage.png" style="width: 52px;border-radius: 8px;" alt="User Avatar" />
-                <div class="btn btn-outline-success " id="changeImg" style="display: none ; height:fit-content;margin-top:7px">
+                <div class="btn btn-outline-success " id="changeImg" style=" height:fit-content;margin-top:7px">
                     <label class="form-label text-green m-0" for="imgFile">Choose Image</label>
                     <input type="file" class="form-control d-none" id="imgFile" name="imgFile" onchange="displaySelectedImage(event, 'selectedImg')" />
                 </div>
@@ -66,58 +67,81 @@
         <input type="hidden" id="imgUrl" name="imgUrl"  value="@Model.ImageUrl" />
         <input type="hidden" asp-for="Id" />
         <div class="row align-items-stretch">
-            <div class="col-md-6">
+            <div class="col-md-8">
                 <div class="form-group mb-4">
-                    <label asp-for="Title" class="control-label"></label>
-                    <input asp-for="Title" class="form-control" readonly />
-                    <span asp-validation-for="Title" class="text-danger"></span>
+                    <label asp-for="Title" class="control-label">Title*</label>
+                    <input asp-for="Title" id="titleInput" class="form-control" />
+                    <span id="titleError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
+
                 </div>
 
                 <div class="form-group mb-4">
-                    <label asp-for="CreatedAt" class="control-label">CreateDate</label>
-                    <input asp-for="CreatedAt" class="form-control" readonly />
-                    <span asp-validation-for="CreatedAt" class="text-danger"></span>
+                    <label asp-for="Excerpt" class="control-label">Excerpt*</label>
+                    <input asp-for="Excerpt" id="excerptInput" class="form-control" />
+                    <span id="excerptError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
+
                 </div>
 
-                <div class="form-group mb-4 ">
-                    <label asp-for="IsPublic" class="form-check-label">
+                <div class="form-group mb-4 d-flex">
+                    <label asp-for="IsPublic" class="form-check-label m-2">
                         Public
                     </label>
-                    <input asp-for="IsPublic" class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" disabled />
+                    @if (Model.IsPublic==true)
+                    {
+                        <div class="form-check m-2">
+                            <input asp-for="IsPublic" class="form-check-input" type="radio" checked value="true" />
+                            <label class="form-check-label">Yes</label>
+                        </div>
+
+                        <div class="form-check m-2">
+                            <input asp-for="IsPublic" class="form-check-input" type="radio" value="false" />
+                            <label class="form-check-label">No</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-check m-2">
+                        <input asp-for="IsPublic" class="form-check-input" type="radio" value="true"  />
+                        <label class="form-check-label">Yes</label>
+                    </div>
+
+                        <div class="form-check m-2">
+                        <input asp-for="IsPublic" class="form-check-input" type="radio" checked value="false"  />
+                        <label class="form-check-label">No</label>
+                    </div>
+                    }
 
                 </div>
 
-                <div class="form-group mb-md-0 mb-4">
-                    <label asp-for="Author" class="control-label">Author</label>
-                    <input asp-for="Author" class="form-control" readonly />
-                    <span asp-validation-for="Author" class="text-danger"></span>
+                <div class="form-group mb-4">
+                    <label asp-for="AuthorName" class="control-label">Author</label>
+                    <input asp-for="AuthorName" class="form-control" readonly />
                 </div>
-                <div class="form-group mb-md-0 mb-4">
+                <div class="form-group mb-4">
                     <label  class="control-label"> Category</label>
-                    @* Hiển thị input readonly khi đang ở chế độ chỉ đọc *@
-                    <input value="@Model.Category" class="form-control" readonly id="inputCate" />
-
                     @* Hiển thị select khi đang ở chế độ chỉnh sửa *@
                     <select id="selectCate" name="category" asp-items="ViewBag.Setting"
-                            class="form-control" style="display:none">
-                        <option value="@Model.Category" class="form-control">@Model.Category</option>
+                            class="form-control">
+                        <option value="@Model.CategoryName" class="form-control">@Model.CategoryName</option>
                     </select>
-                    @*<input asp-for="Category" class="form-control"  readonly />*@
-                    <span asp-validation-for="Category" class="text-danger"></span>
+                    <span id="selectError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
+                </div>
+                <div class="form-group mb-4">
+                    <div class="form-group form-group-textarea mb-md-0" style="height:100%">
+                        <label asp-for="Description" class="control-label">Description*</label>
+                        <textarea asp-for="Description" id="descriptionInput" class="form-control"></textarea>
+                        <span id="descriptionError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
+                    </div>
                 </div>
 
             </div>
             <div class="col-md-6">
 
-                <div class="form-group form-group-textarea mb-md-0" style="height:100%">
-                    <label asp-for="Description" class="control-label"></label>
-                    <textarea asp-for="Description" class="form-control" style="height:350px" readonly></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
+                
             </div>
         </div>
 
-        <button type="submit" value="Save" class="btn btn-outline-success" id="saveButton">Save</button>
+        <button type="button" onclick="validateAndSubmit()" value="Save" class="btn btn-outline-success" id="saveButton">Save</button>
     </form>
 
 </div>
@@ -203,38 +227,49 @@
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="~/plugin/ckeditor/ckeditor.js"></script>
 <script>
-    var isEditing = true;
-    document.getElementById('saveButton').style.display = 'none';
-    function toggleEditing() {
-        // Lấy tất cả các input trong form
-        var formInputs = document.getElementById('editForm').querySelectorAll('input, select, textarea');
+    CKEDITOR.replace('descriptionInput', {
+       
+         width: ['100%'], height: ['600px']
+    })
+    function validateAndSubmit() {
+        // Lấy giá trị từ thẻ select
+        var selectInput = document.getElementById("selectCate").value;
+        var descriptionInput = CKEDITOR.instances['descriptionInput'].getData();
+        var excerptInput = document.getElementById("excerptInput").value;
+        var titleInput = document.getElementById("titleInput").value;
+        var selectError = $("#selectError")
+        var descriptionError = $("#descriptionError")
+        var excerptError = $("#excerptError")
+        var titleError = $("#titleError")
+        // Reset trạng thái và thông báo lỗi trước mỗi lần kiểm tra
+        $("#selectCate").removeClass("input-validation-error");
+        selectError.text("");
+        $("#descriptionInput").removeClass("input-validation-error");
+        descriptionError.text("");
+        $("#titleInput").removeClass("input-validation-error");
+        titleError.text("");
+        $("#excerptInput").removeClass("input-validation-error");
+        excerptError.text("");
 
-        // Nếu đang trong trạng thái chỉnh sửa, tắt readonly; ngược lại, bật readonly
-        formInputs.forEach(function (input) {
-            if (input.name !== 'Category' && input.name !== 'Author' && input.name !== 'CreatedAt') {
-                input.readOnly = !isEditing;
-                input.disabled = !isEditing;
-            }
-            changeImg
-        });
-        if (!isEditing) {
-            document.getElementById('saveButton').style.display = 'none';
-            document.getElementById('changeImg').style.display = 'none';
-            document.getElementById('inputCate').style.display = 'inline-block';
-            document.getElementById('selectCate').style.display = 'none';
-
-        } else {
-            document.getElementById('saveButton').style.display = 'inline-block';
-            document.getElementById('changeImg').style.display = 'inline-block';
-            document.getElementById('inputCate').style.display = 'none';
-            document.getElementById('selectCate').style.display = 'inline-block';
+        // Kiểm tra
+        if (titleInput == "") {
+            titleError.text("Please enter a Title.");
         }
-        // Đảo ngược trạng thái chỉnh sửa
-        isEditing = !isEditing;
+        else if (excerptInput == "") {
+            excerptError.text("Please enter a Excerpt.");
+        }
+        else if (descriptionInput.trim() === "") {
+            descriptionError.text("Please enter a Description.");
+        }
+        else {
+            // Validation thành công, tiếp tục submit form
+            document.forms["editForm"].submit();
+            
+        }
     }
-
-    function displaySelectedImage(event, elementId) {
+     function displaySelectedImage(event, elementId) {
             const selectedImage = document.getElementById(elementId);
             const fileInput = event.target;
 
@@ -269,8 +304,6 @@
         // Đặt vị trí và hiển thị popup container
         popupContainer.style.left = (event.clientX + window.scrollX) + 'px';
         popupContainer.style.top = (event.clientY + window.scrollY)  + 'px';
-        //popupContainer.style.left = event.pageX + 'px';
-        //popupContainer.style.top = event.pageY + 'px';
         popupContainer.style.display = 'block';
     }
 
