@@ -359,7 +359,7 @@ VALUES
         ('PROCESS', 'Process Name 1','Process Name 1'),
         ('PROCESS', 'Process Name 1','Process Name 1'),
         ('PROCESS', 'Process Name 1','Process Name 1'),
-        ('PROCESS', 'Process Name 1','Process Name 1')
+        ('PROCESS', 'Process Name 1','Process Name 1');
 
 
        
