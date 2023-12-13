@@ -26,18 +26,22 @@ public class IssueViewModel
 
 public class NewIssue
 {
-    [Display(Name = "Project")]
-    [Required]
-    public int ProjectId { get; set; }
+    public string ProjectName { get; set; }
 
-    [Display(Name = "Milestone")]
-    public int? MilestoneId { get; set; }
+    [Required]
+    public string Title { get; set; }
+
+    [Required]
+    public int TypeId { get; set; }
+
+    public string? Description { get; set; }
 
     [Display(Name = "Assignee")]
     public int? AssigneeId { get; set; }
 
-    public string Title { get; set; }
-    public string Description { get; set; }
+    [Display(Name = "Milestone")]
+    public int? MilestoneId { get; set; }
+
     public List<IssueSetting> Type { get; set; } = new();
     public List<IssueSetting> Status { get; set; } = new();
     public List<IssueSetting> Process { get; set; } = new();
@@ -53,6 +57,51 @@ namespace IMS.Controllers
         {
             context = _context;
         }
+
+        [Route("{projecId}/issues/new")]
+        public IActionResult Create(int projecId)
+        {
+
+            var project = context.Projects.Include(p => p.Students).SingleOrDefault(project => project.Id == projecId);
+            if (project == null) return RedirectToAction("NotFound", "Error");
+
+            NewIssue vm = new NewIssue()
+            {
+                ProjectName = project.Name
+            };
+
+            var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
+            var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
+            var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
+
+            ViewBag.Types = types;
+
+            ViewBag.Assignees = project.Students.ToList();
+
+            ViewBag.Statuses = statuses;
+            ViewBag.Processes = processes;
+
+            
+
+
+
+            return View(vm);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         [Route("issues")]
         public IActionResult Index(IssueViewModel vm)
@@ -72,14 +121,14 @@ namespace IMS.Controllers
                 .ToList();
 
             if (classes.Count == 0) return View(vm);
-            
+
             List<Project> projects = classes
                 .SelectMany(classes => classes.Projects)
                 .OrderBy(project => project.Name)
                 .ToList();
 
             if (projects.Count == 0) return View(vm);
-            
+
             List<Milestone> milestones = projects.SelectMany(project => project.Milestones).OrderBy(project => project.Title).ToList();
             List<User> users = projects.SelectMany(project => project.Students).DistinctBy(user => user.Id).OrderBy(user => user.Name).ToList();
 
@@ -126,7 +175,7 @@ namespace IMS.Controllers
                 issues = issues.Where(issue => issue.Project != null && issue.Project.Id == vm.ProjectId);
             }
 
-            
+
             //Milestone
             if (vm.MilestoneId != 0)
             {
@@ -232,11 +281,7 @@ namespace IMS.Controllers
 
         }
 
-        [Route("{projecId}/issues/new")]
-        public IActionResult Check(int projecId)
-        {
-            return RedirectToAction("Index");
-        }
+
 
 
         [HttpGet]
