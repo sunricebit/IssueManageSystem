@@ -1,0 +1,127 @@
+﻿@using IMS.ViewModels.Paginate;
+@model IMS.ViewModels.Class.ClassViewModel;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "CLass Member";
+    Pagination pagination = ViewBag.Pagination;
+}
+<div class="container-fluid px-4">
+    <div class="d-flex">
+        <a asp-action="Details" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">General</a>
+        <a asp-action="People" asp-controller="Class" asp-route-id="@Model.Id" class="btn btn-outline-primary text-decoration-none">People</a>
+        <a asp-action="Milestones" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Milestone</a>
+        <a asp-action="IssueSetting" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Issue Setting</a>
+    </div>
+    <h1>Class @Model.Name</h1>
+    <h2>Teacher: @ViewBag.Teacher.Name</h2>
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fas fa-table me-1"></i>
+            Student Table
+        </div>
+        
+        
+            <div class="col-md-auto">
+                <a class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New
+                </a>
+            </div>
+        
+    </div>
+    <div class="card-body">
+        <div class="mb-3 row">
+
+            <form asp-controller="User" asp-action="Index" method="get" id="FilterAndSearchForm">
+                <div class="row">
+                    <input type="hidden" id="pageNumber" name="pageNumber" />
+                   
+                    <div class="col-md-4 mb-3">
+                        <label for="StatusFilter" class="form-label">Filter by Status:</label>
+                        <select id="StatusFilter" class="form-select" name="filterbyStatus">
+                            <option value=>Select Status</option>
+                            <option value=true>Active</option>
+                            <option value=false>Inactive</option>
+                            <option value=>All Status</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="searchInput" class="form-label">Search:</label>
+
+                        <input type="text" id="keyword" name="searchByValue" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                        <button type="submit" class="btn btn-primary">Search</button>
+
+                    </div>
+                </div>
+            </form>
+
+
+
+
+
+            <table style="border-width: 1px;  border-color: #e0e0e0" class="table  table-bordered " id="sorttable-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th onclick="sortTable(0)">Name</th>
+                        <th>Avatar</th>
+                        <th onclick="sortTable(1)">Email</th>
+                        <th>Phone</th>
+
+                        <th>Status</th>
+                        <th class="sortable">Action</th>
+
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var student in ViewBag.Student)
+                    {
+                        <tr>
+                            <td>@student.Name</td>
+                            <td>
+                                <img src="@student.Avatar" alt="Avatar" width="50" height="50" />
+                            </td>
+                            <td>@student.Email</td>
+                            <td>@student.Phone</td>
+
+                            @if (@student.Status == true)
+                            {
+                                <td>
+                                    <form asp-action="ToggleStatus" asp-route-id="@student.Id" method="post">
+                                        <button type="submit" class="btn btn-success btn-sm" >
+                                            Active
+                                        </button>
+                                    </form>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <form asp-action="ToggleStatus" asp-route-id="@student.Id" method="post">
+                                        <button type="submit" class="btn btn-secondary btn-sm" >
+                                            Deactive
+                                        </button>
+                                    </form>
+                                </td>
+                            }
+                            <td>
+                                <div class="btn-group" role="group" aria-label="User Actions">
+                                    <a asp-action="Details" asp-route-id="@student.Id" asp-controller="User" class="btn btn-info">
+                                        <i class="fas fa-eye"></i> Details
+                                    </a>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @Html.Partial("_PaginationPartial", pagination)
+        </div>
+    </div>
+</div>
+</div>

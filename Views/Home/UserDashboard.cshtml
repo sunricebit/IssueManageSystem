@@ -1,0 +1,104 @@
+﻿@using IMS.ViewModels.Common;
+@{
+    ViewData["Title"] = "User Dashboard";
+    var statusData = ViewBag.StatusData;
+    var categoryData = ViewBag.CategoryData;
+    var topAuthorsData = ViewBag.TopAuthorsData;
+  //  var categoryPostCounts = ViewBag.CategoryPostCounts as IEnumerable<CategoryPostCount>;
+ //   var authorPostCounts = ViewBag.authorPostCounts as IEnumerable<AuthorPostCount>;
+}
+
+<div style="width: 80%; margin: auto;">
+    <canvas id="statusChart"></canvas>
+</div>
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var statusData = @Html.Raw(Json.Serialize(ViewBag.StatusData));
+
+        var statusCount = {
+            Draft: 0,
+            Published: 0
+        };
+
+        statusData.forEach(function (post) {
+            if (post.IsPublic.toString().toLowerCase() === "true") {
+                statusCount.Published++;
+            } else {
+                statusCount.Draft++;
+            }
+         
+        });
+
+        var statusChartCanvas = document.getElementById('statusChart').getContext('2d');
+
+        new Chart(statusChartCanvas, {
+            type: 'bar',
+            data: {
+                labels: ['Draft', 'Published'],
+                datasets: [{
+                    label: 'Post Status',
+                    data: [statusCount.Draft, statusCount.Published, statusCount.Archived],
+                    backgroundColor: ['#ff9999', '#66b3ff'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+}
+@*@section scripts {
+    <script>
+        // Ensure that the data is available in ViewBag
+        var categoryPostCounts = @System.Text.Json.JsonSerializer.Serialize(categoryPostCounts);
+        var authorPostCounts = @System.Text.Json.JsonSerializer.Serialize(authorPostCounts);
+
+        // Chart for System's Published Posts by Categories
+        var ctxCategories = document.getElementById('systemPublishedPostsByCategoriesChart').getContext('2d');
+        var chartCategories = new Chart(ctxCategories, {
+            type: 'horizontalBar',
+            data: {
+                labels: categoryPostCounts.map(item => item.Category),
+                datasets: [{
+                    label: 'Post Count',
+                    data: categoryPostCounts.map(item => item.Count),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Chart for System's Published Posts by Top Authors
+        var ctxAuthors = document.getElementById('systemPublishedPostsByTopAuthorsChart').getContext('2d');
+        var chartAuthors = new Chart(ctxAuthors, {
+            type: 'pie',
+            data: {
+                labels: authorPostCounts.map(item => item.Author),
+                datasets: [{
+                    data: authorPostCounts.map(item => item.Count),
+                    backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)', 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)'],
+                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                // Additional options can be configured here
+            }
+        });
+    </script>
+}*@
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

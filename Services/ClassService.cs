@@ -16,6 +16,11 @@ namespace IMS.Services
             if (user != null) return true; else return false;
             
         }
+        public List<Milestone> GetMilestone(int id)
+        {
+            var milestone = _context.Milestones.Where(m => m.ClassId == id).ToList();
+            return milestone;
+        }
         public IEnumerable<Class> GetClasses()
         {
             return _context.Classes.Include(c => c.Students).Include(c => c.Teacher).Include(c => c.Subject).ToList();
@@ -36,7 +41,7 @@ namespace IMS.Services
         {
             return _context.Classes.Include(c => c.Subject).Include(c => c.Students).Include(c => c.Teacher).Include(c => c.Milestones).Include(c => c.IssueSettings).FirstOrDefault(c => c.Id == id);
         }
-        public List<User> GetStudent(int classId) 
+        public IEnumerable<User> GetStudent(int classId) 
         {
             var students = _context.Classes.Where(c => c.Id == classId).SelectMany(c => c.Students).ToList();
             return students;
@@ -55,6 +60,11 @@ namespace IMS.Services
             var user = _context.Users.FirstOrDefault(u => u.Name == name || u.Email == name);
             if (user != null) { return user.Id; }
             else { return 0; }
+        }
+        public int GetSubjectId(string name)
+        {
+            var subject = _context.Subjects.FirstOrDefault(u => u.Name == name);
+            return subject != null ? subject.Id : 0;
         }
         public void AddClass(Class Class) 
         {
