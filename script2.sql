@@ -72,7 +72,6 @@ CREATE TABLE `User` (
     `Description` VARCHAR(255) NULL,
     `Avatar` VARCHAR(300) NULL,
     `Gender` BOOLEAN NULL,
-    `Description` VARCHAR(255) NULL,
     `Phone` VARCHAR(15) NULL,
     `Address` VARCHAR(191) NULL,
     `Status` BOOLEAN NULL,
