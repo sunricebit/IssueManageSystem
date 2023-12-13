@@ -11,6 +11,8 @@ namespace IMS.Models
         public bool CanCreate { get; set; }
         public bool CanRead { get; set; }
         public bool CanUpdate { get; set; }
+        public bool CanExport { get; set; }
+        public bool CanDelete { get; set; }
 
         public virtual Setting Page { get; set; } = null!;
         public virtual Setting Role { get; set; } = null!;

@@ -1,4 +1,4 @@
-﻿DROP SCHEMA IF EXISTS IMS;
+DROP SCHEMA IF EXISTS IMS;
 
 CREATE DATABASE IMS;
 
@@ -71,6 +71,7 @@ CREATE TABLE `User` (
     `Name` VARCHAR(50) NOT NULL,
     `Avatar` VARCHAR(300) NULL,
     `Gender` BOOLEAN NULL,
+    `Description` VARCHAR(255) NULL,
     `Phone` VARCHAR(15) NULL,
     `Address` VARCHAR(191) NULL,
     `Status` BOOLEAN NULL,
@@ -186,7 +187,9 @@ CREATE TABLE `Permission` (
     `CanCreate` BOOLEAN NOT NULL DEFAULT false,
     `CanRead` BOOLEAN NOT NULL DEFAULT false,
     `CanUpdate` BOOLEAN NOT NULL DEFAULT false,
-
+	`CanExport` BOOLEAN NOT NULL DEFAULT false,
+    `CanDelete` BOOLEAN NOT NULL DEFAULT false,
+    
     INDEX `Permission_RoleId_PageId_idx`(`RoleId`, `PageId`),
     UNIQUE INDEX `Permission_RoleId_PageId_key`(`RoleId`, `PageId`),
     PRIMARY KEY (`Id`)
@@ -196,6 +199,7 @@ CREATE TABLE `Permission` (
 CREATE TABLE `Project` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Name` VARCHAR(100) NOT NULL,
+    `GroupName` VARCHAR(255) NOT NULL,
     `Status` BOOLEAN NULL DEFAULT true,
     `Description` TEXT NULL,
     `ClassId` INTEGER NULL,
@@ -326,25 +330,40 @@ ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FORE
 
 -- AddForeignKey
 ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+       
 
-INSERT INTO `IMS`.`Setting` (`Type`, `Value`, `Order`, `Status`)
-VALUES ('ROLE', 'Admin', 1, 1),
-       ('ROLE', 'Manager', 1, 1),
-       ('ROLE', 'Marketer', 1, 1),
-       ('ROLE', 'Teacher', 1, 1),
-       ('ROLE', 'Student', 1, 1),
-       ('POST_CATEGORY', 'Art and Culture', 1, 1),
-       ('POST_CATEGORY', 'Travel and Adventure', 1, 1),
-       ('POST_CATEGORY', 'Science and Technology', 1, 1),
-       ('POST_CATEGORY', 'Health and Lifestyle', 1, 1),
-       ('POST_CATEGORY', 'Learning and Personal Development', 1, 1),
-       ('POST_CATEGORY', 'Family Life', 1, 1),
-       ('CONTACT_TYPE', 'Networking', 1, 1),
-       ('CONTACT_TYPE', 'IT Career Development', 1, 1),
-       ('CONTACT_TYPE', 'Financial Aid and Scholarships', 1, 1),
-       ('CONTACT_TYPE', 'Faculty and Research', 1, 1),
-       ('CONTACT_TYPE', 'International Students', 1, 1),
-       ('PAGE_LINK', '/Setting/SettingList', 1, 1);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (1,'ROLE','Admin',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (2,'ROLE','Manager',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (3,'ROLE','Marketer',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (4,'ROLE','Teacher',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (5,'ROLE','Student',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (6,'POST_CATEGORY','Art and Culture',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (7,'POST_CATEGORY','Travel and Adventure',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (8,'POST_CATEGORY','Science and Technology',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (9,'POST_CATEGORY','Health and Lifestyle',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (10,'POST_CATEGORY','Learning and Personal Development',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (11,'POST_CATEGORY','Family Life',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (12,'CONTACT_TYPE','Networking',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (13,'CONTACT_TYPE','IT Career Development',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (14,'CONTACT_TYPE','Financial Aid and Scholarships',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (15,'CONTACT_TYPE','Faculty and Research',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (16,'CONTACT_TYPE','International Students',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (17,'PAGE_LINK','/Setting/SettingList',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (18,'PAGE_LINK','/Project/Index',0,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (19,'PAGE_LINK','/Project/ProjectDetail',0,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (20,'PAGE_LINK','/Setting/SettingDetail',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (21,'PAGE_LINK','/Setting/AddSetting',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (22,'PAGE_LINK','/Permission/PermissionManage',1,1,'');
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (23,'PAGE_LINK','/Setting/SettingUpdate',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (24,'POST_CATEGORY','Family Not Life',2,1,'');
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (25,'CONTACT_TYPE','Family N Life',7,0,'');
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (26,'PAGE_LINK','/Project/CreateProject',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (27,'PAGE_LINK','/User/Index',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (28,'PAGE_LINK','/Permission/UpdatePermission',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (29,'PAGE_LINK','/User/Details',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (30,'PAGE_LINK','abc',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (31,'PAGE_LINK','/Subject/Index',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (32,'PAGE_LINK','/UserProfile/User',0,0,NULL);
 
 INSERT INTO `IMS`.`IssueSetting` (`Type`,`Value`,`Name`)
 VALUES
@@ -360,7 +379,6 @@ VALUES
         ('PROCESS', 'Process Name 1','Process Name 1'),
         ('PROCESS', 'Process Name 1','Process Name 1'),
         ('PROCESS', 'Process Name 1','Process Name 1');
-
 
        
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);
@@ -494,12 +512,12 @@ INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('29', '1');
 INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('30', '1');
 INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('31', '1');
 
-INSERT INTO `ims`.`project` (`Name`, `Status`, `ClassId`, `LeaderId`) VALUES
-('HumanResourceManagement', '1', '1', '6'),
-('FinancialProject', '1', '1', '12'),
-('CustomerManagementSystem', '1', '1', '18'),
-('LogisticsProject', '1', '1', '24'),
-('ECommerceApp', '1', '1', '30');
+INSERT INTO `ims`.`project` (`Name`,`GroupName`,`Status`, `ClassId`, `LeaderId`) VALUES
+('HumanResourceManagement','G1', '1', '1', '6'),
+('FinancialProject', 'G2', '1', '1', '12'),
+('CustomerManagementSystem', 'G2', '1', '1', '18'),
+('LogisticsProject', 'G2', '1', '1', '24'),
+('ECommerceApp', 'G2', '1', '1', '30');
 
 INSERT INTO `Milestone` (`Title`, `Description`, `StartDate`, `EndDate`, `ProjectId`, `ClassId`, `AssignmentId`) VALUES
 ('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 1, 1, NULL),
@@ -546,9 +564,68 @@ INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('29', '4')
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('30', '5');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('31', '5');
 
-insert into IMS.Permission(RoleId, PageId, CanCreate, CanRead, CanUpdate) values
-(1, 17, 1, 1, 1),
-(2, 17, 0, 0, 0),
-(3, 17, 0, 0, 0),
-(4, 17, 0, 0, 0),
-(5, 17, 0, 0, 0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (1,1,17,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (2,2,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (3,3,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (4,4,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (5,5,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (6,1,18,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (7,2,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (8,3,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (9,5,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (10,4,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (11,1,19,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (12,2,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (13,3,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (14,5,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (15,4,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (16,1,20,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (17,2,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (18,3,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (19,5,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (20,4,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (21,1,21,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (22,2,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (23,3,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (24,5,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (25,4,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (26,1,22,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (27,2,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (28,3,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (29,5,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (30,4,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (31,1,23,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (32,2,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (33,3,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (34,5,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (35,4,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (36,1,26,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (37,2,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (38,3,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (39,5,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (40,4,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (41,1,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (42,2,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (43,3,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (44,5,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (45,4,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (46,1,28,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (47,2,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (48,3,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (49,5,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (50,4,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (51,1,29,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (52,2,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (53,3,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (54,5,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (55,4,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (56,1,31,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (57,2,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (58,3,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (59,5,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (60,4,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (61,1,32,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (62,2,32,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (63,3,32,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (64,5,32,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (65,4,32,0,1,0,0,0);
