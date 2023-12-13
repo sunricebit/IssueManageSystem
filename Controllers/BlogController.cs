@@ -1,4 +1,5 @@
-﻿using IMS.ViewModels.Post;
+﻿using IMS.Models;
+using IMS.ViewModels.Post;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -7,13 +8,17 @@ namespace IMS.Controllers
     public class BlogController : Controller
     {
         private readonly IMSContext _context;
+        public static string checkSendReport;
         public BlogController(IMSContext context)
         {
             _context = context;
         }
+
         [Route("[controller]")]
         public async Task<IActionResult> Index(int page = 1, int pageSize = 8, string searchTerm = "", string filterCat = "", string filterAuthor = "")
         {
+            int? id = HttpContext.Session.GetUser()?.Id;
+            ViewBag.CheckAccount = id;
             ViewBag.Search = searchTerm;
             var cate = _context.Settings.Where(c => c.Type
             == "POST_CATEGORY").ToList();
@@ -127,7 +132,7 @@ namespace IMS.Controllers
                 }
                 else if (filterAuthor == "Author" && filterCat != "Category")
                 {
-                    var Post = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p => p.IsPublic == true).Where(p => p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.IsPublic == true).Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper()) || p.Excerpt.ToUpper().Contains(searchTerm.ToUpper())).ToList();
+                    var Post = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p => p.IsPublic == true).Where(p => p.Category.Value.ToUpper().Contains(filterCat.ToUpper()) ).Where(p => p.IsPublic == true).Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper()) || p.Excerpt.ToUpper().Contains(searchTerm.ToUpper())).ToList();
                     foreach (var post in Post)
                     {
                         postList.Add(new PostDAO
@@ -146,7 +151,7 @@ namespace IMS.Controllers
                 }
                 else if (filterAuthor != "Author" && filterCat == "Category")
                 {
-                    var Post = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p => p.IsPublic == true).Where(p => p.Author.Name.ToUpper().Contains(filterAuthor.ToUpper())).Where(p => p.IsPublic == true).Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper()) || p.Excerpt.ToUpper().Contains(searchTerm.ToUpper())).ToList();
+                    var Post = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p => p.IsPublic == true).Where(p => p.Author.Name.ToUpper().Contains(filterAuthor.ToUpper())).Where(p => p.IsPublic == true).Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper())  || p.Excerpt.ToUpper().Contains(searchTerm.ToUpper())).ToList();
                     foreach (var post in Post)
                     {
                         postList.Add(new PostDAO
@@ -165,7 +170,7 @@ namespace IMS.Controllers
                 }
                 else
                 {
-                    var Post = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p => p.IsPublic == true).Where(p => p.Author.Name.ToUpper().Contains(filterAuthor.ToUpper()) && p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.IsPublic == true).Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper()) || p.Excerpt.ToUpper().Contains(searchTerm.ToUpper())).ToList();
+                    var Post = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p => p.IsPublic == true).Where(p => p.Author.Name.ToUpper().Contains(filterAuthor.ToUpper()) && p.Category.Value.ToUpper().Contains(filterCat.ToUpper())).Where(p => p.IsPublic == true).Where(p => p.Title.ToUpper().Contains(searchTerm.ToUpper())  || p.Excerpt.ToUpper().Contains(searchTerm.ToUpper())).ToList();
                     foreach (var post in Post)
                     {
                         postList.Add(new PostDAO
@@ -207,15 +212,32 @@ namespace IMS.Controllers
 
         public async Task<IActionResult> Detail(int? id)
         {
+
             if (id == null || _context.Posts == null)
             {
                 return NotFound();
+            }
+            if(checkSendReport== "Send report successful")
+            {
+                ViewBag.Report = "Send report successful";
+                checkSendReport = "";
             }
             var post = _context.Posts.Include(p => p.Author).Include(p => p.Category).SingleOrDefault(p => p.Id == id);
             if (post == null)
             {
                 return NotFound();
             }
+            int? idAccount = HttpContext.Session.GetUser()?.Id;
+            ViewBag.CheckAccount = idAccount;
+            ViewBag.CheckPost = id;
+            var cate = _context.Settings.Where(c => c.Type
+           == "POST_CATEGORY").ToList();
+            ViewBag.Setting = new SelectList(cate, "Value", "Value");
+            var author = _context.Posts.Where(p => p.IsPublic == true).Include(p => p.Author).GroupBy(p => p.Author.Name)
+            .Select(group => group.First()).Distinct().ToList();
+            List<PostDAO> authorDuplicate = new List<PostDAO>();
+
+            ViewBag.Author = new SelectList(author, "Author.Name", "Author.Name");
             var randomPostsLienQuan = _context.Posts.Include(p => p.Author).Include(p => p.Category).Where(p=>p.Category.Value==post.Category.Value)
             .OrderBy(p => Guid.NewGuid()) // Sắp xếp ngẫu nhiên bằng cách sử dụng Guid.NewGuid()
             .Take(3)
@@ -240,6 +262,31 @@ namespace IMS.Controllers
             return View(postViewModel);
 
 
+        }
+
+        [HttpPost()]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendReport(int idPost, string content)
+        {
+            int? id = HttpContext.Session.GetUser()?.Id;
+            if (id == null)
+            {
+                return NotFound();
+            }
+            else {
+                var report = new IMS.Models.Report
+                {
+                    Content = content,
+                    PostId = idPost,
+                    ReporterId = (int)id,
+                    CreatedAt = DateTime.Now,
+                };
+                _context.Add(report);
+                await _context.SaveChangesAsync();
+                checkSendReport = "Send report successful";
+                return RedirectToAction("Detail", "Blog", new { id = idPost });
+            }
+            
         }
 
     }
