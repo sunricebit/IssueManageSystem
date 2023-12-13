@@ -20,7 +20,7 @@ public class HomeController : Controller
         var user = HttpContext.Session.GetUser();
         if (user == null)
         {
-            return RedirectToAction("Index", "Landing");
+            return RedirectToAction("Index", "Issue");
         }
         else
         {

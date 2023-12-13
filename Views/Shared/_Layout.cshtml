@@ -164,9 +164,10 @@
     <script src="~/js/datatables-sort.js" asp-append-version="true"></script>
     <script src="~/js/confirm-popup.js" asp-append-version="true"></script>
     <script src="~/js/GetInput.js" asp-append-version="true"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
     @Html.EJS().ScriptManager()
 </body>

@@ -110,6 +110,7 @@ namespace IMS.Controllers
             }
             catch (Exception ex)
             {
+                errorHelper.Error = "Something error";
                 return RedirectToAction("Blank", "Home");
             }
         }

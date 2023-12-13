@@ -1,0 +1,36 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var query = Context.Request.Query["tab"].ToString() ?? "all";
+}
+
+
+<div class="d-flex justify-content-between align-items-center">
+    <h3>Issues</h3>
+    <div class="d-flex align-items-center" style="gap: 12px">
+        <input type="text" class="form-control" placeholder="Searh issue title" name="search" />
+        @*@Html.EJS().AutoCompleteFor(model => model.)*@
+    </div>
+</div>
+
+<ul class="nav nav-tabs mt-4">
+    <li class="nav-item">
+        @Html.ActionLink("All", "Index", "Issue", new { tab = "all" }, new { @id = "all" })
+    </li>
+    <li class="nav-item">
+        @Html.ActionLink("Task", "Index", "Issue", new { tab = "requirement" }, new { @id = "task" })
+    </li>
+    <li class="nav-item">
+        @Html.ActionLink("Requirement", "Index", "Issue", new { tab = "requirement" }, new { @id = "requirement" })
+    </li>
+    <li class="nav-item">
+        @Html.ActionLink("Q & A", "Index", "Issue", new { tab = "requirement" }, new { @id = "question" })
+    </li>
+    <li class="nav-item">
+        @Html.ActionLink("Defect", "Index", "Issue", new { tab = "requirement" }, new { @id = "defect" })
+    </li>
+</ul>
+<div>
+    @RenderBody()
+</div>
+

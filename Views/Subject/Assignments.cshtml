@@ -10,9 +10,9 @@
     <div class="mb-3">
         @using (Html.BeginForm("Assignments", "Subject", FormMethod.Get))
         {
-            <input type="hidden" class="form-control" asp-for="PageIndex" placeholder="Searh subject code or name" name="page">
+            @*<input type="hidden" class="form-control" asp-for="PageIndex" placeholder="Searh subject code or name" name="page">*@
             <div class="row align-items-end">
-                <div class="col-md-2">
+                @*<div class="col-md-2">
                     <label class="form-label">Type</label>
                     <select class="form-select" name="type" asp-for="Type">
                         <option value="all">All</option>
@@ -26,9 +26,9 @@
                 </div>
                 <div class="col-md-4">
                     <button type="submit" class="btn btn-primary">Search</button>
-                </div>
+                </div>*@
 
-                <div class="col-md-2 text-end">
+                <div class="col-md-12 text-end">
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                         New Assignment
                     </button>

@@ -69,6 +69,7 @@ CREATE TABLE `User` (
     `Password` VARCHAR(64) NOT NULL,
     `RoleId` INTEGER NOT NULL,
     `Name` VARCHAR(50) NOT NULL,
+    `Description` VARCHAR(255) NULL,
     `Avatar` VARCHAR(300) NULL,
     `Gender` BOOLEAN NULL,
     `Phone` VARCHAR(15) NULL,

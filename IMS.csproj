@@ -36,6 +36,7 @@
     <None Remove="Extensions\" />
     <None Remove="Views\Subject\" />
     <None Remove="ViewModels\Subject\" />
+    <None Remove="Views\Issue\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ViewModels\Auth\" />
@@ -47,5 +48,6 @@
     <Folder Include="Views\Subject\" />
     <Folder Include="ViewModels\Subject\" />
     <Folder Include="ViewModels\Subject\" />
+    <Folder Include="Views\Issue\" />
   </ItemGroup>
 </Project>

@@ -71,15 +71,16 @@
                     @foreach (var subject in Model.Items)
                     {
                         <tr style="cursor:pointer" onclick="window.location.href = '/subjects/@subject.Code/information'">
-                            <td>@subject.Id</td>
-                            <td>@subject.Code</td>
-                            <td>@subject.Name</td>
-                            <td>@subject.SubjectManager.Name</td>
-                            <td>
-                                <input class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" readonly @(subject.IsActive == true ? "checked" : "") />
+                            <td style="vertical-align: middle">@subject.Id</td>
+                            <td style="vertical-align: middle">@subject.Code</td>
+                            <td style="vertical-align: middle">@subject.Name</td>
+                            <td style="vertical-align: middle">@subject.SubjectManager.Name</td>
+                            <td style="vertical-align: middle">
+                                @(subject.IsActive == true ? "Deactivate":"Activate")
                             </td>
-                            <td>
-                                <a class="page-link text-decoration text-primary" href="@Url.Action("Active", "Subject", new {subjectId = subject.Id, page = Model.PageIndex,search = Model.Additional.Search, type = Model.Additional.Type })">@(subject.IsActive == true ? "Deactivate":"Activate")</a>
+                            <td style="vertical-align: middle">
+                                <a class="btn btn-link" href="@Url.Action("Active", "Subject", new {subjectId = subject.Id, page = Model.PageIndex,search = Model.Additional.Search, type = Model.Additional.Type })">@(subject.IsActive == true ? "Deactivate":"Activate")</a>
+                                <a class="btn btn-link" href="/subjects/@subject.Code/information">@(subject.IsActive == true ? "Deactivate":"Activate")</a>
                             </td>
                         </tr>
                     }
@@ -105,7 +106,7 @@
         <div class="modal-content">
             @using (Html.BeginForm("AddSubject", "Subject", new { page = Model.PageIndex, search = Model.Additional.Search, type = Model.Additional.Type }, FormMethod.Post))
             {
-                    
+
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">New subject</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup()"></button>
@@ -125,10 +126,22 @@
                         @Html.ValidationMessageFor(model => model.Additional.Name, "", new { @class = "text-danger" })
                     </div>
 
-                    <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Additional.Description, new { @class = "control-label mb-1" })
-                        @Html.TextBoxFor(model => model.Additional.Description, new { @class = "form-control", @id = "description" })
+
+                    <div>
+                        @Html.RadioButtonFor(model => model.Additional.IsActive, true, new { @id = "isActive", @class = "mr-2" }) Active
+                        @Html.RadioButtonFor(model => model.Additional.IsActive, false, new { @id = "isActive" }) Deactive
                     </div>
+
+                    <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.Additional.SubjectManagerId, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                        @Html.DropDownListFor(model => model.Additional.SubjectManagerId, ViewBag.SubjectManagers as SelectList, "Select a manager", new { @class = "form-control", @id = "subjectManagerId" })
+                        @Html.ValidationMessageFor(model => model.Additional.SubjectManagerId, "", new { @class = "text-danger" })
+                    </div>
+
+                    @*<div class="form-group mb-3">
+                            @Html.LabelFor(model => model.Additional.Description, new { @class = "control-label mb-1" })
+                            @Html.TextBoxFor(model => model.Additional.Description, new { @class = "form-control", @id = "description" })
+                        </div>*@
 
                     <div class="form-group mb-3">
                         <label class="control-label">Activate </label>
@@ -136,12 +149,6 @@
                             <input type="checkbox" id="isActive" name="isActive" />
                             <label class="custom-control-label" for="isActiveSwitch"></label>
                         </div>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Additional.SubjectManagerId, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
-                        @Html.DropDownListFor(model => model.Additional.SubjectManagerId, ViewBag.SubjectManagers as SelectList, "Select a manager", new { @class = "form-control", @id = "subjectManagerId" })
-                        @Html.ValidationMessageFor(model => model.Additional.SubjectManagerId, "", new { @class = "text-danger" })
                     </div>
 
                     @if (!string.IsNullOrEmpty(@errorMessage))
@@ -185,13 +192,13 @@
         if (error) {
             document.getElementById("code").value = "@intermediate.Code";
             document.getElementById("name").value = "@(intermediate.Name)";
-            document.getElementById("description").value = "@(intermediate.Description)";
+            //document.getElementById("description").value = "@(intermediate.Description)";
             document.getElementById("isActive").checked = sessionStorage.getItem("checked") === "true";
             document.getElementById("subjectManagerId").value = "@(intermediate.SubjectManagerId)";
         } else {
             document.getElementById("code").value = "";
             document.getElementById("name").value = "";
-            document.getElementById("description").value = "";
+            //document.getElementById("description").value = "";
             document.getElementById("isActive").checked = false;
             document.getElementById("subjectManagerId").value = null;
         }
