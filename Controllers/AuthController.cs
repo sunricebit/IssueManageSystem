@@ -1,3 +1,4 @@
+using IMS.Services;
 using IMS.ViewModels.Auth;
 using IMS.ViewModels.Permission;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ namespace IMS.Controllers
         }
 
         [Route("google/callback")]
-        public async Task<ActionResult> Google([FromQuery] string code, [FromServices] IMailService mailService, [FromServices] IHashService hashService)
+        public async Task<ActionResult> Google([FromQuery] string code, [FromServices] IMailService mailService, [FromServices] IHashService hashService, [FromServices] IPermissionService permissionService)
         {
             string authorizationCode = code;
 
@@ -75,6 +76,11 @@ namespace IMS.Controllers
             }
 
             HttpContext.Session.SetUser(user);
+
+            // Get permission of user
+            PermissionViewModel permissionVM = permissionService.GetPermissionViewModel(user.RoleId);
+            string permissionString = JsonSerializer.Serialize(permissionVM);
+            HttpContext.Session.SetString("Permission", permissionString);
 
             return RedirectToAction("Blank", "Home");
         }

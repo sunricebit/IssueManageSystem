@@ -34,7 +34,7 @@ namespace IMS.Controllers
 
         [HttpGet, Route("Index")]
         [CustomAuthorize]
-        public IActionResult Index(int? pageNumber, bool? filterbyStatus, string? searchByValue, string? filterbyRole)
+        public IActionResult Index(int? pageNumber, bool? filterbyStatus, string? searchByValue, string? filterbyRole, [FromServices] IChkPgAcessService chkPgAcess)
         {
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 5;
@@ -89,16 +89,15 @@ namespace IMS.Controllers
             //    }
             //}
 
-            string page = HttpContext.Request.Path;
-            var permission = HttpContext.Session.GetPermission();
-            var pageAccess = permission.PagesAcess.FirstOrDefault(item => item.Page == page);
-            ViewBag.PageAccess = pageAccess;
+            // Check permission
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
+
             return View();
         }
 
         [HttpGet("Details/{id}")]
         [CustomAuthorize]
-        public IActionResult Details(int id)
+        public IActionResult Details(int id, [FromServices] IChkPgAcessService chkPgAcess)
         {
             var user = userService.GetUser(id);
             var role = userService.GetRole();
@@ -123,15 +122,11 @@ namespace IMS.Controllers
 
             };
 
-            string page = HttpContext.Request.Path;
-            int lastSlashIndex = page.LastIndexOf("/");
-            page = page.Substring(0, lastSlashIndex);
-            var permission = HttpContext.Session.GetPermission();
-            var pageAccess = permission.PagesAcess.FirstOrDefault(item => item.Page == page);
-            ViewBag.PageAccess = pageAccess;
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
 
             return View(userViewModel);
         }
+
         [HttpGet("Create")]
         public IActionResult Create()
         {
