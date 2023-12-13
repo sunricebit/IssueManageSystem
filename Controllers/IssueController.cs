@@ -20,6 +20,29 @@ public class IssueViewModel
     public int ItemCount { get; set; }
     public int TotalPages { get; set; }
     public List<Issue> Issues { get; set; } = new();
+
+    [Display(Name = "Project")]
+    [Required]
+    public int ProjectIdToNewIssue { get; set; }
+}
+
+public class NewIssue
+{
+    [Display(Name = "Project")]
+    [Required]
+    public int ProjectId { get; set; }
+
+    [Display(Name = "Milestone")]
+    public int? MilestoneId { get; set; }
+
+    [Display(Name = "Assignee")]
+    public int? AssigneeId { get; set; }
+
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public List<IssueSetting> Type { get; set; } = new();
+    public List<IssueSetting> Status { get; set; } = new();
+    public List<IssueSetting> Process { get; set; } = new();
 }
 
 namespace IMS.Controllers
