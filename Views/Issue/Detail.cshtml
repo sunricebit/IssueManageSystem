@@ -107,15 +107,9 @@
         </div>
     </div>
 
-    <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none" id="_messageError" class="alert alert-danger"></div>
-    <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none" id="_messageSuccess" class="alert alert-success"></div>
+    <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none; z-index: 20" id="_messageError" class="alert alert-danger"></div>
+    <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none; z-index: 20" id="_messageSuccess" class="alert alert-success"></div>
 </div>
-
-<div id="updateStatusResult"></div>
-<div id="updateTypeResult"></div>
-<div id="updateProcessResult"></div>
-<div id="updateAssigneeResult"></div>
-<div id="updateParentIssueResult"></div>
 
 <script>
     function updateDropdown(dropdownId, updateAction, resultId) {
