@@ -29,7 +29,7 @@
 }
 
 
-@using (Html.BeginForm("Index", "Issue", FormMethod.Get, new { @class="my-5"}))
+@using (Html.BeginForm("Index", "Issue", FormMethod.Get, new { @class = "my-5" , @id="myForm"}))
 {
     <div class="d-flex justify-content-between align-items-center">
         <h3>Issues</h3>
@@ -37,7 +37,7 @@
             <input type="text" class="form-control" placeholder="Searh issue title" name="search" asp-for="Search" />
             <div class="d-flex align-items-center">
 
-                <select class="form-control" id="projectIdToNew" style="min-width: 250px" >
+                <select class="form-control" id="projectIdToNew" style="min-width: 250px">
                     @foreach (var project in ViewBag.Projects)
                     {
                         <option value="@project.Id">@project.Name</option>
@@ -48,21 +48,22 @@
             <button type="button" class="btn btn-primary" style="min-width: 110px" onclick="newIssue()">New issue</button>
         </div>
     </div>
+    @Html.HiddenFor(model => model.Tab, new {@id = "tabselect"})
     <ul class="nav nav-tabs mt-4">
         <li class="nav-item">
-            <button type="submit" name="Tab" value="all" class="nav-link @(Model.Tab == "all" ? "active" :"")">All</button>
+            <button type="button" onclick="tabChange('all')" class="nav-link @(Model.Tab == "all" ? "active" :"")">All</button>
         </li>
         <li class="nav-item">
-            <button type="submit" name="Tab" value="task" class="nav-link @(Model.Tab == "task" ? "active" :"")">Task</button>
+            <button type="button" onclick="tabChange('task')" class="nav-link @(Model.Tab == "task" ? "active" :"")">Task</button>
         </li>
         <li class="nav-item">
-            <button type="submit" name="Tab" value="requirement" class="nav-link @(Model.Tab == "requirement" ? "active" :"")">Requirement</button>
+            <button type="button" onclick="tabChange('requirement')" class="nav-link @(Model.Tab == "requirement" ? "active" :"")">Requirement</button>
         </li>
         <li class="nav-item">
-            <button type="submit" name="Tab" value="question" class="nav-link @(Model.Tab == "question" ? "active" :"")">Question</button>
+            <button type="button" onclick="tabChange('question')" class="nav-link @(Model.Tab == "question" ? "active" :"")">Question</button>
         </li>
         <li class="nav-item">
-            <button type="submit" name="Tab" value="defect" class="nav-link @(Model.Tab == "defect" ? "active" :"")">Defect</button>
+            <button type="button" onclick="tabChange('defect')" class="nav-link @(Model.Tab == "defect" ? "active" :"")">Defect</button>
         </li>
     </ul>
     <div class="py-4">
@@ -144,7 +145,7 @@
 
                         @for (int i = 1; i <= Model.TotalPages; i++)
                         {
-                            <li class="page-item"><button type="submit" asp-for="PageIndex" class="page-link">@i</button></li>
+                            <li class="page-item"><button type="submit" name="PageIndex" value="@i" class="page-link">@i</button></li>
                         }
 
                         <li class="page-item">
@@ -165,4 +166,10 @@
         var projectid = parseInt(any.value);
         window.location.href = "/" + projectid + "/issues/new"
 
+    }
+    function tabChange(tab) {
+        document.getElementById("tabselect").value=tab
+        document.forms["myForm"].submit();
     }</script>
+
+
