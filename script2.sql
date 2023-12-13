@@ -123,7 +123,7 @@ CREATE TABLE `ClassStudent` (
 CREATE TABLE `Issue` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
-    `Description` LONGTEXT NOT NULL,
+    `Description` LONGTEXT NULL,
     `MilestoneId` INTEGER NULL,
     `ProjectId` INTEGER NOT NULL,
     `AuthorId` INTEGER NOT NULL,

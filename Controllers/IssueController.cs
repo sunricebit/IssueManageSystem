@@ -20,18 +20,18 @@ public class IssueViewModel
     public int ItemCount { get; set; }
     public int TotalPages { get; set; }
     public List<Issue> Issues { get; set; } = new();
-
-    public int ProjectIdToNewIssue { get; set; }
 }
 
 public class NewIssue
 {
+    [Display(Name = "Project name")]
     public string ProjectName { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Please enter issue title")]
     public string Title { get; set; }
 
     [Required]
+    [Display(Name = "Type")]
     public int TypeId { get; set; }
 
     public string? Description { get; set; }
@@ -42,9 +42,16 @@ public class NewIssue
     [Display(Name = "Milestone")]
     public int? MilestoneId { get; set; }
 
-    public List<IssueSetting> Type { get; set; } = new();
-    public List<IssueSetting> Status { get; set; } = new();
-    public List<IssueSetting> Process { get; set; } = new();
+    [Required(ErrorMessage = "Please select an issue status")]
+    [Display(Name = "Status")]
+    public int StatusId { get; set; }
+
+    [Required(ErrorMessage = "Please select an issue process")]
+    [Display(Name = "Process")]
+    public int ProcessId { get; set; }
+
+    [Display(Name = "Issue parent")]
+    public int? IssueParentId { get; set; }
 }
 
 namespace IMS.Controllers
@@ -62,7 +69,12 @@ namespace IMS.Controllers
         public IActionResult Create(int projecId)
         {
 
-            var project = context.Projects.Include(p => p.Students).SingleOrDefault(project => project.Id == projecId);
+            var project = context.Projects
+                .Include(p => p.Students)
+                .Include(p => p.Class)
+                .ThenInclude(cls => cls.Milestones)
+                .SingleOrDefault(project => project.Id == projecId);
+
             if (project == null) return RedirectToAction("NotFound", "Error");
 
             NewIssue vm = new NewIssue()
@@ -75,38 +87,53 @@ namespace IMS.Controllers
             var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
 
             ViewBag.Types = types;
-
             ViewBag.Assignees = project.Students.ToList();
-
+            ViewBag.Milestones = project.Class.Milestones.ToList();
             ViewBag.Statuses = statuses;
             ViewBag.Processes = processes;
-
-            
-
-
 
             return View(vm);
         }
 
 
+        [Route("{projecId}/issues/new")]
+        [HttpPost]
+        [CustomAuthorize]
+        public async Task<IActionResult> Create(NewIssue vm, int projecId, [FromServices] ErrorHelper errorHelper)
+        {
+            var project = context.Projects.SingleOrDefault(project => project.Id == projecId);
+            if (project == null) return RedirectToAction("NotFound", "Error");
 
+            int userId = HttpContext.Session.GetUser()!.Id;
+            Issue issue = new()
+            {
+                Title = vm.Title,
+                Description = vm.Description,
+                TypeId = vm.TypeId,
+                StatusId = vm.StatusId,
+                ProcessId = vm.ProcessId,
+                MilestoneId = vm.MilestoneId,
+                ProjectId = project.Id,
+                AuthorId = userId,
+                AssigneeId = vm.AssigneeId,
+                ParentIssueId = vm.IssueParentId
+            };
 
-
-
-
-
-
-
-
-
-
-
+            context.Issues.Add(issue);
+            await context.SaveChangesAsync();
+            errorHelper.Success = "Create issue successfully";
+            
+   
+            return RedirectToAction("Index");
+        }
 
 
         [Route("issues")]
+        [CustomAuthorize]
         public IActionResult Index(IssueViewModel vm)
         {
-            var userId = 4;
+            var userId = HttpContext.Session.GetUser()!.Id;
+
 
             ViewBag.Projects = new List<Project>();
             ViewBag.Milestones = new List<Milestone>();
@@ -120,7 +147,7 @@ namespace IMS.Controllers
                 .Where(cls => cls.TeacherId != null && cls.TeacherId == userId)
                 .ToList();
 
-            if (classes.Count == 0) return View(vm);
+
 
             List<Project> projects = classes
                 .SelectMany(classes => classes.Projects)
@@ -147,18 +174,20 @@ namespace IMS.Controllers
             switch (vm.Tab)
             {
                 case "requirement":
-                    issues = issues.Where(issue => issue.Type.Name == "R");
+                    issues = issues.Where(issue => issue.Type.Value == "R");
                     break;
                 case "task":
-                    issues = issues.Where(issue => issue.Type.Name == "T");
+                    issues = issues.Where(issue => issue.Type.Value == "T");
                     break;
                 case "question":
-                    issues = issues.Where(issue => issue.Type.Name == "Q");
+                    issues = issues.Where(issue => issue.Type.Value == "Q");
                     break;
                 case "defect":
-                    issues = issues.Where(issue => issue.Type.Name == "D");
+                    issues = issues.Where(issue => issue.Type.Value == "D");
                     break;
             }
+
+            var data = issues.ToList();
 
             if (!string.IsNullOrEmpty(vm.Search))
             {
@@ -166,7 +195,7 @@ namespace IMS.Controllers
             }
 
             // Project
-            if (vm.ProjectId == 0)
+            if (vm.ProjectId == null)
             {
                 issues = issues.Where(issue => projects.Contains(issue.Project));
             }
@@ -177,7 +206,7 @@ namespace IMS.Controllers
 
 
             //Milestone
-            if (vm.MilestoneId != 0)
+            if (vm.MilestoneId != null)
             {
                 if (vm.MilestoneId == -1)
                 {
@@ -185,35 +214,44 @@ namespace IMS.Controllers
                 }
                 else
                 {
-                    issues = issues.Where(issue => issue.Milestone != null && issue.Milestone.Id == vm.MilestoneId);
+                    issues = issues.Where(issue => issue.MilestoneId != null && issue.MilestoneId == vm.MilestoneId);
                 }
             }
 
             //Author
-            if (vm.AuthorId != 0)
+            if (vm.AuthorId != null)
             {
                 issues = issues.Where(issue => issue.Author != null && issue.Author.Id == vm.AuthorId);
             }
 
             //Assignee
-            if (vm.AssigneeId != 0)
+            if (vm.AssigneeId != null)
             {
-                if (vm.MilestoneId == -1)
+                if (vm.AssigneeId == -1)
                 {
                     issues = issues.Where(issue => issue.AssigneeId == null);
                 }
                 else
                 {
-                    issues = issues.Where(issue => issue.Assignee != null && issue.Assignee.Id == vm.AssigneeId);
+                    issues = issues.Where(issue => issue.AssigneeId != null && issue.AssigneeId == vm.AssigneeId);
                 }
             }
 
-            issues = issues.Include(issue => issue.Type).Include(issue => issue.Status).Include(issue => issue.Process);
+            issues = issues
+                .Include(issue => issue.Type)
+                .Include(issue => issue.Status)
+                .Include(issue => issue.Process)
+                .Include(issue => issue.Process)
+                .Include(issue => issue.Milestone)
+                .Include(issue => issue.Author)
+                .Include(issue => issue.Assignee)
+                .OrderByDescending(issue => issue.CreatedAt);
 
             int pageIndex = vm.PageIndex == 0 ? 1 : vm.PageIndex;
             int pageSize = 10;
             int itemCount = issues.Count();
             int totalPages = (int)Math.Ceiling((double)itemCount / pageSize);
+
             issues = issues.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
             vm.PageIndex = pageIndex;

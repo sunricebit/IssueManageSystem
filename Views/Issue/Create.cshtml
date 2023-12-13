@@ -4,34 +4,69 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="d-flex flex-column" style="gap: 24px">
 
-    <div class="form-group mb-3">
-        @Html.LabelFor(model => model.Title, new { @class = "control-label mb-1" })<span class="text-danger">*</span>
-        @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
-        @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
-    </div>
+<h3 class="mt-5">New Issue</h3>
 
-    <div class="form-group mb-3">
-        @Html.DropDownListFor(model => model.TypeId, new SelectList(ViewBag.Type, "Id", "Name"), "Select a manager", new { @class = "form-control", @id = "project" })
-        @Html.ValidationMessageFor(model => model.TypeId, "", new { @class = "text-danger" })
-    </div>
+@using (Html.BeginForm("Create", "Issue", FormMethod.Post, new {@class="my-5"}))
+{
+    <div class="d-flex flex-column" style="gap: 24px">
 
-    <div class="form-group mb-3">
-        @Html.LabelFor(model => model.Description, new { @class = "control-label mb-1" })<span class="text-danger">*</span>
-        @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
-    </div>
+        <div class="form-group mb-3">
+            @Html.LabelFor(model => model.ProjectName, new { @class = "control-label mb-1" })
+            @Html.TextBoxFor(model => model.ProjectName, new { @class = "form-control", @readonly = "readonly" })
+        </div>
 
-    <div class="row">
+        <div class="form-group mb-3">
+            @Html.LabelFor(model => model.Title, new { @class = "control-label mb-1" })<span class="text-danger">*</span>
+            @Html.TextBoxFor(model => model.Title, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+        </div>
 
-        <div class=col-6>
-            <div class="form-group mb-3">
-                @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Type, "Id", "Name"), "Select a manager", new { @class = "form-control", @id = "project" })
-                @Html.ValidationMessageFor(model => model.AssigneeId, "", new { @class = "text-danger" })
+        <div class="form-group mb-3">
+            @Html.LabelFor(model => model.TypeId, new { @class = "control-label mb-1" })<span class="text-danger">*</span>
+            @Html.DropDownListFor(model => model.TypeId, new SelectList(ViewBag.Types, "Id", "Value"), new { @class = "form-control" })
+        </div>
+
+        <div class="form-group mb-3">
+            @Html.LabelFor(model => model.Description, new { @class = "control-label mb-1" })<span class="text-danger">*</span>
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-6 mb-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.AssigneeId, new { @class = "control-label mb-1" })
+                    @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Assignees, "Id", "Name"), "Select a manager", new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="col-6 mb-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.MilestoneId, new { @class = "control-label mb-1" })
+                    @Html.DropDownListFor(model => model.MilestoneId, new SelectList(ViewBag.Milestones, "Id", "Title"), "Select a manager", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.MilestoneId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-6 mb-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.StatusId, new { @class = "control-label mb-1" })<span class="text-danger">*</span>
+                    @Html.DropDownListFor(model => model.StatusId, new SelectList(ViewBag.Statuses, "Id", "Value"), new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.StatusId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="col-6 mb-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ProcessId, new { @class = "control-label mb-1" })<span class="text-danger">*</span>
+                    @Html.DropDownListFor(model => model.ProcessId, new SelectList(ViewBag.Processes, "Id", "Value"), new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.ProcessId, "", new { @class = "text-danger" })
+                </div>
             </div>
         </div>
+
+        <div class="d-flex" style="gap: 12px">
+            <button class="btn btn-primary mr-2" style="max-width: 130px">Save change</button>
+            <button class="btn btn-secondary" type="button" style="max-width: 130px">Canel</button>
+        </div>
     </div>
-
-
-
-</div>
+}

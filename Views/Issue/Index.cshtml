@@ -29,16 +29,21 @@
 }
 
 
-@using (Html.BeginForm("Index", "Issue", FormMethod.Get))
+@using (Html.BeginForm("Index", "Issue", FormMethod.Get, new { @class="my-5"}))
 {
-
-
     <div class="d-flex justify-content-between align-items-center">
         <h3>Issues</h3>
         <div class="d-flex align-items-center" style="gap: 12px">
             <input type="text" class="form-control" placeholder="Searh issue title" name="search" />
             <div class="d-flex align-items-center">
-                @Html.DropDownListFor(model => model.ProjectIdToNewIssue, new SelectList(ViewBag.Projects, "Id", "Name"), new { @class = "form-control", @id = "projectIdToNew", @style = "min-width: 250px"})
+
+                <select class="form-control" id="projectIdToNew" style="min-width: 250px" >
+                    @foreach (var project in ViewBag.Projects)
+                    {
+                        <option value="@project.Id">@project.Name</option>
+                    }
+                </select>
+                @*@Html.DropDownListFor(model => model.ProjectIdToNewIssue, new SelectList(ViewBag.Projects, "Id", "Name"), new { @class = "form-control", @id = "projectIdToNew", @style = "min-width: 250px" })*@
             </div>
             <button type="button" class="btn btn-primary" style="min-width: 110px" onclick="newIssue()">New issue</button>
         </div>
@@ -57,7 +62,7 @@
             <button type="submit" name="Tab" value="question" class="nav-link @(Model.Tab == "question" ? "active" :"")">Question</button>
         </li>
         <li class="nav-item">
-            <button type="submit" name="Tab" value="defect" class="nav-link @(Model.Tab == "question" ? "active" :"")">Defect</button>
+            <button type="submit" name="Tab" value="defect" class="nav-link @(Model.Tab == "defect" ? "active" :"")">Defect</button>
         </li>
     </ul>
     <div class="py-4">
@@ -105,22 +110,25 @@
             {
                 @foreach (var item in Model.Issues)
                 {
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center justify-content-between py-2">
                         <div class="d-flex flex-column" style="gap: 4px">
-                            <h4>@item.Title</h4>
-                            <span><span class="text-secondary">Created at</span> @GetTimeAgoString(item.CreatedAt) by <span>@item.Author.Name</span> - @(item.Project.Name) @(item.Milestone != null ? "-" + item.Milestone.Title:"" )<span></span></span>
+                            <h5 class="mb-1">@item.Title</h5>
+                            <span class="fw-bold"><span class="text-secondary fw-normal">Created at</span> @GetTimeAgoString(item.CreatedAt) <span class="text-secondary fw-normal">by</span> <span>@item.Author.Name</span> <span class="text-secondary fw-normal">-</span> @(item.Project.Name) @(item.Milestone != null ? " - " + item.Milestone.Title:"" )<span></span></span>
 
-                            <div class="d-flex">
-                                <span class="badge badge-pill badge-primary">@item.Type.Name</span>
-                                <span class="badge badge-pill badge-secondary">@item.Type.Name</span>
-                                <span class="badge badge-pill badge-info">@item.Type.Name</span>
+                            <div class="d-flex" style="gap: 6px">
+                                <span class="badge rounded-pill bg-primary">@item.Type.Name</span>
+                                <span class="badge rounded-pill bg-secondary">@item.Status.Name</span>
+                                <span class="badge rounded-pill bg-success">@item.Process.Name</span>
                             </div>
                         </div>
                         <div>
-                            @(item.Assignee != null ? item.Assignee.Name : "")
+                            <h5>
+                                @(item.Assignee != null ? item.Assignee.Name : "")
+                            </h5>
                         </div>
                     </div>
-                    <hr class="dropdown-divider" />
+                    <hr class="border-1 border-top border-secondary my-none" />
+
                 }
             }
         </div>
@@ -134,7 +142,7 @@
                             <a class="page-link" href="#">Previous</a>
                         </li>
 
-                        @for (int i = 1; i <= Model.ItemCount; i++)
+                        @for (int i = 1; i <= Model.TotalPages; i++)
                         {
                             <li class="page-item"><button type="submit" asp-for="PageIndex" class="page-link">@i</button></li>
                         }
@@ -169,14 +177,11 @@
     </div>
 </div>
 
-<script>
-
-    function newIssue() {
+<script>function newIssue() {
         var any = document.getElementById("projectIdToNew");
         var value = any.value;
 
         var projectid = parseInt(any.value);
         window.location.href = "/" + projectid + "/issues/new"
 
-    }
-   </script>
+    }</script>
