@@ -7,7 +7,7 @@
 
 <h3 class="mt-5">New Issue</h3>
 
-@using (Html.BeginForm("Create", "Issue", FormMethod.Post, new {@class="my-5"}))
+@using (Html.BeginForm("Create", "Issue", FormMethod.Post, new { @class = "my-5", @id = "editForm2" }))
 {
     <div class="d-flex flex-column" style="gap: 24px">
 
@@ -29,7 +29,7 @@
 
         <div class="form-group mb-3">
             @Html.LabelFor(model => model.Description, new { @class = "control-label mb-1" })<span class="text-danger">*</span>
-            @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @id = "descriptionInput2" })
         </div>
 
         <div class="row mb-3">
@@ -62,11 +62,28 @@
                     @Html.ValidationMessageFor(model => model.ProcessId, "", new { @class = "text-danger" })
                 </div>
             </div>
+
+            <div class="col-6 mb-4">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.IssueParentId, new { @class = "control-label mb-1" })
+                    @Html.DropDownListFor(model => model.IssueParentId, new SelectList(ViewBag.Issues, "Id", "Title"), "Select a parent issue", new { @class = "form-control" })
+                </div>
+            </div>
         </div>
 
         <div class="d-flex" style="gap: 12px">
-            <button class="btn btn-primary mr-2" style="max-width: 130px">Save change</button>
+            <button class="btn btn-primary mr-2" style="max-width: 130px" type="button" onclick="validateAndSubmit()">Save change</button>
             <button class="btn btn-secondary" type="button" style="max-width: 130px">Canel</button>
         </div>
     </div>
 }
+
+<script src="~/plugin/ckeditor/ckeditor.js"></script>
+
+<script>CKEDITOR.replace('descriptionInput2', {
+        width: ['100%'], height: ['100px']
+    });
+    function validateAndSubmit() {
+        var descriptionInput = CKEDITOR.instances['descriptionInput2'].getData();
+        document.forms["editForm2"].submit();
+    }</script>

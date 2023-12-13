@@ -68,7 +68,6 @@ namespace IMS.Controllers
         [Route("{projecId}/issues/new")]
         public IActionResult Create(int projecId)
         {
-
             var project = context.Projects
                 .Include(p => p.Students)
                 .Include(p => p.Class)
@@ -77,7 +76,7 @@ namespace IMS.Controllers
 
             if (project == null) return RedirectToAction("NotFound", "Error");
 
-            NewIssue vm = new NewIssue()
+            NewIssue vm = new()
             {
                 ProjectName = project.Name
             };
@@ -85,12 +84,14 @@ namespace IMS.Controllers
             var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
             var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
             var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
+            var issues = context.Issues.Where(issue => issue.ProcessId == projecId);
 
             ViewBag.Types = types;
             ViewBag.Assignees = project.Students.ToList();
             ViewBag.Milestones = project.Class.Milestones.ToList();
             ViewBag.Statuses = statuses;
             ViewBag.Processes = processes;
+            ViewBag.Issues = issues;
 
             return View(vm);
         }
@@ -122,8 +123,9 @@ namespace IMS.Controllers
             context.Issues.Add(issue);
             await context.SaveChangesAsync();
             errorHelper.Success = "Create issue successfully";
-            
-   
+
+
+
             return RedirectToAction("Index");
         }
 
@@ -139,6 +141,37 @@ namespace IMS.Controllers
             ViewBag.Milestones = new List<Milestone>();
             ViewBag.Authors = new List<User>();
             ViewBag.Assignees = new List<User>();
+
+            // get my project joined =
+            User? user = context.Users.Include(user => user.Projects).Include(user => user.Role).SingleOrDefault(user => user.Id == userId);
+            if (user == null) return RedirectToAction("SignIn", "Auth");
+            var projectJoined = user.Projects.ToList();
+
+            var roleName = user.Role.Value;
+
+            List<Milestone> milestonesJoined = new();
+
+            switch (roleName)
+            {
+                case "Teacher":
+                    milestonesJoined = context.Classes
+                        //.Include(cls => cls.Milestones)
+                        .Where(cls => cls.TeacherId == user.Id)
+                        .SelectMany(cls => cls.Milestones)
+                        .ToList();
+                    break;
+
+                case "Student":
+                    milestonesJoined = context.Users
+                         .Include(user => user.Classes)
+                         .ThenInclude(cls => cls.Milestones)
+                         .SelectMany(user => user.Classes.SelectMany(cls => cls.Milestones))
+                         .ToList();
+                    break;
+                default:
+                    break;
+            }
+
 
             List<Class> classes = context.Classes
                 .Include(cls => cls.Milestones)
