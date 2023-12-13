@@ -21,7 +21,7 @@ namespace IMS.Models
         public int AuthorId { get; set; }
         public int? CategoryId { get; set; }
 
-        public virtual User? Author { get; set; } = null!;
+        public virtual User Author { get; set; } = null!;
         public virtual Setting? Category { get; set; }
         public virtual ICollection<Report> Reports { get; set; }
     }

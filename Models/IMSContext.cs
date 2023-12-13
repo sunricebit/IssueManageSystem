@@ -25,7 +25,6 @@ namespace IMS.Models
         public virtual DbSet<Milestone> Milestones { get; set; } = null!;
         public virtual DbSet<Permission> Permissions { get; set; } = null!;
         public virtual DbSet<Post> Posts { get; set; } = null!;
-        public virtual DbSet<PrismaMigration> PrismaMigrations { get; set; } = null!;
         public virtual DbSet<Project> Projects { get; set; } = null!;
         public virtual DbSet<Report> Reports { get; set; } = null!;
         public virtual DbSet<Setting> Settings { get; set; } = null!;
@@ -216,7 +215,7 @@ namespace IMS.Models
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.Issues)
                     .HasForeignKey(d => d.ProjectId)
-                    .OnDelete(DeleteBehavior.SetNull)
+                    .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("Issue_ProjectId_fkey");
 
                 entity.HasOne(d => d.Status)
@@ -240,8 +239,6 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.Id, "IssueSetting_Id_idx");
 
-                entity.HasIndex(e => e.IssueId, "IssueSetting_IssueId_fkey");
-
                 entity.HasIndex(e => e.ProjectId, "IssueSetting_ProjectId_fkey");
 
                 entity.Property(e => e.Name).HasMaxLength(50);
@@ -250,17 +247,15 @@ namespace IMS.Models
                     .IsRequired()
                     .HasDefaultValueSql("'1'");
 
+                entity.Property(e => e.Type).HasMaxLength(20);
+
+                entity.Property(e => e.Value).HasMaxLength(100);
+
                 entity.HasOne(d => d.Class)
                     .WithMany(p => p.IssueSettings)
                     .HasForeignKey(d => d.ClassId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("IssueSetting_ClassId_fkey");
-
-                entity.HasOne(d => d.Issue)
-                    .WithMany(p => p.IssueSettings)
-                    .HasForeignKey(d => d.IssueId)
-                    .OnDelete(DeleteBehavior.SetNull)
-                    .HasConstraintName("IssueSetting_IssueId_fkey");
 
                 entity.HasOne(d => d.Project)
                     .WithMany(p => p.IssueSettings)
@@ -386,42 +381,6 @@ namespace IMS.Models
                     .HasForeignKey(d => d.CategoryId)
                     .OnDelete(DeleteBehavior.SetNull)
                     .HasConstraintName("Post_CategoryId_fkey");
-            });
-
-            modelBuilder.Entity<PrismaMigration>(entity =>
-            {
-                entity.ToTable("_prisma_migrations", "IMS");
-
-                entity.Property(e => e.Id)
-                    .HasMaxLength(36)
-                    .HasColumnName("id");
-
-                entity.Property(e => e.AppliedStepsCount).HasColumnName("applied_steps_count");
-
-                entity.Property(e => e.Checksum)
-                    .HasMaxLength(64)
-                    .HasColumnName("checksum");
-
-                entity.Property(e => e.FinishedAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("finished_at");
-
-                entity.Property(e => e.Logs)
-                    .HasColumnType("text")
-                    .HasColumnName("logs");
-
-                entity.Property(e => e.MigrationName)
-                    .HasMaxLength(255)
-                    .HasColumnName("migration_name");
-
-                entity.Property(e => e.RolledBackAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("rolled_back_at");
-
-                entity.Property(e => e.StartedAt)
-                    .HasColumnType("datetime(3)")
-                    .HasColumnName("started_at")
-                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
             });
 
             modelBuilder.Entity<Project>(entity =>

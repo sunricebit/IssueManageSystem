@@ -8,14 +8,13 @@ namespace IMS.Models
         public Issue()
         {
             InverseParentIssue = new HashSet<Issue>();
-            IssueSettings = new HashSet<IssueSetting>();
         }
 
         public int Id { get; set; }
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
         public int? MilestoneId { get; set; }
-        public int? ProjectId { get; set; }
+        public int ProjectId { get; set; }
         public int AuthorId { get; set; }
         public int? AssigneeId { get; set; }
         public int TypeId { get; set; }
@@ -29,11 +28,10 @@ namespace IMS.Models
         public virtual User Author { get; set; } = null!;
         public virtual Milestone? Milestone { get; set; }
         public virtual Issue? ParentIssue { get; set; }
-        public virtual Setting Process { get; set; } = null!;
-        public virtual Project? Project { get; set; }
-        public virtual Setting Status { get; set; } = null!;
-        public virtual Setting Type { get; set; } = null!;
+        public virtual IssueSetting Process { get; set; } = null!;
+        public virtual Project Project { get; set; } = null!;
+        public virtual IssueSetting Status { get; set; } = null!;
+        public virtual IssueSetting Type { get; set; } = null!;
         public virtual ICollection<Issue> InverseParentIssue { get; set; }
-        public virtual ICollection<IssueSetting> IssueSettings { get; set; }
     }
 }
