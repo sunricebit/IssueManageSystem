@@ -2,20 +2,21 @@
 @{
     ViewData["Title"] = "Project Detail";
     string confirmMessage = "Are you want to update this project ?";
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
 }
 <div class="container mt-5">
     <ul class="nav nav-tabs mt-4">
         <li class="nav-item">
-            <a class="nav-link text-white bg-primary" asp-controller="Project" asp-action="IssueSetting">General</a>
+            <a class="nav-link text-white bg-primary" asp-controller="Project" asp-action="ProjectDetail" asp-route-id="@Model.Id">General</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-primary" asp-controller="Project" asp-action="IssueSetting">Member</a>
+            <a class="nav-link text-primary" asp-controller="Project" asp-action="Member" asp-route-id="@Model.Id">Member</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-primary" asp-controller="Project" asp-action="IssueSetting">Milestone</a>
+            <a class="nav-link text-primary" asp-controller="Project" asp-action="MileStone" asp-route-id="@Model.Id">Milestone</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-primary" asp-controller="Project" asp-action="IssueSetting">Issue Setting</a>
+            <a class="nav-link text-primary" asp-controller="Project" asp-action="IssueSetting" asp-route-id="@Model.Id">Issue Setting</a>
         </li>
     </ul>
     <h2>Project Detail</h2>
@@ -50,76 +51,111 @@
             </div>
         }
 
-        <!-- Name -->
+        <!-- Id -->
         <div class="form-group">
             <label for="Id">Id:</label>
             <input type="text" class="form-control" id="Id" name="Id" asp-for="Id" value="@Model.Id" required readonly>
         </div>
 
         <!-- Name -->
-        <div class="form-group">
-            <label for="Name">Name*:</label>
-            @if (ViewBag.Leader)
-            {
+        @if (pageAcess.CanUpdate)
+        {
+            <div class="form-group mb-3">
+                <label for="Name">Name*:</label>
                 <input type="text" class="form-control" id="Name" name="Name" asp-for="Name" value="@Model.Name" required>
-            }
-            else
-            {
-                <input type="text" class="form-control" id="Name" name="Name" asp-for="Name" readonly value="@Model.Name" required>
-            }
-            
-            <div class="invalid-feedback">Please enter the Name.</div>
-        </div>
-
-        <!-- Class -->
-        <div class="form-group">
-            <label for="ClassId">Class*:</label>
-            <select class="form-control" id="ClassId" name="ClassId" asp-for="ClassId" required readonly>
-                <option value="@ViewBag.Class.Id">@ViewBag.Class.Name</option>
-            </select>
-            <div class="invalid-feedback">Please select a Class.</div>
-        </div>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <div class="form-group mb-3">
+                <label for="Name">Name*:</label>
+                <input type="text" class="form-control" id="Name" name="Name" asp-for="Name" value="@Model.Name" readonly required>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        }
+        <!-- Group Name -->
+        @if (pageAcess.CanUpdate)
+        {
+            <div class="form-group">
+                <label for="GroupName">Group Name:</label>
+                <input type="text" class="form-control" id="GroupName" name="GroupName" asp-for="GroupName" value="@Model.GroupName" required>
+                <span asp-validation-for="GroupName" class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label for="GroupName">Group Name:</label>
+                <input type="text" class="form-control" id="GroupName" name="GroupName" asp-for="GroupName" value="@Model.GroupName" readonly required>
+                <span asp-validation-for="GroupName" class="text-danger"></span>
+            </div>
+        }
 
         <!-- Description -->
-        <div class="form-group">
-            <label for="Description">Description:</label>
-            @if (ViewBag.Leader){
+        @if (pageAcess.CanUpdate)
+        {
+            <div class="form-group">
+                <label for="Description">Description:</label>
                 <textarea class="form-control" id="Description" name="Description" asp-for="Description" value="@Model.Description"></textarea>
-            }else{
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label for="Description">Description:</label>
                 <textarea class="form-control" id="Description" name="Description" asp-for="Description" readonly value="@Model.Description"></textarea>
-            }
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+        }
+        <!-- Class -->
+        <div class="form-group">
+            <label for="Class">Class*:</label>
+            <select class="form-control" id="ClassId" name="ClassId" asp-for="ClassId" required>
+                <option value="@Model.ClassId">@ViewBag.Class</option>
+            </select>
         </div>
 
         <!-- Status -->
-        <div class="form-group">
-            <label for="statusToggle">Status</label>
-            <div class="form-check form-switch">
-                <input type="hidden" name="Status" value="false" id="StatusId" />
-                @if (ViewBag.Leader)
-                {
-                    <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" onchange="changeStatus()" @((bool)Model.Status ? "checked" :"") />
-                }
-                else
-                {
-                    <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" onchange="changeStatus()" disabled @((bool)Model.Status ? "checked" :"")/>
-                }
+        <label for="Status">Status:</label>
+        <br />
+        @if (pageAcess.CanUpdate)
+        {
+            <div class="form-check" style="display: inline-block; margin-right: 10px;">
+                <input class="form-check-input" type="radio" name="status" value="true" @(Model.Status.Value ? "checked" : "")>
+                <label class="form-check-label" asp-for="Status">
+                    True
+                </label>
             </div>
-        </div>
+            <div class="form-check" style="display: inline-block;">
+                <input class="form-check-input" type="radio" name="status" value="false" @(!Model.Status.Value ? "checked" : "")>
+                <label class="form-check-label" asp-for="Status">
+                    False
+                </label>
+            </div>
+        }
+        else
+        {
+            <div class="form-check" style="display: inline-block; margin-right: 10px;">
+                <input class="form-check-input" type="radio" name="status" value="true" disabled readonly @(Model.Status.Value ? "checked" : "")>
+                <label class="form-check-label" asp-for="Status">
+                    True
+                </label>
+            </div>
+            <div class="form-check" style="display: inline-block;">
+                <input class="form-check-input" type="radio" name="status" value="false" disabled readonly @(!Model.Status.Value ? "checked" : "")>
+                <label class="form-check-label" asp-for="Status">
+                    False
+                </label>
+            </div>
+        }
 
         <br />
         <!-- Button submit -->
-        @if (ViewBag.Leader)
+        @if (pageAcess.CanUpdate)
         {
-            <button type="submit" class="btn btn-primary" id="btnSubmit">Update Project</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Update Project</button>
         }
     </form>
 </div>
-@Html.Partial("_ConfirmPartial", confirmMessage)
-
-<script>
-    function changeStatus() {
-        var statusToggle = document.getElementById('statusToggle');
-        var statusId = document.getElementById('StatusId');
-        statusId.value = statusToggle.checked ? "true" : "false";
-    }
-</script>

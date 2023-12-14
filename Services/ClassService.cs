@@ -152,6 +152,11 @@ namespace IMS.Services
         {
             return _context.Users.Include(u => u.ClassesNavigation).FirstOrDefault(u => u.Id == studentId).ClassesNavigation;
         }
+
+        public IEnumerable<Class> GetClassesByTeacher(int teacherId)
+        {
+            return _context.Users.Include(u => u.Classes).ThenInclude(c => c.Students).FirstOrDefault(u => u.Id == teacherId).Classes;
+        }
     }
 }
             

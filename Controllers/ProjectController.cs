@@ -19,7 +19,7 @@ namespace IMS.Controllers
 
         [Route("List")]
         [CustomAuthorize]
-        public IActionResult Index(int? pageNumber, bool? filterByStatus, string? searchByName)
+        public IActionResult Index(int? pageNumber, int? filterByClass, bool? filterByStatus, string? searchByName, [FromServices]IChkPgAcessService chkPgAcess)
         {
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
@@ -30,20 +30,27 @@ namespace IMS.Controllers
             if (user.Role.Value == RoleUser.Admin)
             {
                 projects = _projectService.GetAllProject();
+                ViewBag.ClassList = _classService.GetClasses();
             }
             if (user.Role.Value == RoleUser.Student) 
             {
                 projects = _projectService.GetProjectByStudent(user.Id);
+                ViewBag.ClassList = _classService.GetClassesByTeacher(user.Id);
             }
             if (user.Role.Value == RoleUser.Teacher)
             {
                 projects = _projectService.GetProjectByTeacher(user.Id);
+                ViewBag.ClassList = _classService.GetClassesByTeacher(user.Id);
             }
 
-            // Filter và hoặc search -> quay về trang đầu
             if (filterByStatus != null)
             {
                 projects = projects.Where(p => p.Status == filterByStatus).ToList();
+            }
+
+            if (filterByClass != null)
+            {
+                projects = projects.Where(p => p.ClassId == filterByClass).ToList();
             }
 
             if (!string.IsNullOrEmpty(searchByName))
@@ -54,8 +61,8 @@ namespace IMS.Controllers
             ViewBag.SearchValue = searchByName;
             ViewBag.ProjectList = paginate.GetListPaginate(projects);
             ViewBag.Action = "Index";
-            ViewBag.User = user.Email;
             ViewBag.Pagination = paginate.GetPagination();
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
             return View();
         }
 
@@ -82,7 +89,8 @@ namespace IMS.Controllers
         public IActionResult CreateProject()
         {
             User user = HttpContext.Session.GetUser();
-            ViewBag.ClassList = _classService.GetClassesByStudent(5);
+            List<Class> classList = _classService.GetClassesByTeacher(user.Id).ToList();
+            ViewBag.ClassList = classList;
             return View();
         }
 
@@ -96,7 +104,6 @@ namespace IMS.Controllers
             }
 
             User user = HttpContext.Session.GetUser();
-            ViewBag.ClassList = _classService.GetClassesByStudent(5);
 
             if (!ModelState.IsValid)
             {
@@ -107,6 +114,7 @@ namespace IMS.Controllers
             {
                 Name = projectView.Name,
                 ClassId = projectView.ClassId,
+                GroupName = projectView.GroupName,
                 Description = projectView.Description,
                 Status = projectView.Status,
             };
@@ -128,7 +136,7 @@ namespace IMS.Controllers
 
         [Route("Detail")]
         [CustomAuthorize]
-        public IActionResult ProjectDetail(int id)
+        public IActionResult ProjectDetail(int id, [FromServices] IChkPgAcessService chkPgAcess)
         {
             Project project = _projectService.GetProject(id);
             ProjectViewModel projectVM = new ProjectViewModel()
@@ -136,6 +144,8 @@ namespace IMS.Controllers
                 Id = id,
                 ClassId = project.ClassId,
                 Description = project.Description,
+                GroupName = project.GroupName,
+                
                 Name = project.Name,
                 Status = project.Status,
             };
@@ -148,8 +158,8 @@ namespace IMS.Controllers
             {
                 ViewBag.Leader = false;
             }
-            ViewBag.Class = _classService.GetClass((int)project.ClassId);
-
+            ViewBag.Class = _classService.GetClass((int)project.ClassId).Name;
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
             return View(projectVM);
         }
 
@@ -162,7 +172,7 @@ namespace IMS.Controllers
             }
 
             User user = HttpContext.Session.GetUser();
-            ViewBag.ClassList = _classService.GetClassesByStudent(user.Id);
+            //ViewBag.ClassList = _classService.GetClassesByStudent(user.Id);
 
             if (!ModelState.IsValid)
             {
@@ -172,6 +182,7 @@ namespace IMS.Controllers
             Project project = _projectService.GetProject((int)projectView.Id);
             project.Description = projectView.Description;
             project.Name = projectView.Name;
+            project.GroupName = projectView.GroupName;
             project.Status = projectView.Status;
             Class c = _classService.GetClass((int)project.ClassId);
 
@@ -180,7 +191,6 @@ namespace IMS.Controllers
                 errorMessage.Error = "You have been created a project with name " + project.Name + " in class " + c.Name;
                 return RedirectToAction("ProjectDetail", new { id = project.Id });
             }
-
             _projectService.UpdateProject(project);
             errorMessage.Success = "Update project success!";
             return RedirectToAction("ProjectDetail", new { id = project.Id } );
@@ -212,10 +222,11 @@ namespace IMS.Controllers
         }
 
         [Route("IssueSetting")]
-        public IActionResult IssueSetting(string? searchString, int projectId)
+        public IActionResult IssueSetting(string? searchString, int id)
         {
+            ViewBag.ProjectId = id;
             User u = HttpContext.Session.GetUser();
-            Project p = _projectService.GetProject(projectId);
+            Project p = _projectService.GetProject(id);
             if (p.LeaderId == u.Id)
             {
                 ViewBag.CanAdd = true;
@@ -225,9 +236,9 @@ namespace IMS.Controllers
                 ViewBag.CanAdd = false;
             }
 
-            ViewBag.ProjectId = projectId;
+            ViewBag.ProjectId = id;
 
-            List<IssueSetting> issueSettings = _isDAO.GetIssueSettingByProject(projectId);
+            List<IssueSetting> issueSettings = _isDAO.GetIssueSettingByProject(id);
             if (!string.IsNullOrEmpty(searchString))
             {
                 issueSettings = issueSettings.Where(item => item.Type.ToLower().Contains(searchString.ToLower())
