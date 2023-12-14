@@ -16,6 +16,49 @@ namespace IMS.Services
             if (user != null) return true; else return false;
             
         }
+        public bool AddStudentToClass(int classId, string email)
+        {
+            var @class = _context.Classes.FirstOrDefault(c=> c.Id ==classId);
+            var student = _context.Users.FirstOrDefault(u=> u.Email == email);
+
+            if (@class == null || student == null)
+            {
+                return false; 
+            }
+
+            if (@class.Students.Contains(student))
+            {
+                return false;
+            }
+
+            @class.Students.Add(student);
+
+            _context.SaveChanges();
+
+            return true; 
+        }
+        public bool RemoveStudentFromClass(int classId, string email)
+        {
+            var @class = _context.Classes.FirstOrDefault(c => c.Id == classId);
+            var student = _context.Users.FirstOrDefault(u => u.Email == email);
+
+            if (@class == null || student == null)
+            {
+                return false; 
+            }
+
+            if (!@class.Students.Contains(student))
+            {
+                return false;
+            }
+
+            @class.Students.Remove(student);
+
+            _context.SaveChanges();
+
+            return true; 
+        }
+
         public List<Milestone> GetMilestone(int id)
         {
             var milestone = _context.Milestones.Where(m => m.ClassId == id).ToList();

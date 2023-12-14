@@ -18,7 +18,7 @@ namespace IMS.Models
         public int? ProjectId { get; set; }
         public int ClassId { get; set; }
         public int? AssignmentId { get; set; }
-
+        public bool? Status { get; set; }
         public virtual Assignment? Assignment { get; set; }
         public virtual Class Class { get; set; } = null!;
         public virtual Project? Project { get; set; }

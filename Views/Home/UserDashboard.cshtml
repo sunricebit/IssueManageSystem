@@ -2,10 +2,7 @@
 @{
     ViewData["Title"] = "User Dashboard";
     var statusData = ViewBag.StatusData;
-    var categoryData = ViewBag.CategoryData;
-    var topAuthorsData = ViewBag.TopAuthorsData;
-  //  var categoryPostCounts = ViewBag.CategoryPostCounts as IEnumerable<CategoryPostCount>;
- //   var authorPostCounts = ViewBag.authorPostCounts as IEnumerable<AuthorPostCount>;
+  
 }
 
 <div style="width: 80%; margin: auto;">
@@ -22,12 +19,18 @@
         };
 
         statusData.forEach(function (post) {
-            if (post.IsPublic.toString().toLowerCase() === "true") {
-                statusCount.Published++;
+            // Check if post and IsPublic are defined
+            if (post && post.hasOwnProperty('isPublic')) {
+                if ( post.isPublic===true) {
+                    statusCount.Published++;
+                } else {
+                    statusCount.Draft++;
+                }
             } else {
-                statusCount.Draft++;
+                // Handle the case when IsPublic is not defined in the post object
+                // You may choose to ignore such posts or handle them differently
+                console.error("IsPublic is not defined in the post object:", post);
             }
-         
         });
 
         var statusChartCanvas = document.getElementById('statusChart').getContext('2d');

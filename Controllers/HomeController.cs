@@ -11,10 +11,11 @@ public class HomeController : Controller
     private readonly IUserService _userService;
     private readonly ICommonService _commonService;
 
-    public HomeController(ILogger<HomeController> logger,IUserService userService)
+    public HomeController(ILogger<HomeController> logger,IUserService userService,ICommonService commonService)
     {
         _userService = userService;
         _logger = logger;
+        _commonService = commonService;
     }
 
     [Route("")]
@@ -44,11 +45,6 @@ public class HomeController : Controller
         var user = HttpContext.Session.GetUser();
        
         ViewBag.StatusData = _userService.GetPost(user.Id);
-        //var categoryPostCounts = _commonService.GetSystemPublishedPostsByCategories();
-        //ViewBag.CategoryPostCounts = categoryPostCounts;
-        //var authorPostCounts = _commonService.GetSystemPublishedPostsByTopAuthors();
-        //ViewBag.AuthorPostCounts = authorPostCounts;
-
         return View("UserDashboard");
     }
 

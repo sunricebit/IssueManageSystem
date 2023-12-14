@@ -13,9 +13,11 @@
         <a asp-action="People" asp-controller="Class" asp-route-id="@Model.Id" class="btn btn-outline-primary text-decoration-none">People</a>
         <a asp-action="Milestones" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Milestone</a>
         <a asp-action="IssueSetting" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Issue Setting</a>
+        <input type="hidden" id="classid" value="@Model.Id" />
     </div>
     <h1>Class @Model.Name</h1>
-    <h2>Teacher: @ViewBag.Teacher.Name</h2>
+    
+    
 <div class="card mb-4">
     <div class="card-header d-flex justify-content-between align-items-center">
         <div>
@@ -25,7 +27,7 @@
         
         
             <div class="col-md-auto">
-                <a class="btn btn-primary">
+                <a class="btn btn-primary" onclick="openPopupAddStudent()">
                     <i class="fas fa-plus"></i> New
                 </a>
             </div>
@@ -35,9 +37,7 @@
         <div class="mb-3 row">
 
             <form asp-controller="User" asp-action="Index" method="get" id="FilterAndSearchForm">
-                <div class="row">
-                    <input type="hidden" id="pageNumber" name="pageNumber" />
-                   
+                <div class="row"> 
                     <div class="col-md-4 mb-3">
                         <label for="StatusFilter" class="form-label">Filter by Status:</label>
                         <select id="StatusFilter" class="form-select" name="filterbyStatus">
@@ -91,21 +91,21 @@
                             @if (@student.Status == true)
                             {
                                 <td>
-                                    <form asp-action="ToggleStatus" asp-route-id="@student.Id" method="post">
-                                        <button type="submit" class="btn btn-success btn-sm" >
+                                    <a>
+                                        <button  class="btn btn-success btn-sm" >
                                             Active
                                         </button>
-                                    </form>
+                                    </a>
                                 </td>
                             }
                             else
                             {
                                 <td>
-                                    <form asp-action="ToggleStatus" asp-route-id="@student.Id" method="post">
-                                        <button type="submit" class="btn btn-secondary btn-sm" >
+                                    <a >
+                                        <button  class="btn btn-secondary btn-sm" >
                                             Deactive
                                         </button>
-                                    </form>
+                                    </a>
                                 </td>
                             }
                             <td>
@@ -113,15 +113,76 @@
                                     <a asp-action="Details" asp-route-id="@student.Id" asp-controller="User" class="btn btn-info">
                                         <i class="fas fa-eye"></i> Details
                                     </a>
-
+                                        <form asp-action="RemoveStudent" asp-route-id="@Model.Id" asp-route-email="@student.Email" asp-controller="Class" method="post" onsubmit="">
+                                            <button type="submit" class="btn btn-danger" >
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </form>
                                 </div>
                             </td>
                         </tr>
                     }
                 </tbody>
             </table>
-            @Html.Partial("_PaginationPartial", pagination)
         </div>
     </div>
 </div>
 </div>
+<div class="modal" id="exampleModal" tabindex="-1" style="background-color: #2220208c">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup()"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form for Milestone input -->
+                <form id="milestoneForm" onsubmit="addstudent(event)">
+                    <div class="mb-3">
+                        <label for="Name/Email" class="form-label">Email*</label>
+                        <input type="text" class="form-control" id="Email" required>
+                    </div>
+                    
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup()">Close</button>
+
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function openPopupAddStudent() {
+        var popup = document.getElementById("exampleModal");
+        document.getElementById("Email").value = "";
+      
+        popup.style.display = 'block';
+    }
+
+    function closePopup() {
+        var popup = document.getElementById("exampleModal");
+        popup.style.display = 'none';
+    }
+
+    function addstudent(event) {
+        event.preventDefault();
+
+        var formData = {
+            Name: document.getElementById("Email").value,
+            ClassId: document.getElementById("classid").value
+        };
+
+        $.ajax({
+            url: "/Class/AddStudent",
+            method: "POST",
+            data: formData,
+            success: function (response) {
+                closePopup();
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    }
+</script>

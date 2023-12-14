@@ -6,5 +6,7 @@ namespace IMS.Services
     {
         public IEnumerable<AuthorPostCount> GetSystemPublishedPostsByTopAuthors();
         public IEnumerable<CategoryPostCount> GetSystemPublishedPostsByCategories();
+        public IEnumerable<Setting> GetCategory();
+        public List<int> userPostByCategory(int categoryId, int authorId);
     }
 }

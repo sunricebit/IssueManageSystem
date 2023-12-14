@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using IMS.Models;
 using IMS.Services;
@@ -188,11 +189,10 @@ namespace IMS.Controllers
             return RedirectToAction("Index");
         }
         [HttpGet("People/{id}")]
-        public IActionResult People(int? pageNumber,int id, bool? filterbyStatus, string? searchByValue)
+        public IActionResult People(int id,int page = 1, int pageSize = 5, string searchTerm = "", string filterCat = "", string filterAuthor = "")
         {
 
-            int tempPageNumber = pageNumber ?? 1;
-            int tempPageSize = 5;
+            
             
             Dictionary<string, dynamic> filter = new Dictionary<string, dynamic>(), search = new Dictionary<string, dynamic>();
 
@@ -211,36 +211,16 @@ namespace IMS.Controllers
                 IssueSettings = Class.IssueSettings
             };
             User teacher = _classService.GetTeacherById(Class.TeacherId?? 0);
-            if (filterbyStatus != null && !filterbyStatus.Equals("All"))
-            {
-                filter.Add("Status", filterbyStatus);
-            }
-            if (!string.IsNullOrEmpty(searchByValue))
-            {
-                search.Add("Name", searchByValue);
-                search.Add("Email", searchByValue);
-                search.Add("Phone", searchByValue);
-            }
             
             IEnumerable<User> students = _classService.GetStudent(id);
-            Paginate<User> paginate = new Paginate<User>(tempPageNumber, tempPageSize);
-            List<User> student = new List<User>();
             
             ViewBag.Teacher = teacher;
-            foreach (var user in paginate.GetListPaginate<User>(filter, search))
-            {
-                foreach(var student2 in students)
-                {
-                    student.Add(_userService.GetUser(student2.Id));
-                }   
-                       
-            }
-            ViewBag.Student = student;
-            ViewBag.StatusValue = filterbyStatus;
-            ViewBag.SearchValue = searchByValue;
+            
+            ViewBag.Student = students;
             ViewBag.Action = "People";
-            ViewBag.Teacher = teacher;
-            ViewBag.Pagination = paginate.GetPagination();
+           
+            Pagination(page, pageSize, students, searchTerm);
+
             return View("People",ClassViewModel);
         }
         [HttpGet("Milestones/{id}")]
@@ -308,6 +288,54 @@ namespace IMS.Controllers
             
             return RedirectToAction("Index");
         }
+        [HttpPost("AddStudent")]
+        public IActionResult AddStudent(int ClassId, string Name)
+        {
+            _classService.AddStudentToClass(ClassId, Name);
+            return RedirectToAction("Index");
+        }
+        [HttpPost("People/{id}")]
+        public IActionResult RemoveStudent(int id,string email)
+        {
+            Class Class = _classService.GetClass(id);
+            ClassViewModel ClassViewModel = new ClassViewModel()
+            {
+                Id = Class.Id,
+                Name = Class.Name,
+                Description = Class.Description,
+                TeacherId = Class.TeacherId,
+                SubjectId = Class.SubjectId,
+                IsActive = Class.IsActive,
+                Teacher = Class.Teacher,
+                Subject = Class.Subject,
+                Milestones = Class.Milestones,
+                IssueSettings = Class.IssueSettings
+            };
+            User teacher = _classService.GetTeacherById(Class.TeacherId ?? 0);
 
+            IEnumerable<User> students = _classService.GetStudent(id);
+
+            ViewBag.Teacher = teacher;
+
+            ViewBag.Student = students;
+            _classService.RemoveStudentFromClass(id, email);
+            return View("People",ClassViewModel);
+        }
+
+        public void Pagination(int page, int pageSize, IEnumerable<User> UserList, string searchTerm)
+        {
+
+            
+            var totalItems = UserList.Count();
+            var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            var itemsOnPage = UserList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+            ViewBag.Search = searchTerm;
+            ViewBag.PostList = itemsOnPage;
+        }
+        
     }
 }

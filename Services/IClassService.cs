@@ -18,5 +18,7 @@ namespace IMS.Services
         public IEnumerable<User> GetStudent(int classId);
         public List<Milestone> GetMilestone(int id);
         public int GetSubjectId(string name);
+        public bool AddStudentToClass(int classId, string email);
+        public bool RemoveStudentFromClass(int classId, string email);
     }
 }

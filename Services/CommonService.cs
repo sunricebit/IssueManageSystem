@@ -25,6 +25,23 @@ namespace IMS.Services
 
             return categoryPostCounts;
         }
+        public IEnumerable<Setting> GetCategory()
+        {
+            var category = _context.Settings.Where(s => s.Type == "POST_CATEGORY").ToList();
+            return category ?? Enumerable.Empty<Setting>();
+        }
+        public List<int> userPostByCategory(int categoryId, int authorId)
+        {
+            var userPostsByCategories = new List<int>();
+            var categorys = _context.Settings.Where(s => s.Type == "POST_CATEGORY").ToList();
+            foreach (var category in categorys)
+            {
+                var postCount = _context.Posts.Count(p => p.CategoryId == category.Id && p.AuthorId == authorId);
+                userPostsByCategories.Add(postCount);
+            }
+            return userPostsByCategories;
+
+        }
         public IEnumerable<AuthorPostCount> GetSystemPublishedPostsByTopAuthors()
         {
             var authorPostCounts = _context.Posts

@@ -308,6 +308,7 @@ namespace IMS.Models
                 entity.Property(e => e.StartDate).HasColumnType("datetime(3)");
 
                 entity.Property(e => e.Title).HasColumnType("text");
+                entity.Property(e => e.Status).HasDefaultValueSql("'1'");
 
                 entity.HasOne(d => d.Assignment)
                     .WithMany(p => p.Milestones)
