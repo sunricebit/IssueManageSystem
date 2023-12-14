@@ -77,44 +77,97 @@
         }
         else
         {
-            <div class="form-group">
-                <label for="Value">Value*:</label>
-                <input type="text" class="form-control" id="Value" name="Value" asp-for="Value" required value="@Model.Value">
-                <span asp-validation-for="Value" class="text-danger"></span>
-            </div>
+            @if (pageAcess.CanUpdate)
+            {
+                <div class="form-group">
+                    <label for="Value">Value*:</label>
+                    <input type="text" class="form-control" id="Value" name="Value" asp-for="Value" required value="@Model.Value">
+                    <span asp-validation-for="Value" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    <label for="Value">Value*:</label>
+                    <input type="text" class="form-control" id="Value" name="Value" asp-for="Value" readonly required value="@Model.Value">
+                    <span asp-validation-for="Value" class="text-danger"></span>
+                </div>
+            }
         }
 
         <!-- Order -->
-        <div class="form-group">
-            <label for="Order">Order*:</label>
-            <input type="text" class="form-control" id="Order" name="Order" asp-for="Order">
-            <span asp-validation-for="Order" class="text-danger"></span>
-        </div>
+        @if (pageAcess.CanUpdate)
+        {
+            <div class="form-group">
+                <label for="Order">Order*:</label>
+                <input type="text" class="form-control" id="Order" name="Order" asp-for="Order" value="@Model.Order">
+                <span asp-validation-for="Order" class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label for="Order">Order*:</label>
+                <input type="text" class="form-control" id="Order" name="Order" asp-for="Order" value="@Model.Order" readonly>
+                <span asp-validation-for="Order" class="text-danger"></span>
+            </div>
+        }
 
         <!-- Description -->
-        <div class="form-group">
-            <label for="Description">Description:</label>
-            <textarea class="form-control" id="Description" name="Description" asp-for="Description" value="@Model.Description"></textarea>
-        </div>
+        @if (pageAcess.CanUpdate)
+        {
+            <div class="form-group">
+                <label for="Description">Description:</label>
+                <textarea class="form-control" id="Description" name="Description" asp-for="Description" value="@Model.Description"></textarea>
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label for="Description">Description:</label>
+                <textarea class="form-control" id="Description" name="Description" asp-for="Description" readonly value="@Model.Description"></textarea>
+            </div>
+        }
 
         <!-- Status -->
-        <label for="Status">Status:</label><br />
-        <div class="form-check" style="display: inline-block; margin-right: 10px;">
-            <input class="form-check-input" type="radio" name="status" value="true" @(Model.Status ? "checked" : "")>
-            <label class="form-check-label" asp-for="Status">
-                True
-            </label>
-        </div>
-        <div class="form-check" style="display: inline-block;">
-            <input class="form-check-input" type="radio" name="status" value="false" @(!Model.Status ? "checked" : "")>
-            <label class="form-check-label" asp-for="Status">
-                False
-            </label>
-        </div>
+        <label for="Status">Status:</label>
+        <br />
+        @if (pageAcess.CanUpdate)
+        {
+            <div class="form-check" style="display: inline-block; margin-right: 10px;">
+                <input class="form-check-input" type="radio" name="status" value="true" @(Model.Status ? "checked" : "")>
+                <label class="form-check-label" asp-for="Status">
+                    True
+                </label>
+            </div>
+            <div class="form-check" style="display: inline-block;">
+                <input class="form-check-input" type="radio" name="status" value="false" @(!Model.Status ? "checked" : "")>
+                <label class="form-check-label" asp-for="Status">
+                    False
+                </label>
+            </div>
+        }
+        else{
+                <div class="form-check" style="display: inline-block; margin-right: 10px;">
+                    <input class="form-check-input" type="radio" name="status" value="true" readonly @(Model.Status ? "checked" : "")>
+                    <label class="form-check-label" asp-for="Status">
+                        True
+                    </label>
+                </div>
+                <div class="form-check" style="display: inline-block;">
+                    <input class="form-check-input" type="radio" name="status" value="false" readonly @(!Model.Status ? "checked" : "")>
+                <label class="form-check-label" asp-for="Status">
+                        False
+                    </label>
+                </div>
+        }
 
         <br />
         <!-- Button submit -->
-        <button type="submit" class="btn btn-primary" id="btnSubmit" style="display: inline-block; margin-right: 10px;">Update Setting</button>
+        @if (pageAcess.CanUpdate)
+        {
+            <button type="submit" class="btn btn-primary" id="btnSubmit" style="display: inline-block; margin-right: 10px;">Update Setting</button>
+        }
         <a class="btn btn-primary" href="@Url.Action("SettingList")" style="display: inline-block;">Back To Setting List</a>
     </form>
 </div>

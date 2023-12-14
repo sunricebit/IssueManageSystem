@@ -134,6 +134,7 @@ namespace IMS.Controllers
             ViewBag.Roles = role;
             return View(new UserViewModel());
         }
+
         [HttpPost("Create")]
         public async Task<IActionResult> Create(UserViewModel? userView, IFormFile avatarFile)
         {
