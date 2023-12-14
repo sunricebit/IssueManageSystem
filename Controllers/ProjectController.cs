@@ -1,4 +1,6 @@
-﻿using IMS.ViewModels.Validation;
+﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using IMS.ViewModels.Milestone;
+using IMS.ViewModels.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMS.Controllers
@@ -9,12 +11,14 @@ namespace IMS.Controllers
         private readonly IProjectService _projectService;
         private readonly IClassService _classService;
         private readonly IssueSettingDAO _isDAO;
+        private readonly IMilestoneService _milestoneService;
 
-        public ProjectController(IProjectService projectService, IClassService classService, IssueSettingDAO isDAO)
+        public ProjectController(IProjectService projectService, IClassService classService, IssueSettingDAO isDAO, IMilestoneService milestoneService)
         {
             _projectService = projectService;
             _classService = classService;
             _isDAO = isDAO;
+            _milestoneService = milestoneService;
         }
 
         [Route("List")]
@@ -222,19 +226,12 @@ namespace IMS.Controllers
         }
 
         [Route("IssueSetting")]
+        [CustomAuthorize]
         public IActionResult IssueSetting(string? searchString, int id)
         {
             ViewBag.ProjectId = id;
             User u = HttpContext.Session.GetUser();
             Project p = _projectService.GetProject(id);
-            if (p.LeaderId == u.Id)
-            {
-                ViewBag.CanAdd = true;
-            }
-            else
-            {
-                ViewBag.CanAdd = false;
-            }
 
             ViewBag.ProjectId = id;
 
@@ -263,6 +260,74 @@ namespace IMS.Controllers
             _isDAO.UpdateIssueSetting(issueSetting);
 
             return RedirectToAction("IssueSetting", new { projectId = projectId });
+        }
+
+        [HttpGet("Milestones/{id}")]
+        [CustomAuthorize]
+        public IActionResult ProjectMilestone(int id, string searchString, [FromServices] IChkPgAcessService chkPgAcess)
+        {
+            var milestone = _classService.GetMilestoneByProject(id);
+            var project = _projectService.GetProject(id);
+            if (project == null)
+            {
+                return NotFound();
+            }
+            ProjectViewModel projectViewModel = new ProjectViewModel()
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                ClassId = project.ClassId,
+                GroupName = project.GroupName,
+                Status = project.Status,
+            };
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                milestone = milestone.Where(item => item.Title.ToLower().Contains(searchString.ToLower())).ToList();
+            }
+            ViewBag.MilestoneList = milestone;
+            return View(projectViewModel);
+        }
+
+        [HttpPost("CreateMilestone")]
+        public IActionResult CreateMilestone(MilestoneViewModel model)
+        {
+            var project = _projectService.GetProject((int)model.ProjectId);
+            Milestone milestone = new Milestone()
+            {
+                Title = model.Title,
+                Description = model.Description,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                ClassId = project.ClassId,
+                ProjectId = model.ProjectId,
+            };
+            _milestoneService.AddMilestone(milestone);
+            return RedirectToAction("ProjectMilestone");
+        }
+
+        [HttpPost("ClosedMilestone")]
+        public IActionResult CloseMilestone(int id)
+        {
+            var milestone = _milestoneService.GetMilestone(id);
+
+            milestone.Status = !milestone.Status;
+            var project = _projectService.GetProject(id);
+            _milestoneService.UpdateMilestone(milestone);
+            ProjectViewModel projectViewModel = new ProjectViewModel()
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                ClassId = project.ClassId,
+                GroupName = project.GroupName,
+                Status = project.Status,
+            };
+            IEnumerable<Milestone> Milestone = _classService.GetMilestoneByProject(id);
+            ViewBag.MilestoneList = Milestone;
+            return View("ProjectMilestone", projectViewModel);
         }
     }
 }
