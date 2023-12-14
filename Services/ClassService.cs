@@ -39,7 +39,7 @@ namespace IMS.Services
         }
         public Class GetClass(int id)
         {
-            return _context.Classes.Include(c => c.Subject).Include(c => c.Students).Include(c => c.Teacher).Include(c => c.Milestones).Include(c => c.IssueSettings).FirstOrDefault(c => c.Id == id);
+            return _context.Classes.Include(c => c.Subject).Include(c => c.Students).Include(c => c.Teacher).Include(c => c.Milestones).FirstOrDefault(c => c.Id == id);
         }
         public IEnumerable<User> GetStudent(int classId) 
         {

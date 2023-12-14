@@ -26,7 +26,7 @@
                 </div>
                 <div class="form-group mb-4">
                     <label asp-for="Excerpt" class="control-label">Excerpt*</label>
-                <input asp-for="Excerpt" id="excerptInput" class="form-control" />
+                <textarea asp-for="Excerpt" id="excerptInput" class="form-control" ></textarea>
                 <span id="excerptError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
             </div>
             <div class="form-group mb-4 d-flex">
@@ -108,6 +108,21 @@
         else {
             // Validation thành công, tiếp tục submit form
             document.forms["form"].submit();
+        }
+    }
+
+    function displaySelectedImage(event, elementId) {
+        const selectedImage = document.getElementById(elementId);
+        const fileInput = event.target;
+
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                selectedImage.src = e.target.result;
+            };
+
+            reader.readAsDataURL(fileInput.files[0]);
         }
     }
 </script>

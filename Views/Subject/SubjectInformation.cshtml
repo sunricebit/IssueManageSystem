@@ -22,24 +22,21 @@
             </div>
 
             <div class="form-group mb-3">
-                @Html.LabelFor(model => model.Description, new { @class = "control-label mb-1" })
-                @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.IsActive, new { @class = "control-label" })
-                <div class="input-group">
-                    <span class="input-group-prepend">
-                        @Html.CheckBoxFor(model => model.IsActive)
-                    </span>
-                </div>
-            </div>
-
-            <div class="form-group mb-3">
                 @Html.LabelFor(model => model.SubjectManagerId, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
                 @Html.DropDownListFor(model => model.SubjectManagerId, ViewBag.SubjectManagers as SelectList, new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.SubjectManagerId, "", new { @class = "text-danger" })
             </div>
+
+            <div class="form-group mb-3">
+                @Html.RadioButtonFor(model => model.IsActive, true, new { @id = "isActive" }) Active
+                @Html.RadioButtonFor(model => model.IsActive, false, new { @id = "isActive", @class = "ml-4" }) Deactive
+            </div>
+
+            <div class="form-group mb-3">
+                @Html.LabelFor(model => model.Description, new { @class = "control-label mb-1" })
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control" })
+            </div>
+
 
             @if (!string.IsNullOrEmpty(ViewBag.Success))
             {

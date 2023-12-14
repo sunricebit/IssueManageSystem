@@ -1,0 +1,111 @@
+﻿@{
+    ViewData["Title"] = "Project List";
+    Pagination pagination = ViewBag.Pagination;
+}
+
+<div class="container-fluid px-4">
+    <ul class="nav nav-tabs mt-4">
+        <li class="nav-item">
+            <a class="nav-link class="text-primary" asp-controller="Project" asp-action="IssueSetting">Milestone</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link class="text-primary" asp-controller="Project" asp-action="IssueSetting">Assignments</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link class="text-primary" asp-controller="Project" asp-action="IssueSetting">Assignments</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link class="text-white bg-primary" asp-controller="Project" asp-action="IssueSetting">Issue Setting</a>
+        </li>
+    </ul>
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="mt-4">Project Issue Setting</h1>
+    </div>
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fa-solid fa-list me-1"></i>
+                Project Issue Setting
+            </div>
+            <div class="col-md-auto">
+                <a class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Issue Setting
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            <form asp-controller="Project" asp-action="SearchIssueSetting" method="get">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="keyword" class="form-label">Search:</label>
+                        <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Search Page</button>
+                    </div>
+                </div>
+            </form>
+            <table class="table" id="issueSettingTable" style="table-layout: fixed">
+                <tbody>
+                    <tr>
+                        <td class="label-column">
+                            <a data-html="true" class="badge badge-pill issue-label" style="background-color: #dc143c">
+                                <span data-container="body" data-html="true" style="background-color: #dc143c">Defect</span>
+                                <span data-container="body" data-html="true" style="background-color: #ffffff">Create</span>
+                            </a>
+                        </td>
+                        
+                        <td class="description-column">Decription s</td>
+                        <td class="action-column">
+                            <form asp-action="ToggleStatusIssue" method="post">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Active
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label-column">
+                            <a data-html="true" class="badge badge-pill issue-label" style="background-color: #dc143c">
+                                <span data-container="body" data-html="true" style="background-color: #dc143c">Defect</span>
+                                <span data-container="body" data-html="true" style="background-color: #ffffff">Create</span>
+                            </a>
+                        </td>
+
+                        <td style="text-align: left">Decription ss</td>
+                        <td class="action-column">
+                            <form asp-action="ToggleStatusIssue" method="post">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Active
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="label-column">
+                            <a data-html="true" class="badge badge-pill issue-label" style="background-color: #dc143c">
+                                <span data-container="body" data-html="true" style="background-color: #dc143c">Defect</span>
+                                <span data-container="body" data-html="true" style="background-color: #ffffff">Create</span>
+                            </a>
+                        </td>
+
+                        <td style="text-align: left">Decription ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss</td>
+                        <td class="action-column">
+                            <form asp-action="ToggleStatusIssue" method="post">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Active
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            
+
+            @*@Html.Partial("_PaginationPartial", pagination)*@
+        </div>
+    </div>
+</div>

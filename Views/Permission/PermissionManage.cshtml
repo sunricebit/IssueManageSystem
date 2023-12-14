@@ -13,14 +13,18 @@
             Permission Table
         </div>
         <div class="card-body">
-            @if (ViewBag.SuccessMessage != null)
-            {
-                <div class="alert alert-success">
-                    <ul>
-                        <li>@ViewBag.SuccessMessage</li>
-                    </ul>
+            <form asp-controller="Permission" asp-action="SearchPage" method="get">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="keyword" class="form-label">Search:</label>
+                        <input type="text" id="keyword" name="page" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">Search Page</button>
+                    </div>
                 </div>
-            }
+            </form>
+            <br />
             <table class="table table-bordered" id="permissionTable">
                 <thead>
                     <tr>
@@ -36,11 +40,14 @@
                     {
                         <tr>
                             <td><strong>@pageAccess.Page</strong></td>
-                            @foreach(var permission in Model){
+                            @foreach (var permission in Model)
+                            {
                                 <td>
                                     <input type="checkbox" @(permission.PagesAcess.FirstOrDefault(pa => pa.Page == pageAccess.Page).CanAccess ? "checked" : "") /> Can Access <br />
                                     <input type="checkbox" @(permission.PagesAcess.FirstOrDefault(pa => pa.Page == pageAccess.Page).CanAdd ? "checked" : "") /> Can Create <br />
                                     <input type="checkbox" @(permission.PagesAcess.FirstOrDefault(pa => pa.Page == pageAccess.Page).CanUpdate ? "checked" : "") /> Can Update <br />
+                                    <input type="checkbox" @(permission.PagesAcess.FirstOrDefault(pa => pa.Page == pageAccess.Page).CanExport ? "checked" : "") /> Can Export <br />
+                                    <input type="checkbox" @(permission.PagesAcess.FirstOrDefault(pa => pa.Page == pageAccess.Page).CanDelete ? "checked" : "") /> Can Delete <br />
                                 </td>
                             }
                         </tr>
@@ -111,13 +118,17 @@
                 var canAccess = $(cellData).find('input:eq(0)').prop('checked');
                 var canCreate = $(cellData).find('input:eq(1)').prop('checked');
                 var canUpdate = $(cellData).find('input:eq(2)').prop('checked');
+                var canExport = $(cellData).find('input:eq(3)').prop('checked');
+                var canDelete = $(cellData).find('input:eq(4)').prop('checked');
 
                 // Tạo đối tượng PageAccess
                 var pageAccess = {
                     Page: page,
                     CanAccess: canAccess,
                     CanAdd: canCreate,
-                    CanUpdate: canUpdate
+                    CanUpdate: canUpdate,
+                    CanExport: canExport,
+                    CanDelete: canDelete,
                 };
                 // Thêm vào danh sách
                 pageAccessList.push(pageAccess);
@@ -141,15 +152,45 @@
         var permissionData = getPermissionData();
 
         $.ajax({
-            url: '/Permission/Update', 
+            url: '/Permission/Update',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(permissionData),
             success: function (data) {
+                var messageSuccess = "Update permission success"
+                var sucessTimeout
+                if (messageSuccess) {
+                    var notificationSuccess = document.getElementById("_messageSuccess");
+                    notificationSuccess.innerHTML = messageSuccess;
+                    notificationSuccess.style.display = 'block';
+
+                    function closeNotificationSuccess() {
+                        notificationSuccess.innerHTML = "";
+                        notificationSuccess.style.display = 'none';
+                    }
+
+                    if (sucessTimeout) clearTimeout(sucessTimeout);
+                    sucessTimeout = setTimeout(closeNotificationSuccess, 5000);
+                }
             },
             error: function (error) {
                 console.log(error);
             }
         });
+
+        //var form = document.createElement('form');
+        //form.method = 'post';
+        //form.action = '/Permission/Update';
+        //console.log("abc");
+        //var input = document.createElement('input');
+        //input.type = 'hidden';
+        //input.name = 'permissionData';
+        //input.value = JSON.stringify(permissionData);
+
+        //form.appendChild(input);
+        //document.body.appendChild(form);
+
+        //// Submit form
+        //form.submit();
     }
 </script>

@@ -1,37 +1,149 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+<link href="~/css/blog.css" rel="stylesheet" />
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - IMS</title>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+<style>
+   /* body {
+        margin: 0;
+        padding: 0;
+    }*/
+    .container-fluid{
+        margin: 0;
+        padding: 0;
+    }
+    #mainNav {
+        position: fixed;
+        height: 80px;
+    }
 
-</head>
+    #phandungyen {
+        position: fixed;
+        right: 320px;
+    }
+    /* Thêm một khu vực nút để kiểm tra việc cuộn */
+    #buttonMove {
+        margin-top: 700px;
+    }
+</style>
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color:#009999;" id="mainNav">
+    <div class="container">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            Menu
+            <i class="fas fa-bars ms-1"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
+                @if (@ViewBag.CheckAccount == null)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" style="color: white;" href="/landing">HOME</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" style="color: white;" href="/BlankDashboard">HOME</a>
+                    </li>
+                }
+                <li class="nav-item"><a class="nav-link" style="color: white;" id="abc" href="/landing#services">Services</a></li>
+                <li class="nav-item"><a class="nav-link" style="color: white;" id="Team" href="/landing#team">Team</a></li>
+                <li class="nav-item"><a class="nav-link" style="color: #ffc800;" id="BlogList" href="/blog">BlogList</a></li>
+                <li class="nav-item"><a class="nav-link" style="color: white;" id="Contact" href="/landing#contact">Contact</a></li>
+                @if (@ViewBag.CheckAccount == null)
+                {
+                    <li class="nav-item"><a class="nav-link" style="color: white;" href="/auth/sign-in">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" style="color: white;" href="/auth/sign-up">Register</a></li>
+                }
+                else
+                {
+                    <li class="nav-item"><a class="nav-link" style="color: white;" asp-controller="Auth" asp-action="Logout">Logout</a></li>
+                }
 
-<body class="sb-nav-fixed">
-
-        <div id="layoutSidenav_content">
-            <main style="margin-left:50px; width:90%">
-                @RenderBody()
-            </main>
-            <footer class="py-4 bg-light mt-auto" style="position:relative">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Group 1</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-                <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none" id="_messageError" class="alert alert-danger"></div>
-                <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none" id="_messageSuccess" class="alert alert-success"></div>
-            </footer>
+            </ul>
         </div>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+        @*<a href="#menu-toggle" id="menu-toggle" class="navbar-brand"><span class="navbar-toggler-icon"></span></a> <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample02" aria-controls="navbarsExample02" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>*@
 
-</html>
+    </div>
+</nav>
+<div id="wrapper" class="toggled">
+    <!-- Sidebar -->
+    
+
+    <div id="sidebar-wrapper" style="background-color:#f3e7bc; top: 80px;">
+        <form asp-action="Index" method="get">
+              <ul class="sidebar-nav">
+                <li>
+                    <div class="d-flex m-2">
+                        <input class="form-control tm-search-input" type="search" placeholder="Search" aria-label="Search" value="@ViewBag.Search" name="searchTerm" style="border-radius: 7px;">
+                        @* <button class="btn btn-outline-success tm-search-btn" type="submit" style="border-radius: 7px;">
+                        <i class="fas fa-search"></i>
+                        </button>*@
+                    </div>
+                </li>
+            <li>
+                <div class="d-flex m-2">
+                    <select name="filterCat" asp-items="ViewBag.Setting"
+                            class="form-control"
+                            style="border-radius: 7px;height: fit-content;">
+                        <option value="Category" class="form-control">Category</option>
+                    </select>
+                    <button class="btn btn-outline-success" style="border-radius: 7px;">Filter</button>
+                </div> </li>
+            <li>
+                <div class="d-flex m-2">
+                    <select name="filterAuthor" asp-items="ViewBag.Author"
+                            class="form-control"
+                                style="border-radius: 7px;height: fit-content;">
+                        <option value="Author" class="form-control">Author</option>
+                    </select>
+                    <button class="btn btn-outline-success" style="border-radius: 7px;">Filter</button>
+                </div> 
+                </li>
+                @if (@ViewBag.CheckAccount != null && ViewBag.CheckPost!=null)
+                {
+                    <li>
+                        <div onclick="openPopup('popupReport')" class="btn btn-outline-success" style="display: flex; width: 92%; margin: auto; justify-content: center; border-radius: 5px;">
+                            Report
+                        </div>
+                    </li>
+                    @if (ViewBag.Report == "Send report successful")
+                    {
+                        <span style="color:green; display:flex;justify-content:center;">@ViewBag.Report</span>
+                    }
+                }
+                
+           
+        </ul>
+        </form>
+      
+    </div> <!-- /#sidebar-wrapper -->
+    <!-- Page Content -->
+    <div id="page-content-wrapper" style="top:80px;">
+        <div class="container-fluid">
+           @RenderBody()
+        </div>
+    </div> <!-- /#page-content-wrapper -->
+</div> <!-- /#wrapper -->
+<!-- Bootstrap core JavaScript -->
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script> <!-- Menu Toggle Script -->
+<script>
+    $(function () {
+        $("#menu-toggle").click(function (e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+
+        $(window).resize(function (e) {
+            if ($(window).width() <= 768) {
+                $("#wrapper").removeClass("toggled");
+            } else {
+                $("#wrapper").addClass("toggled");
+            }
+        });
+    });
+
+</script>
+

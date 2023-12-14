@@ -1,0 +1,175 @@
+﻿@model IssueViewModel;
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@functions {
+    string GetTimeAgoString(DateTime pastDate)
+    {
+        TimeSpan timeDifference = DateTime.Now - pastDate;
+
+        if (timeDifference.TotalMinutes < 1)
+            return "Just now";
+
+        if (timeDifference.TotalHours < 1)
+            return $"{(int)timeDifference.TotalMinutes} minute{((int)timeDifference.TotalMinutes != 1 ? "s" : "")} ago";
+
+        if (timeDifference.TotalDays < 1)
+            return $"{(int)timeDifference.TotalHours} hour{((int)timeDifference.TotalHours != 1 ? "s" : "")} ago";
+
+        if (timeDifference.TotalDays < 7)
+            return $"{(int)timeDifference.TotalDays} day {((int)timeDifference.TotalDays != 1 ? "s" : "")} ago";
+
+        if (timeDifference.TotalDays < 30)
+            return $"{(int)(timeDifference.TotalDays / 7)} week{((int)(timeDifference.TotalDays / 7) != 1 ? "s" : "")} ago";
+
+        return pastDate.ToString("dd/MM/yyyy");
+    }
+}
+
+
+@using (Html.BeginForm("Index", "Issue", FormMethod.Get, new { @class = "my-5", @id = "myForm" }))
+{
+    <div class="d-flex justify-content-between align-items-center">
+        <h3>Issues</h3>
+        <div class="d-flex align-items-center" style="gap: 12px">
+            <input type="text" class="form-control" placeholder="Searh issue title" name="search" asp-for="Search" />
+            <div class="d-flex align-items-center">
+
+                <select class="form-control" id="projectIdToNew" style="min-width: 250px">
+                    @foreach (var project in ViewBag.Projects)
+                    {
+                        <option value="@project.Id">@project.Name</option>
+                    }
+                </select>
+                @*@Html.DropDownListFor(model => model.ProjectIdToNewIssue, new SelectList(ViewBag.Projects, "Id", "Name"), new { @class = "form-control", @id = "projectIdToNew", @style = "min-width: 250px" })*@
+            </div>
+            <button type="button" class="btn btn-primary" style="min-width: 110px" onclick="newIssue()">New issue</button>
+        </div>
+    </div>
+    @Html.HiddenFor(model => model.Tab, new { @id = "tabselect" })
+    <ul class="nav nav-tabs mt-4">
+        <li class="nav-item">
+            <button type="button" onclick="tabChange('all')" class="nav-link @(Model.Tab == "all" ? "active" :"")">All</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" onclick="tabChange('task')" class="nav-link @(Model.Tab == "task" ? "active" :"")">Task</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" onclick="tabChange('requirement')" class="nav-link @(Model.Tab == "requirement" ? "active" :"")">Requirement</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" onclick="tabChange('question')" class="nav-link @(Model.Tab == "question" ? "active" :"")">Question</button>
+        </li>
+        <li class="nav-item">
+            <button type="button" onclick="tabChange('defect')" class="nav-link @(Model.Tab == "defect" ? "active" :"")">Defect</button>
+        </li>
+    </ul>
+    <div class="py-4">
+        <div class="row mb-4 align-items-end">
+            <div class="col-3">
+                <div class="form-group mb-3">
+                    @Html.LabelFor(model => model.ProjectId, new { @class = "control-label mb-1" })
+                    @Html.DropDownListFor(model => model.ProjectId, new SelectList(ViewBag.Projects, "Id", "Name"), "Select a manager", new { @class = "form-control", @id = "project" })
+                </div>
+            </div>
+
+            <div class="col-3">
+                <div class="form-group mb-3">
+                    @Html.LabelFor(model => model.MilestoneId, new { @class = "control-label mb-1" })
+                    @Html.DropDownListFor(model => model.MilestoneId, new SelectList(ViewBag.Milestones, "Id", "Title"), "Select a milestone", new { @class = "form-control", @id = "project" })
+                </div>
+            </div>
+
+            <div class="col-3">
+                <div class="form-group mb-3">
+                    @Html.LabelFor(model => model.AuthorId, new { @class = "control-label mb-1" })
+                    @Html.DropDownListFor(model => model.AuthorId, new SelectList(ViewBag.Authors, "Id", "Name"), "Select an author", new { @class = "form-control", @id = "project" })
+                </div>
+            </div>
+
+            <div class="col-2">
+                <div class="form-group mb-3">
+                    @Html.LabelFor(model => model.AssigneeId, new { @class = "control-label mb-1" })
+                    @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Assignees, "Id", "Name"), "Select an assignee", new { @class = "form-control", @id = "project" })
+                </div>
+            </div>
+            <div class="col-1">
+                <div class="form-group mb-3">
+                    <button type="submit" name="Tab" value="@Model.Tab" class="btn btn-primary">Search</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            @if (Model.ItemCount == 0)
+            {
+                <div class="text-center text-secondary"> Empty issue </div>
+            }
+            else
+            {
+                @foreach (var item in Model.Issues)
+                {
+                    <div class="d-flex align-items-center justify-content-between py-2">
+                        <div class="d-flex flex-column" style="gap: 4px">
+                            <h5 class="mb-1" onclick="window.location.href = '/@item.Project.Id/issues/@item.Id'">@item.Title</h5>
+                            <span class="fw-bold"><span class="text-secondary fw-normal">Created at</span> @GetTimeAgoString(item.CreatedAt) <span class="text-secondary fw-normal">by</span> <span>@item.Author.Name</span> <span class="text-secondary fw-normal">-</span> @(item.Project.Name) @(item.Milestone != null ? " - " + item.Milestone.Title:"" )<span></span></span>
+
+                            <div class="d-flex" style="gap: 6px">
+                                <span class="badge rounded-pill bg-primary">@item.Type.Value</span>
+                                <span class="badge rounded-pill bg-secondary">@item.Status.Value</span>
+                                <span class="badge rounded-pill bg-success">@item.Process.Value</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h5>
+                                @(item.Assignee != null ? item.Assignee.Name : "")
+                            </h5>
+                        </div>
+                    </div>
+                    <hr class="border-1 border-top border-secondary my-none" />
+
+                }
+            }
+        </div>
+
+        <div>
+            @if (@Model.ItemCount != 0)
+            {
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        @*<li class="page-item">
+                                <a class="page-link" href="#">Previous</a>
+                            </li>*@
+
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item"><button type="submit" name="PageIndex" value="@i" class="page-link">@i</button></li>
+                        }
+
+                        @*<li class="page-item">
+                                <a class="page-link" href="#">Next</a>
+                            </li>*@
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+}
+
+
+<script>function newIssue() {
+        var any = document.getElementById("projectIdToNew");
+        var value = any.value;
+
+        var projectid = parseInt(any.value);
+        window.location.href = "/" + projectid + "/issues/new"
+
+    }
+    function tabChange(tab) {
+        document.getElementById("tabselect").value = tab
+        document.forms["myForm"].submit();
+    }</script>
+
+

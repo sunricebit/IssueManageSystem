@@ -1,76 +1,78 @@
 ﻿@model IMS.Models.User;
+@*@{
+        Layout = "~/Views/Shared/_TabBar.cshtml";
+    }*@
 
-@{
-    Layout = "~/Views/Shared/_TabBar.cshtml";
-}
+<style>
+    .popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 1px solid #ccc;
+        padding: 20px;
+        background-color: #fff;
+        z-index: 1;
+        width: 450px;
+    }
 
-    <style>
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 1px solid #ccc;
-            padding: 20px;
-            background-color: #fff;
-            z-index: 1;
-            width: 450px;
+    .popup-content {
+        /*text-align: center;*/
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+        .close:hover {
+            color: black;
         }
 
-        .popup-content {
-            /*text-align: center;*/
+    .avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid #000;
+        overflow: hidden;
+    }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    .avatarAdd {
+        width: 50px;
+        height: 50px;
+        overflow: hidden;
+        margin-left: 35px;
+        margin-top: 10px;
+    }
 
-            .close:hover {
-                color: black;
-            }
-
-        .avatar {
-            width: 100px;
-            height: 100px;
+        .avatarAdd img {
+            width: 60%;
+            object-fit: cover;
             border-radius: 50%;
-            border: 3px solid #000;
-            overflow: hidden;
         }
 
-            .avatar img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-
-        .avatarAdd {
-            width: 50px;
-            height: 50px;
-            overflow: hidden;
-            margin-left: 35px;
-            margin-top: 10px;
+        .avatarAdd :hover {
+            background-color: gray;
         }
 
-            .avatarAdd img {
-                width: 60%;
-                object-fit: cover;
-                border-radius: 50%;
-            }
+    .active-color {
+        background-color: green !important;
+        color: #f8f9fa;
+    }
+</style>
 
-            .avatarAdd :hover {
-                background-color: gray;
-            }
+<h3 class="text-h3 mb-4 mt-4">User detail</h3>
 
-        .active-color {
-            background-color: green !important;
-            color: #f8f9fa;
-        }
-    </style>
 
 @if (Model.Avatar == null)
 {
@@ -91,134 +93,60 @@ else
     <div class="avatarAdd">
         <img src="~/img/editAvatar.png" alt="Thumbnail" class="thumbnail" onclick="openPopup('popupEdit')">
     </div>
-
-
 }
 
 <div>
     <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Phone)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Phone)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Address)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Gender)
-        </dt>
-        <dd class="col-sm-10">
-            @if (Model.Gender == true)
-            {
-                <p>Male</p>
-            }
-            else if (Model.Gender == null)
-            {
-                <p></p>
-            }
-            else
-            {
-                <p>Female</p>
-            }
-        </dd>
-    </dl>
-</div>
-<div style="display:flex">
-    <div style="background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%); height:fit-content; border-radius:5px; display:flex;justify-content:center;width:fit-content;padding:5px">
-        <button style="color:white; text-decoration:none;background-image: linear-gradient(195deg, #66BB6A 0%, #43A047 100%); border:none"
-                onclick="openPopup('popupEditDetails')">
-            Edit profile
-        </button>
+    <div class="row" style="padding:10px">
+        <form asp-action="EditUserProfile" id="form">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" id="Name" class="form-control" readonly />
+                <span id="nameError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" id="Phone" class="form-control" readonly />
+                <span id="phoneError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+                <label asp-for="Gender" class="control-label"></label>
+                @if (Model.Gender == true)
+                {
+                    <label><input asp-for="Gender" type="radio" value="true" checked disabled /> Male</label>
+                    <label><input asp-for="Gender" type="radio" value="false" disabled /> Female</label>
+                }
+                else if (Model.Gender == null)
+                {
+                    <label><input asp-for="Gender" type="radio" value="true" disabled /> Male</label>
+                    <label><input asp-for="Gender" type="radio" value="false" disabled /> Female</label>
+                }
+                else
+                {
+                    <label><input asp-for="Gender" type="radio" value="true" disabled /> Male</label>
+                    <label><input asp-for="Gender" type="radio" value="false" checked disabled /> Female</label>
+                }
+            </div>
+            <div class="form-group" style="float:right">
+                <input style="background-color: #43A047;border-color: #43A047; height:40px;"
+                       type="button" value="Edit" class="btn btn-primary" onclick="enableEdit()" />
+                <input style="background-color: #43A047;border-color: #43A047; height:40px; display:none;"
+                       type="button" value="Save" class="btn btn-primary" onclick="validateAndSubmit()" id="saveBtn" />
+            </div>
+        </form>
     </div>
 
 </div>
-
-<div class="modal" tabindex="-1" id="popupEditDetails" style="background-color:#2220208c">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Edit profile</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup('popupEditDetails')"></button>
-            </div>
-            <!-- Nội dung của popup edit detail-->
-            <div class="row" style="padding:10px">
-                <form asp-action="EditUserProfile" id="form">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <input type="hidden" asp-for="Id" />
-                    <div class="form-group">
-                        <label asp-for="Email" class="control-label"></label>
-                        <input asp-for="Email" class="form-control" disabled />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Name" class="control-label"></label>
-                        <input asp-for="Name" id="Name" class="form-control" />
-                        <span id="nameError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Phone" class="control-label"></label>
-                        <input asp-for="Phone" id="Phone" class="form-control" />
-                        <span id="phoneError" style="color:rgba(var(--bs-danger-rgb));" class="field-validation-error"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Address" class="control-label"></label>
-                        <input asp-for="Address" class="form-control" />
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Gender" class="control-label"></label>
-                        @if (Model.Gender == true)
-                        {
-                            <label><input asp-for="Gender" type="radio" value="true" checked /> Male</label>
-                            <label><input asp-for="Gender" type="radio" value="false" /> Female</label>
-
-                        }
-                        else if (Model.Gender == null)
-                        {
-                            <label><input asp-for="Gender" type="radio" value="true" /> Male</label>
-                            <label><input asp-for="Gender" type="radio" value="false" /> Female</label>
-                        }
-                        else
-                        {
-                            <label><input asp-for="Gender" type="radio" value="true" /> Male</label>
-                            <label><input asp-for="Gender" type="radio" value="false" checked /> Female</label>
-
-
-                        }
-                    </div>
-                    <div class="form-group" style="float:right">
-                        <input style="background-color: #43A047;border-color: #43A047; height:40px;"
-                               type="button" value="Save" class="btn btn-primary"
-                               onclick="validateAndSubmit()" />
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup('popupEditDetails')" style="height:40px">Close</button>
-
-                    </div>
-                </form>
-            </div>
-
-            <div class="modal-footer">
-                @*<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup('popupEditDetails')">Close</button>*@
-            </div>
-        </div>
-    </div>
-</div>
-
 
 <!-- Popup Add -->
 <div class="modal" tabindex="-1" id="popupAdd" style="background-color:#2220208c">
@@ -336,16 +264,33 @@ else
 
         if (!phoneRegex.test(phoneValue) && phoneValue != "") {
             // Hiển thị thông báo lỗi và đặt lỗi cho trường input
-            //phoneInput.addClass("input-validation-error");
             phoneError.text("Invalid phone number, phone number has 10 digits and starts with 0.");
         }
         else if (nameValue == "") {
             nameError.text("Please enter a name.");
         }
         else {
+
             // Validation thành công, tiếp tục submit form
             document.forms["form"].submit();
             //$("form").submit/*();*/
         }
+    }
+
+    function enableEdit() {
+        // Enable all readonly fields
+        document.getElementById('Name').readOnly = false;
+        document.getElementById('Phone').readOnly = false;
+        document.getElementById('Address').readOnly = false;
+
+        // Enable radio buttons
+        var radioButtons = document.querySelectorAll('input[type=radio]');
+        for (var i = 0; i < radioButtons.length; i++) {
+            radioButtons[i].disabled = false;
+        }
+
+        // Show Save button and hide Edit button
+        document.getElementById('saveBtn').style.display = 'inline-block';
+        document.querySelector('input[value="Edit"]').style.display = 'none';
     }</script>
 

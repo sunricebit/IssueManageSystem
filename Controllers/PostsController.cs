@@ -42,6 +42,9 @@ namespace IMS.Controllers
             else
             {
                 ViewBag.Search = searchTerm;
+                ViewBag.filterCat = filterCat;
+                ViewBag.filterAuthor = filterAuthor;
+                ViewBag.filterPublic = filterPublic;
                 var cate = _context.Settings.Where(c => c.Type
                 == "POST_CATEGORY").ToList();
                 ViewBag.Setting = new SelectList(cate, "Value", "Value");
@@ -211,8 +214,6 @@ namespace IMS.Controllers
         {
             int? id = HttpContext.Session.GetUser()?.Id;
            
-            if (ModelState.IsValid)
-            {
                 var categoryData = _context.Settings.SingleOrDefault(s => s.Value == category);
                 if (imgFile != null && imgFile.Length > 0)
                 {
@@ -250,7 +251,6 @@ namespace IMS.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-            }
             return View(post);
         }
 

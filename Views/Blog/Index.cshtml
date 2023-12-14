@@ -21,55 +21,6 @@
 
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
-        <div class="container">
-            <a class="navbar-brand" href="#page-top">IMS</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                Menu
-                <i class="fas fa-bars ms-1"></i>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav text-uppercase ms-auto py-4 py-lg-0">
-                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" id="abc" href="/landing#services">Services</a></li>
-                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" id="Team" href="/landing#team">Team</a></li>
-                    <li class="nav-item"><a class="nav-link" style="color: #ffc800;" id="BlogList" href="/blog">BlogList</a></li>
-                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" id="Contact" href="/landing#contact">Contact</a></li>
-                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" href="/auth/sign-in">Login</a></li>
-                    <li class="nav-item"><a class="nav-link" style="color: #3399CC;" href="/auth/sign-up">Register</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="tm-hero d-flex  align-items-center" >
-        <div class="d-flex justify-content-between ">
-            <form asp-action="Index" method="get" class="d-flex">
-                <div class="d-flex m-2">
-                    <select name="filterCat" asp-items="ViewBag.Setting"
-                            class="form-control"
-                            style="border-radius: 7px;">
-                        <option value="Category" class="form-control">Category</option>
-                    </select>
-                    <button class="btn btn-outline-success" style="border-radius: 7px;">Filter</button>
-                </div>
-                 <div class="d-flex m-2">
-                    <select name="filterAuthor" asp-items="ViewBag.Author"
-                            class="form-control"
-                            style="border-radius: 7px;">
-                        <option value="Author" class="form-control">Author</option>
-                    </select>
-                    <button class="btn btn-outline-success" style="border-radius: 7px;">Filter</button>
-                </div>
-                <div class="d-flex m-2">
-                    <input class="form-control tm-search-input" type="search" placeholder="Search" aria-label="Search" value="@ViewBag.Search" name="searchTerm" style="border-radius: 7px;">
-                    <button class="btn btn-outline-success tm-search-btn" type="submit" style="border-radius: 7px;">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-            </form>
-
-        </div>
-    </div>
 
     <div class="container-fluid tm-container-content tm-mt-60">
 
@@ -106,37 +57,12 @@
                     </div>
                 </div>
             }
-           @* string htmlContent = @"
-            <!DOCTYPE html>
-            <html lang=""en"">
-            <head>
-                <meta charset=""UTF-8"">
-                <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-                <title>Stored HTML Page</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        background-color: #f4f4f4;
-                        margin: 20px;
-                    }
-                    h1 {
-                        color: #333;
-                    }
-                </style>
-            </head>
-            <body>
-                <h1>Hello, Stored HTML!</h1>
-                <p>This HTML is stored in the database.</p>
-            </body>
-            </html>
-        ";*@
-
         </div> <!-- row -->
       <div class="row tm-mb-90">
             <div class="col-12 d-flex justify-content-between align-items-center tm-paging-col">
                 @if (ViewBag.CurrentPage > 1)
                 {
-                    <a class="btn btn-Primary tm-btn-prev mb-2 " href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })">&laquo; Previous</a>
+                    <a class="btn btn-Primary tm-btn-prev mb-2 " href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search , filterCat = ViewBag.filterCat, filterAuthor = ViewBag.filterAuthor})">&laquo; Previous</a>
                 }
                 else
                 {
@@ -147,13 +73,13 @@
 
                     @for (int i = 1; i <= ViewBag.TotalPages; i++)
                     {
-                        <a class="@((i == ViewBag.CurrentPage) ? "active" : "") tm-paging-link" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })">@i</a>
+                        <a class="@((i == ViewBag.CurrentPage) ? "active" : "") tm-paging-link" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search, filterCat = ViewBag.filterCat, filterAuthor = ViewBag.filterAuthor})">@i</a>
                     }
 
                 </div>
                 @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                 {
-                    <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })" class="btn btn-Primary tm-btn-next">Next &raquo;</a>
+                    <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search, filterCat = ViewBag.filterCat, filterAuthor = ViewBag.filterAuthor})" class="btn btn-Primary tm-btn-next">Next &raquo;</a>
                 }
                 else
                 {

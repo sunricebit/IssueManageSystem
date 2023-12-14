@@ -89,7 +89,8 @@ CREATE TABLE `Assignment` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Name` VARCHAR(100) NOT NULL,
     `Description` TEXT NULL,
-    `SubjectId` INTEGER NULL,
+    `SubjectId` INTEGER NOT NULL,
+    `Weight` INTEGER NOT NULL,
     `IsActive` BOOLEAN NOT NULL DEFAULT true,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
@@ -123,7 +124,7 @@ CREATE TABLE `ClassStudent` (
 CREATE TABLE `Issue` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
-    `Description` LONGTEXT NOT NULL,
+    `Description` LONGTEXT NULL,
     `MilestoneId` INTEGER NULL,
     `ProjectId` INTEGER NOT NULL,
     `AuthorId` INTEGER NOT NULL,
@@ -144,7 +145,8 @@ CREATE TABLE `IssueSetting` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Type` VARCHAR(20) NOT NULL,
     `Value` VARCHAR(100) NOT NULL,
-    `Name` VARCHAR(50) NOT NULL,
+    `Description` VARCHAR(200) NULL,
+    `Color` VARCHAR(10) NOT NULL DEFAULT '#009966',
     `Status` BOOLEAN NOT NULL DEFAULT true,
     `ClassId` INTEGER NULL,
     `ProjectId` INTEGER NULL,
@@ -232,6 +234,8 @@ CREATE TABLE `Subject` (
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+
+
 -- AddForeignKey
 ALTER TABLE `Contact` ADD CONSTRAINT `Contact_ContactTypeId_fkey` FOREIGN KEY (`ContactTypeId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -254,7 +258,7 @@ ALTER TABLE `Report` ADD CONSTRAINT `Report_PostId_fkey` FOREIGN KEY (`PostId`) 
 ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Assignment` ADD CONSTRAINT `Assignment_SubjectId_fkey` FOREIGN KEY (`SubjectId`) REFERENCES `Subject`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Assignment` ADD CONSTRAINT `Assignment_SubjectId_fkey` FOREIGN KEY (`SubjectId`) REFERENCES `Subject`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Class` ADD CONSTRAINT `Class_SubjectId_fkey` FOREIGN KEY (`SubjectId`) REFERENCES `Subject`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -329,7 +333,9 @@ ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_ProjectId_fkey` FORE
 ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;      
+ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
 
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (1,'ROLE','Admin',1,1,NULL);
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (2,'ROLE','Manager',1,1,NULL);
@@ -364,26 +370,25 @@ INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`)
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (31,'PAGE_LINK','/Subject/Index',0,0,NULL);
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (32,'PAGE_LINK','/UserProfile/User',0,0,NULL);
 
-INSERT INTO `IMS`.`IssueSetting` (`Type`,`Value`,`Name`)
+INSERT INTO `IMS`.`IssueSetting` (`Type`,`Value`)
 VALUES
-        ('TYPE', 'R','Requirement'),
-        ('TYPE', 'T','Task'),
-        ('TYPE', 'Q','Q&A'),
-        ('TYPE', 'D','Defect'),
-        ('STATUS', 'Todo','Todo'),
-        ('STATUS', 'Process','Process'),
-        ('STATUS', 'Test','Test'),
-        ('STATUS', 'Done','Done'),
-        ('PROCESS', 'Process Name 1','Process Name 1'),
-        ('PROCESS', 'Process Name 1','Process Name 1'),
-        ('PROCESS', 'Process Name 1','Process Name 1'),
-        ('PROCESS', 'Process Name 1','Process Name 1');
+        ('TYPE', 'Requirement'),
+        ('TYPE', 'Task'),
+        ('TYPE', 'Q&A'),
+        ('TYPE', 'Defect'),
+        ('STATUS', 'To do'),
+        ('STATUS', 'Doing'),
+        ('STATUS', 'Done'),
+        ('PROCESS', 'Coding'),
+        ('PROCESS', 'Req'),
+        ('PROCESS', 'Testing'),
+        ('PROCESS', 'Design');
 
        
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (2, 'manager@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 2, 'Queenie Suff', 'https://robohash.org/consectetursuntet.png?size=100x100&set=set1', null, '0654960037', '36459 Nevada Trail', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (3, 'marketer@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 3, 'Jeremie Bethel', 'https://robohash.org/voluptatibusconsequaturin.png?size=100x100&set=set1', 1, '0720320267', '09 Hudson Terrace', 1);
-INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (4, 'teacher@gmail.', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 4, 'Noella Quaintance', 'https://robohash.org/sedquodquis.png?size=100x100&set=set1', 0, '0176636839', '4522 Sycamore Avenue', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (4, 'teacher@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 4, 'Noella Quaintance', 'https://robohash.org/sedquodquis.png?size=100x100&set=set1', 0, '0176636839', '4522 Sycamore Avenue', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (5, 'student@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Bucky Ferrettini', 'https://robohash.org/liberoreiciendisvelit.png?size=100x100&set=set1', null, '0542942149', '16 Warbler Parkway', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (6, 'student@facebook.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Iolanthe Akker', 'https://robohash.org/eosnostrumquo.png?size=100x100&set=set1', 0, '0537712440', '33107 Barby Alley', 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (7, 'imatschuk6@hibu.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ingra Matschuk', 'https://robohash.org/maioresquinulla.png?size=100x100&set=set1', 1, '0241136823', null, 1);
@@ -460,21 +465,21 @@ insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManag
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (16, 'OJS201', 'On the job training	', 1, null, 2);
 
 
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (1, 'Assignment 1', null, 1);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (2, 'Assignment 2', null, 1);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (3, 'Assignment 3', null, 1);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (4, 'Assignment 1', null, 2);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (5, 'Assignment 2', null, 2);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (6, 'Assignment 3', null, 2);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (7, 'Assignment 1', null, 3);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (8, 'Assignment 2', null, 3);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (9, 'Assignment 3', null, 3);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (10, 'Assignment 1', null, 4);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (11, 'Assignment 2', null, 4);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (12, 'Assignment 3', null, 4);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (13, 'Assignment 1', null, 5);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (14, 'Assignment 2', null, 5);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (15, 'Assignment 3', null, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description, Weight, SubjectId) values (1, 'Assignment 1', null, 10, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, Weight, SubjectId) values (2, 'Assignment 2', null, 10, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (3, 'Assignment 3', null,  10,1);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (4, 'Assignment 1', null,  10,2);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (5, 'Assignment 2', null,  10,2);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (6, 'Assignment 3', null,  10,2);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (7, 'Assignment 1', null,  10,3);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (8, 'Assignment 2', null,  10,3);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (9, 'Assignment 3', null,  10,3);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (10, 'Assignment 1', null, 10, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (11, 'Assignment 2', null, 10, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (12, 'Assignment 3', null, 10, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (13, 'Assignment 1', null, 10, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (14, 'Assignment 2', null, 10, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (15, 'Assignment 3', null, 10, 5);
 
 
 
@@ -522,44 +527,36 @@ INSERT INTO `Milestone` (`Title`, `Description`, `StartDate`, `EndDate`, `Projec
 ('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 1, 1, NULL),
 ('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 1, 1, NULL),
 ('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 1, 1, NULL),
-('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 2, 1, NULL),
-('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 2, 1, NULL),
-('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 2, 1, NULL),
-('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 3, 1, NULL),
-('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 3, 1, NULL),
-('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 3, 1, NULL),
-('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 4, 1, NULL),
-('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 4, 1, NULL),
-('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 4, 1, NULL),
-('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 5, 1, NULL),
-('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 5, 1, NULL),
-('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 5, 1, NULL);
 
-
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('6', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('7', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('8', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('9', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('10', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('11', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('12', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('13', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('14', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('15', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('16', '2');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('17', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('18', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('19', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('20', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('21', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('22', '3');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('23', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('24', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('25', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('26', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('27', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('28', '4');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('29', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '5');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('30', '5');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('31', '5');
 

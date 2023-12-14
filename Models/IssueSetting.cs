@@ -15,7 +15,8 @@ namespace IMS.Models
         public int Id { get; set; }
         public string Type { get; set; } = null!;
         public string Value { get; set; } = null!;
-        public string Name { get; set; } = null!;
+        public string? Description { get; set; }
+        public string Color { get; set; } = null!;
         public bool? Status { get; set; }
         public int? ClassId { get; set; }
         public int? ProjectId { get; set; }

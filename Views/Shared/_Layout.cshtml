@@ -36,8 +36,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/IMS.styles.css" asp-append-version="true" />
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/23.2.4/material.css" />
-    <script src="https://cdn.syncfusion.com/ej2/23.2.4/dist/ej2.min.js"></script>
 </head>
 
 <body class="sb-nav-fixed">
@@ -67,6 +65,7 @@
                    aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><a class="dropdown-item" href="/userprofile?tab=userdetails">User Profile</a></li>
+                    <li><a class="dropdown-item" href="/change-password">Password change</a></li>
                     <li><a class="dropdown-item" href="#!">Settings</a></li>
                     <li><a class="dropdown-item" href="#!">Activity Log</a></li>
                     <li>
@@ -105,7 +104,7 @@
             }
         </div>
         <div id="layoutSidenav_content">
-            <main style="margin-left:50px; width:90%">
+            <main style="margin-left:50px; width:90%; height: 100%">
                 @RenderBody()
             </main>
             <footer class="py-4 bg-light mt-auto" style="position:relative">
@@ -164,11 +163,9 @@
     <script src="~/js/datatables-sort.js" asp-append-version="true"></script>
     <script src="~/js/confirm-popup.js" asp-append-version="true"></script>
     <script src="~/js/GetInput.js" asp-append-version="true"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
-    @Html.EJS().ScriptManager()
 </body>
 
 </html>

@@ -22,12 +22,14 @@
                     </form>
                 </div>
             }
-            <div class="col-md-auto">
-                <a class="btn btn-outline-primary" asp-controller="User" asp-action="Export">
+            @if (pageAcess.CanExport)
+            {
+                <div class="col-md-auto">
+                    <a class="btn btn-outline-primary" asp-controller="User" asp-action="Export">
                     <i class="fas fa-download"></i> Export
                 </a>
             </div>
-
+            }
 
         </div>
 
