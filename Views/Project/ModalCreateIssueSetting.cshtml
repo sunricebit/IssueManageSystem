@@ -1,16 +1,16 @@
 ﻿@model IMS.ViewModels.Validation.IssueSettingViewModel
 @{
 }
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Add Issue Setting</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <form asp-action="CreateIssueSetting" method="post">
+                <div class="modal-body">
 
-            <div class="modal-body">
-                <form asp-action="AddIssueSetting" method="post">
 
                     <!-- Type -->
                     <div class="form-group mb-3">
@@ -28,13 +28,15 @@
 
                     <!-- Description -->
                     <div class="form-group mb-3">
-                        <label for="Description">Value*:</label>
+                        <label for="Description">Description:</label>
                         <textarea class="form-control" id="Description" name="Description" asp-for="Description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
                     </div>
 
                     <!-- Color -->
-                    <div class="form-group row">
-                        <label for="label_color">Background color</label>
+                    <div class="form-group mb-3">
+                        <label for="Color">Background color</label>
+                        <input type="text" class="form-control" id="color-input" name="Color" asp-for="Color" readonly required />
                         <div class="form-text text-muted">
                             Select a color from the presets below.
                         </div>
@@ -54,7 +56,7 @@
                             <a class="has-tooltip" style="background-color: #36454f" data-color="#36454f" title="Charcoal grey" href="#"></a>
                             <a class="has-tooltip" style="background-color: #808080" data-color="#808080" title="Gray" href="#"></a>
                         </div>
-                        <input class="form-control" id="Color" name="Color" asp-for="Color" />
+
                         <span asp-validation-for="Color" class="text-danger"></span>
                     </div>
 
@@ -72,28 +74,14 @@
                             False
                         </label>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
+                    <input type="hidden" id="ProjectId" name="ProjectId" asp-for="ProjectId" />
 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var colorInput = document.getElementById("color-input");
-        var colorLinks = document.querySelectorAll(".has-tooltip");
-
-        colorLinks.forEach(function (link) {
-            link.addEventListener("click", function (e) {
-                e.preventDefault();
-                var selectedColor = this.getAttribute("data-color");
-                colorInput.value = selectedColor;
-            });
-        });
-    });
-</script>

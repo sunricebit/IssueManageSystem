@@ -516,7 +516,7 @@ INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('30', '1');
 INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('31', '1');
 
 INSERT INTO `ims`.`project` (`Name`,`GroupName`,`Status`, `ClassId`, `LeaderId`) VALUES
-('HumanResourceManagement','G1', '1', '1', '6'),
+('HumanResourceManagement','G1', '1', '1', '5'),
 ('FinancialProject', 'G2', '1', '1', '12'),
 ('CustomerManagementSystem', 'G2', '1', '1', '18'),
 ('LogisticsProject', 'G2', '1', '1', '24'),
@@ -539,7 +539,7 @@ INSERT INTO `Milestone` (`Title`, `Description`, `StartDate`, `EndDate`, `Projec
 ('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 5, 1, NULL),
 ('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 5, 1, NULL);
 
-
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('5', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('6', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('7', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('8', '1');

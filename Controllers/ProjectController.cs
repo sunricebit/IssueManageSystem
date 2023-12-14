@@ -1,7 +1,4 @@
-﻿using DocumentFormat.OpenXml.Office2010.Excel;
-using IMS.DAO;
-using IMS.Services;
-using IMS.ViewModels.Validation;
+﻿using IMS.ViewModels.Validation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IMS.Controllers
@@ -11,11 +8,13 @@ namespace IMS.Controllers
     {
         private readonly IProjectService _projectService;
         private readonly IClassService _classService;
+        private readonly IssueSettingDAO _isDAO;
 
-        public ProjectController(IProjectService projectService, IClassService classService)
+        public ProjectController(IProjectService projectService, IClassService classService, IssueSettingDAO isDAO)
         {
             _projectService = projectService;
             _classService = classService;
+            _isDAO = isDAO;
         }
 
         [Route("List")]
@@ -188,19 +187,71 @@ namespace IMS.Controllers
         }
 
         [HttpPost("CreateIssueSetting")]
-        public IActionResult CreateIssueSetting(int id)
+        public IActionResult CreateIssueSetting(IssueSettingViewModel issueSettingViewModel, [FromServices] ErrorHelper message)
         {
-            
+            Project p = _projectService.GetProject((int)issueSettingViewModel.ProjectId);
+            IssueSetting iS = new IssueSetting()
+            {
+                Type = issueSettingViewModel.Type,
+                Value = issueSettingViewModel.Value,
+                Description = issueSettingViewModel.Description,
+                ProjectId = issueSettingViewModel.ProjectId,
+                ClassId = p.ClassId,
+                Color = issueSettingViewModel.Color,
+                Status = issueSettingViewModel.Status,
+            };
 
-            return RedirectToAction("IssueSetting");
+            string checkDup = _isDAO.CheckDuplicate(iS);
+            if (checkDup.Equals("Can Add"))
+            {
+                _isDAO.AddIssueSetting(iS);
+                message.Success = "Add Issue Setting success";
+            }
+            message.Error = checkDup;
+            return RedirectToAction("IssueSetting", new { projectId = p.Id });
         }
 
         [Route("IssueSetting")]
-        public IActionResult IssueSetting(string? searchString)
+        public IActionResult IssueSetting(string? searchString, int projectId)
         {
-            
+            User u = HttpContext.Session.GetUser();
+            Project p = _projectService.GetProject(projectId);
+            if (p.LeaderId == u.Id)
+            {
+                ViewBag.CanAdd = true;
+            }
+            else
+            {
+                ViewBag.CanAdd = false;
+            }
 
+            ViewBag.ProjectId = projectId;
+
+            List<IssueSetting> issueSettings = _isDAO.GetIssueSettingByProject(projectId);
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                issueSettings = issueSettings.Where(item => item.Type.ToLower().Contains(searchString.ToLower())
+                || item.Value.ToLower().Contains(searchString.ToLower())).ToList();
+            }
+            ViewBag.IssueSettingList = issueSettings;
             return View();
+        }
+
+        [HttpPost("ToggleIssueSettingStatus")]
+        public IActionResult ToggleIssueSettingStatus(int id, int projectId)
+        {
+            var issueSetting = _isDAO.GetIssueSettingById(id);
+
+            if (issueSetting == null)
+            {
+                return NotFound();
+            }
+
+            issueSetting.Status = !issueSetting.Status;
+
+            _isDAO.UpdateIssueSetting(issueSetting);
+
+            return RedirectToAction("IssueSetting", new { projectId = projectId });
         }
     }
 }

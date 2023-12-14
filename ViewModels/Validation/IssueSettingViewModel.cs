@@ -7,9 +7,10 @@
         public string Type { get; set; } = null!;
         [Required(ErrorMessage = "Value is required")]
         public string Value { get; set; } = null!;
-        [Required(ErrorMessage = "Name is required")]
+        [Required(ErrorMessage = "Color is required")]
         public string Color { get; set; } = null!;
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public bool Status { get; set; }
+        public int? ProjectId { get; set; }
     }
 }
