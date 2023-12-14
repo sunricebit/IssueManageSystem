@@ -125,14 +125,14 @@ namespace IMS.Controllers
                 .Include(p => p.Class).ThenInclude(cls => cls.Milestones)
                 .SingleOrDefault(project => project.Id == projectId);
 
-                if (project == null) return RedirectToAction("NotFound", "Error");
+            if (project == null) return RedirectToAction("NotFound", "Error");
 
             var assignees = project.Students.ToList();
             var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
             var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
             var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
             var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
-            var issues = project.Issues.ToList();
+            var issues = project.Issues.Where(issue => issue.Id != issueId).ToList();
 
             ViewBag.Types = types;
             ViewBag.Assignees = assignees;
@@ -176,7 +176,7 @@ namespace IMS.Controllers
             var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
             var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
             var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
-            var issues = project.Issues.ToList();
+            var issues = project.Issues.Where(issue => issue.Id != issueId).ToList();
 
             ViewBag.Types = types;
             ViewBag.Assignees = assignees;
@@ -235,7 +235,7 @@ namespace IMS.Controllers
             var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
             var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
             var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
-            var issues = project.Issues.ToList() ;
+            var issues = project.Issues.ToList();
 
             ViewBag.Types = types;
             ViewBag.Assignees = assignees;
@@ -280,13 +280,13 @@ namespace IMS.Controllers
                 context.Issues.Add(issue);
                 await context.SaveChangesAsync();
                 errorHelper.Success = "Create issue successfully";
+                return RedirectToAction("Detail", new { projectId, issueId = issue.Id });
             }
             catch
             {
                 errorHelper.Error = "Create issue faild";
-
+                return RedirectToAction("Index");
             }
-            return RedirectToAction("Index");
         }
 
 
