@@ -98,7 +98,7 @@ namespace IMS.Controllers
             if (!ModelState.IsValid) return View();
 
             var user = _context.Users.FirstOrDefault(user => user.Email == vm.Email);
-            if(user!=null && user.Status == false)
+            if (user != null && user.Status == false)
             {
                 ViewBag.Success = "This account has been blocked, please choose another account";
                 return View();
@@ -110,7 +110,7 @@ namespace IMS.Controllers
                 return View();
             }
 
-            if(user != null && user.Status == null)
+            if (user != null && user.Status == null)
             {
                 user.ConfirmToken = hashService.RandomHash();
                 await _context.SaveChangesAsync();
@@ -150,7 +150,7 @@ namespace IMS.Controllers
             var emailRegistor = HttpContext.Session.GetString("emailRegistor");
             if (emailRegistor == null) return RedirectToAction("SignUp");
             var user = _context.Users.SingleOrDefault(user => user.Email == emailRegistor);
-            if(user == null) return RedirectToAction("SignUp");
+            if (user == null) return RedirectToAction("SignUp");
 
             user.ConfirmToken = hashService.RandomHash();
             await _context.SaveChangesAsync();
@@ -199,7 +199,7 @@ namespace IMS.Controllers
 
         [Route("sign-in")]
         [HttpPost]
-        public IActionResult SignIn(SignInViewModel vm, [FromServices] IHashService hashService, 
+        public IActionResult SignIn(SignInViewModel vm, [FromServices] IHashService hashService,
             [FromServices] IPermissionService permissionService)
         {
             if (!ModelState.IsValid) return View();
@@ -229,7 +229,7 @@ namespace IMS.Controllers
             PermissionViewModel permissionVM = permissionService.GetPermissionViewModel(user.RoleId);
             string permissionString = JsonSerializer.Serialize(permissionVM);
             HttpContext.Session.SetString("Permission", permissionString);
-
+            HttpContext.Session.Remove("emailRegistor");
             ModelState.Clear();
             return Redirect("/BlankDashboard");
         }
