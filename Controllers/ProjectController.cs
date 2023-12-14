@@ -186,5 +186,21 @@ namespace IMS.Controllers
             errorMessage.Success = "Update project success!";
             return RedirectToAction("ProjectDetail", new { id = project.Id } );
         }
+
+        [HttpPost("CreateIssueSetting")]
+        public IActionResult CreateIssueSetting(int id)
+        {
+            
+
+            return RedirectToAction("IssueSetting");
+        }
+
+        [Route("IssueSetting")]
+        public IActionResult IssueSetting(string? searchString)
+        {
+            
+
+            return View();
+        }
     }
 }

@@ -40,6 +40,8 @@ namespace IMS.Services
                     CanRead = true,
                     CanUpdate = role.Value.Equals(RoleUser.Admin) ? true : false,
                     CanCreate = role.Value.Equals(RoleUser.Admin) ? true : false,
+                    CanExport = role.Value.Equals(RoleUser.Admin) ? true : false,
+                    CanDelete = role.Value.Equals(RoleUser.Admin) ? true : false,
                 };
                 _context.Permissions.Add(p);
             }
@@ -62,6 +64,8 @@ namespace IMS.Services
                     CanAccess = p.CanRead,
                     CanAdd = p.CanCreate,
                     CanUpdate = p.CanUpdate,
+                    CanDelete = p.CanDelete,
+                    CanExport = p.CanExport,
                 }).ToList()
             })
             .First();
