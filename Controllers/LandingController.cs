@@ -15,12 +15,11 @@ namespace IMS.Controllers
         [Route("/landing")]
         public async Task<IActionResult> Index()
         {
-            //using (IMSContext context = new IMSContext())
-            //{
-               var type= context.Settings.Where(setting => setting.Type== "CONTACT_TYPE").ToList();
+            int? id = HttpContext.Session.GetUser()?.Id;
+            ViewBag.CheckAccount = id;
+            var type= context.Settings.Where(setting => setting.Type== "CONTACT_TYPE").ToList();
                 ViewBag.Setting = new SelectList(type, "Id", "Value");
                 return View();
-            //}
         }
 
         [Route("/landing")]
@@ -29,6 +28,8 @@ namespace IMS.Controllers
         {
             var type = context.Settings.Where(setting => setting.Type == "CONTACT_TYPE").ToList();
             ViewBag.Setting = new SelectList(type, "Id", "Value");
+            int? id = HttpContext.Session.GetUser()?.Id;
+            ViewBag.CheckAccount = id;
             try
             {
                 if (_contact.Id == 0)

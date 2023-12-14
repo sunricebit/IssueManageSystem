@@ -62,7 +62,7 @@
             <div class="col-12 d-flex justify-content-between align-items-center tm-paging-col">
                 @if (ViewBag.CurrentPage > 1)
                 {
-                    <a class="btn btn-Primary tm-btn-prev mb-2 " href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })">&laquo; Previous</a>
+                    <a class="btn btn-Primary tm-btn-prev mb-2 " href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search , filterCat = ViewBag.filterCat, filterAuthor = ViewBag.filterAuthor})">&laquo; Previous</a>
                 }
                 else
                 {
@@ -73,13 +73,13 @@
 
                     @for (int i = 1; i <= ViewBag.TotalPages; i++)
                     {
-                        <a class="@((i == ViewBag.CurrentPage) ? "active" : "") tm-paging-link" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })">@i</a>
+                        <a class="@((i == ViewBag.CurrentPage) ? "active" : "") tm-paging-link" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search, filterCat = ViewBag.filterCat, filterAuthor = ViewBag.filterAuthor})">@i</a>
                     }
 
                 </div>
                 @if (ViewBag.CurrentPage < ViewBag.TotalPages)
                 {
-                    <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })" class="btn btn-Primary tm-btn-next">Next &raquo;</a>
+                    <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search, filterCat = ViewBag.filterCat, filterAuthor = ViewBag.filterAuthor})" class="btn btn-Primary tm-btn-next">Next &raquo;</a>
                 }
                 else
                 {
