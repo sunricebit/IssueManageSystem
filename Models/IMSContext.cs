@@ -247,6 +247,10 @@ namespace IMS.Models
 
                 entity.Property(e => e.Description).HasMaxLength(200);
 
+                entity.Property(e => e.Color)
+                    .HasMaxLength(10)
+                    .HasDefaultValueSql("'#009966'");
+
                 entity.Property(e => e.Status)
                     .IsRequired()
                     .HasDefaultValueSql("'1'");

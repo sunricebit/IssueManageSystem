@@ -14,7 +14,8 @@
 
         public bool Status { get; set; }
 
-        [Range(1, 255, ErrorMessage = "Order must be between 1 and 255.")]
+        [Required(ErrorMessage = "Order is required")]
+        [Range(1, 255, ErrorMessage = "Order must be a integer between 1 and 255.")]
         public sbyte? Order { get; set; }
     }
 }

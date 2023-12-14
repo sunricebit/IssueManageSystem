@@ -26,6 +26,8 @@ namespace IMS.Services
             {
                 Type = "PAGE_LINK",
                 Value = page,
+                Order = 1,
+                Status = true,
             };
             _context.Settings.Add(setting);
             _context.SaveChanges();

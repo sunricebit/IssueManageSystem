@@ -14,6 +14,7 @@ builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<SettingDAO>();
 builder.Services.AddScoped<PermissionDAO>();
 builder.Services.AddScoped<IMilestoneService, MilestoneService>();
+builder.Services.AddScoped<IssueSettingDAO>();
 builder.Services.AddSingleton<ErrorHelper>();
 builder.Services.AddHttpContextAccessor();
 

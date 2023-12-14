@@ -517,7 +517,7 @@ INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('30', '1');
 INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('31', '1');
 
 INSERT INTO `ims`.`project` (`Name`,`GroupName`,`Status`, `ClassId`, `LeaderId`) VALUES
-('HumanResourceManagement','G1', '1', '1', '6'),
+('HumanResourceManagement','G1', '1', '1', '5'),
 ('FinancialProject', 'G2', '1', '1', '12'),
 ('CustomerManagementSystem', 'G2', '1', '1', '18'),
 ('LogisticsProject', 'G2', '1', '1', '24'),

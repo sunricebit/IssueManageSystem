@@ -1,6 +1,7 @@
-﻿@{
+﻿@model IMS.ViewModels.Validation.IssueSettingViewModel
+@{
     ViewData["Title"] = "Project List";
-    Pagination pagination = ViewBag.Pagination;
+    // Pagination pagination = ViewBag.Pagination;
 }
 
 <div class="container-fluid px-4">
@@ -28,18 +29,19 @@
                 Project Issue Setting
             </div>
             <div class="col-md-auto">
-                <a class="btn btn-primary">
+                <a class="btn btn-primary" id="newIssueSettingBtn">
                     <i class="fas fa-plus"></i> New Issue Setting
                 </a>
             </div>
         </div>
         <div class="card-body">
-            <form asp-controller="Project" asp-action="SearchIssueSetting" method="get">
+            <form asp-controller="Project" asp-action="IssueSetting" method="get">
                 <div class="row">
                     <div class="col-md-6">
-                        <label for="keyword" class="form-label">Search:</label>
-                        <input type="text" id="keyword" name="keyword" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                        <label for="searchString" class="form-label">Search:</label>
+                        <input type="text" id="searchString" name="searchString" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
                     </div>
+                    <input type="hidden" id="projectId" name="projectId" value="@ViewBag.ProjectId">
                     <div class="col-md-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary">Search Page</button>
                     </div>
@@ -47,65 +49,89 @@
             </form>
             <table class="table" id="issueSettingTable" style="table-layout: fixed">
                 <tbody>
-                    <tr>
-                        <td class="label-column">
-                            <a data-html="true" class="badge badge-pill issue-label" style="background-color: #dc143c">
-                                <span data-container="body" data-html="true" style="background-color: #dc143c">Defect</span>
-                                <span data-container="body" data-html="true" style="background-color: #ffffff">Create</span>
-                            </a>
-                        </td>
-                        
-                        <td class="description-column">Decription s</td>
-                        <td class="action-column">
-                            <form asp-action="ToggleStatusIssue" method="post">
-                                <button type="submit" class="btn btn-success btn-sm">
-                                    Active
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
+                    @foreach (IssueSetting issueSetting in ViewBag.IssueSettingList)
+                    {
+                        <tr>
+                            <td class="label-column">
+                                <div data-html="true" class="badge badge-pill issue-label" style="background-color: @issueSetting.Color">
+                                    <span data-container="body" data-html="true" style="background-color: @issueSetting.Color">@issueSetting.Type</span>
+                                    <span data-container="body" data-html="true" style="background-color: #ffffff">@issueSetting.Value</span>
+                                </div>
+                            </td>
 
-                    <tr>
-                        <td class="label-column">
-                            <a data-html="true" class="badge badge-pill issue-label" style="background-color: #dc143c">
-                                <span data-container="body" data-html="true" style="background-color: #dc143c">Defect</span>
-                                <span data-container="body" data-html="true" style="background-color: #ffffff">Create</span>
-                            </a>
-                        </td>
+                            <td style="text-align: left">@issueSetting.Description</td>
+                            <td class="action-column">
+                                @if (issueSetting.Status.Value)
+                                {
+                                    <form asp-action="ToggleIssueSettingStatus" asp-route-id="@issueSetting.Id" method="post">
+                                        <input type="hidden" name="projectId" value="@issueSetting.ProjectId" />
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            Active
+                                        </button>
+                                    </form>
 
-                        <td style="text-align: left">Decription ss</td>
-                        <td class="action-column">
-                            <form asp-action="ToggleStatusIssue" method="post">
-                                <button type="submit" class="btn btn-success btn-sm">
-                                    Active
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td class="label-column">
-                            <a data-html="true" class="badge badge-pill issue-label" style="background-color: #dc143c">
-                                <span data-container="body" data-html="true" style="background-color: #dc143c">Defect</span>
-                                <span data-container="body" data-html="true" style="background-color: #ffffff">Create</span>
-                            </a>
-                        </td>
-
-                        <td style="text-align: left">Decription ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss</td>
-                        <td class="action-column">
-                            <form asp-action="ToggleStatusIssue" method="post">
-                                <button type="submit" class="btn btn-success btn-sm">
-                                    Active
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
+                                }
+                                else
+                                {
+                                    <form asp-action="ToggleIssueSettingStatus" asp-route-id="@issueSetting.Id" method="post">
+                                        <input type="hidden" name="projectId" value="@issueSetting.ProjectId" />
+                                        <button type="submit" class="btn btn-secondary btn-sm">
+                                            Deactive
+                                        </button>
+                                    </form>
+                                }
+                                @*@if (issueSetting.ProjectId != null)
+                                {
+                                    <div id="modalContainer">
+                                        @await Html.PartialAsync("ModalUpdateIssueSetting", new IMS.ViewModels.Validation.IssueSettingViewModel
+                                        { 
+                                            Id = issueSetting.Id,
+                                            Type = issueSetting.Type,
+                                            Value = issueSetting.Value,
+                                            Color = issueSetting.Color,
+                                            Description = issueSetting.Description, 
+                                            ProjectId = issueSetting.ProjectId
+                                        })
+                                    </div>
+                                    <button onclick="openUpdateModal(@issueSetting.Id)" class="btn btn-primary btn-sm">
+                                        Update
+                                    </button>
+                                }*@
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
-            
-            
-
-            @*@Html.Partial("_PaginationPartial", pagination)*@
         </div>
     </div>
 </div>
+
+<div id="modalContainer">
+    @await Html.PartialAsync("ModalCreateIssueSetting")
+</div>
+
+
+<script>
+    document.getElementById("newIssueSettingBtn").addEventListener("click", function () {
+        // Hiển thị modal
+        $('#createModal').modal('show');
+    });
+    function openUpdateModal(issueSettingId) {
+        var modalId = "#modalUpdateIssueSetting_" + issueSettingId;
+        $(modalId).modal('show');
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("sa");
+        var colorInput = document.getElementById("color-input");
+        var colorLinks = document.querySelectorAll(".has-tooltip");
+
+        colorLinks.forEach(function (link) {
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                var selectedColor = this.getAttribute("data-color");
+                colorInput.value = selectedColor;
+            });
+        });
+    });
+</script>
