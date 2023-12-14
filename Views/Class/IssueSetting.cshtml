@@ -1,4 +1,4 @@
-﻿@model IMS.ViewModels.Class.ClassViewModel;
+﻿
 @*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
@@ -8,10 +8,10 @@
 
 <div class="container-fluid px-4">
     <div class="d-flex">
-        <a asp-action="Details" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">General</a>
-        <a asp-action="People" asp-controller="Class" asp-route-id="@Model.Id" class="btn btn-outline-primary text-decoration-none">People</a>
-        <a asp-action="Milestones" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Milestone</a>
-        <a asp-action="IssueSetting" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Issue Setting</a>
+        <a asp-action="Details" asp-controller="Class" asp-route-id="@ViewBag.ClassId" class="btn  btn-outline-primary text-decoration-none">General</a>
+        <a asp-action="People" asp-controller="Class" asp-route-id="@ViewBag.ClassId" class="btn btn-outline-primary text-decoration-none">People</a>
+        <a asp-action="Milestones" asp-controller="Class" asp-route-id="@ViewBag.ClassId" class="btn  btn-outline-primary text-decoration-none">Milestone</a>
+        <a asp-action="IssueSetting" asp-controller="Class" asp-route-id="@ViewBag.ClassId" class="btn  btn-outline-primary text-decoration-none">Issue Setting</a>
     </div>
 </div>
 <div class="d-flex justify-content-between align-items-center">
@@ -30,11 +30,11 @@
         </div>
     </div>
     <div class="card-body">
-        <form asp-controller="Class" asp-action="IssueSetting" asp-route-id="@Model.Id" method="get">
+        <form asp-controller="Class" asp-action="IssueSetting" asp-route-id="@ViewBag.ClassId" method="get">
             <div class="row">
                 <div class="col-md-6">
                     <label for="searchString" class="form-label">Search:</label>
-                    <input type="text" id="searchString" name="searchString" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                    <input type="text" id="searchString" name="searchString" class="form-control" placeholder="Search..." value="">
                 </div>
                 
                 <div class="col-md-3 d-flex align-items-end">
@@ -58,8 +58,8 @@
                         <td class="action-column">
                             @if (issueSetting.Status.Value)
                             {
-                                <form asp-action="ToggleIssueSettingStatus" asp-route-id="@issueSetting.Id" method="post">
-                                    <input type="hidden" name="projectId" value="@issueSetting.ProjectId" />
+                                <form asp-action="ToggleIssueSettingStatus" asp-controller="Class" asp-route-id="@issueSetting.Id" method="post">
+                                    <input type="hidden" name="ClassId" value="@issueSetting.ClassId" />
                                     <button type="submit" class="btn btn-success btn-sm">
                                         Active
                                     </button>
@@ -68,8 +68,8 @@
                             }
                             else
                             {
-                                <form asp-action="ToggleIssueSettingStatus" asp-route-id="@issueSetting.Id" method="post">
-                                    <input type="hidden" name="projectId" value="@issueSetting.ProjectId" />
+                                <form asp-action="ToggleIssueSettingStatus" asp-controller="Class" asp-route-id="@issueSetting.Id" method="post">
+                                    <input type="hidden" name="ClassId" value="@issueSetting.ClassId" />
                                     <button type="submit" class="btn btn-secondary btn-sm">
                                         Deactive
                                     </button>
@@ -83,6 +83,8 @@
         </table>
     </div>
 </div>
+<div id="modalContainer">
+    @await Html.PartialAsync("ModalCreateIssueSetting")
 </div>
 
 

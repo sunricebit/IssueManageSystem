@@ -6,6 +6,7 @@ using IMS.Models;
 using IMS.Services;
 using IMS.ViewModels.Class;
 using IMS.ViewModels.Milestone;
+using IMS.ViewModels.Validation;
 using Microsoft.AspNetCore.Mvc;
 using System.Runtime.CompilerServices;
 
@@ -307,6 +308,7 @@ namespace IMS.Controllers
         public IActionResult IssueSetting(int id,string searchString, [FromServices] IChkPgAcessService chkPgAcess)
         {
             var Class = _classService.GetClass(id);
+            ViewBag.ClassId = id;
             if (Class == null)
             {
                 return NotFound();
@@ -333,7 +335,7 @@ namespace IMS.Controllers
             ViewBag.IssueSettingList = issueSettings;
             ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
 
-            return View("IssueSetting", ClassViewModel);
+            return View("IssueSetting");
         }
         [HttpPost("CreateMilestone")]
         public IActionResult CreateMilestone(MilestoneViewModel model)
@@ -386,6 +388,45 @@ namespace IMS.Controllers
             ViewBag.Student = students;
             _classService.RemoveStudentFromClass(id, email);
             return View("People",ClassViewModel);
+        }
+        [HttpPost("CreateIssueSetting")]
+        public IActionResult CreateIssueSetting(IssueSettingViewModel issueSettingViewModel, [FromServices] ErrorHelper message)
+        {
+            Class @class = _classService.GetClass(issueSettingViewModel.ClassId ?? 0);
+            IssueSetting iS = new IssueSetting()
+            {
+                Type = issueSettingViewModel.Type,
+                Value = issueSettingViewModel.Value,
+                Description = issueSettingViewModel.Description,
+                ClassId = issueSettingViewModel.ClassId,
+                Color = issueSettingViewModel.Color,
+                Status = issueSettingViewModel.Status,
+            };
+
+            string checkDup = _isDAO.CheckDuplicate(iS);
+            if (checkDup.Equals("Can Add"))
+            {
+                _isDAO.AddIssueSetting(iS);
+                message.Success = "Add Issue Setting success";
+            }
+            message.Error = checkDup;
+            return RedirectToAction("IssueSetting", issueSettingViewModel.Id);
+        }
+        [HttpPost("ToggleIssueSettingStatus")]
+        public IActionResult ToggleIssueSettingStatus(int id)
+        {
+            var issueSetting = _isDAO.GetIssueSettingById(id);
+
+            if (issueSetting == null)
+            {
+                return NotFound();
+            }
+
+            issueSetting.Status = !issueSetting.Status;
+
+            _isDAO.UpdateIssueSetting(issueSetting);
+
+            return RedirectToAction("IssueSetting",  issueSetting.ClassId );
         }
 
         public void Pagination(int page, int pageSize, IEnumerable<User> UserList, string searchTerm)

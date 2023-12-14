@@ -12,5 +12,6 @@
         public string? Description { get; set; }
         public bool Status { get; set; }
         public int? ProjectId { get; set; }
+        public int? ClassId { get; set; }
     }
 }
