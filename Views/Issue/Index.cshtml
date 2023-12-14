@@ -34,7 +34,7 @@
     <div class="d-flex justify-content-between align-items-center">
         <h3>Issues</h3>
         <div class="d-flex align-items-center" style="gap: 12px">
-            <input type="text" class="form-control" placeholder="Searh issue title" name="search" asp-for="Search" />
+            @Html.TextBoxFor(model => model.Search, new { @class = "form-control", @placeholder = "Searh issue title" })
             <div class="d-flex align-items-center">
 
                 <select class="form-control" id="projectIdToNew" style="min-width: 250px">

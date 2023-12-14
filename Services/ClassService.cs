@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.VariantTypes;
+using IMS.Models;
 using NuGet.DependencyResolver;
 
 namespace IMS.Services
@@ -16,9 +17,16 @@ namespace IMS.Services
             if (user != null) return true; else return false;
             
         }
+        public IEnumerable<Assignment> GetAssignments(int subjectid)
+        {
+            var assignments = _context.Assignments
+       .Where(a => a.SubjectId == subjectid)
+       .ToList();
+            return assignments;
+        }
         public bool AddStudentToClass(int classId, string email)
         {
-            var @class = _context.Classes.FirstOrDefault(c=> c.Id ==classId);
+            Class @class = _context.Classes.Include(c => c.Students).FirstOrDefault(c=> c.Id ==classId);
             var student = _context.Users.FirstOrDefault(u=> u.Email == email);
 
             if (@class == null || student == null)

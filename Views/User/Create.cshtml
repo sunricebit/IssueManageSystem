@@ -10,7 +10,22 @@
 <form asp-action="Create" method="post" enctype="multipart/form-data">
     <input type="hidden" name="_token" value="@ViewBag.Token" />
 
-
+    @if (ViewBag.SuccessMessage != null)
+    {
+        <div class="alert alert-success">
+            <ul>
+                <li>@ViewBag.SuccessMessage</li>
+            </ul>
+        </div>
+    }
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                <li>@ViewBag.ErrorMessage</li>
+            </ul>
+        </div>
+    }
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">

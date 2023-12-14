@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Diagrams;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using IMS.Models;
@@ -16,17 +17,20 @@ namespace IMS.Controllers
         private readonly IClassService _classService;
         private readonly IUserService _userService;
         private readonly IMilestoneService _milestoneService;
-        public ClassController(IClassService classService, IUserService userService, IMilestoneService milestoneService)
+        private readonly IssueSettingDAO _isDAO;
+        public ClassController(IClassService classService, IUserService userService, IMilestoneService milestoneService, IssueSettingDAO isDAO)
         {
             _classService = classService;
             _userService = userService;
             _milestoneService = milestoneService;
+            _isDAO = isDAO;
         }
-        [HttpGet]
-        public IActionResult Index(int? pageNumber, bool? filterbyStatus, string? searchByValue, string? filterByTeacher, string? filterBySubject)
+        [HttpGet, Route("Index")]
+        [CustomAuthorize]
+        public IActionResult Index(int? pageNumber, bool? filterbyStatus, string? searchByValue, string? filterByTeacher, string? filterBySubject, [FromServices] IChkPgAcessService chkPgAcess)
         {
             int tempPageNumber = pageNumber ?? 1;
-            int tempPageSize = 5;
+            int tempPageSize = 10;
             Paginate<Class> paginate = new Paginate<Class>(tempPageNumber, tempPageSize);
             Dictionary<string, dynamic> filter = new Dictionary<string, dynamic>(), search = new Dictionary<string, dynamic>();
             if (filterByTeacher != null && !filterByTeacher.Equals("All"))
@@ -67,12 +71,13 @@ namespace IMS.Controllers
                 ViewBag.ClassList = classes;
                 ViewBag.Action = "ClassList";
                 ViewBag.Pagination = paginate.GetPagination();
-
-                return View();
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
+            return View();
             
         }
         [HttpGet("Details/{id}")]
-        public IActionResult Details(int id)
+        [CustomAuthorize]
+        public IActionResult Details(int id, [FromServices] IChkPgAcessService chkPgAcess)
         {
             var subject = _classService.GetSubjects();
             ViewBag.Subject = subject;
@@ -96,7 +101,7 @@ namespace IMS.Controllers
                 Milestones = Class.Milestones,
                 IssueSettings = Class.IssueSettings
             };
-           
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
             return View(ClassViewModel);
         }
         [HttpGet("Create")]
@@ -146,6 +151,22 @@ namespace IMS.Controllers
                 IsActive = classViewModel.IsActive
             };
             _classService.AddClass(Class);
+            var assignments = _classService.GetAssignments(Class.SubjectId??0);
+            foreach (var assignment in assignments)
+            {
+                var milestone = new Milestone
+                {
+                    Title = $"Initial Milestone for Class {Class.Name}",
+                    Description = "Description for the initial milestone",
+                    StartDate = DateTime.Now,
+                    EndDate = DateTime.Now.AddDays(30),
+                    ClassId = Class.Id,
+                    AssignmentId = assignment.Id,
+                    Status = true
+                };
+                _milestoneService.AddMilestone(milestone);
+            }
+        
 
             var subject = _classService.GetSubjects();
             ViewBag.Subject = subject;
@@ -166,6 +187,17 @@ namespace IMS.Controllers
             Class Class1 = _classService.GetClass(classViewModel.Id);
             Class1.SubjectId = classViewModel.SubjectId;  
            Class1.TeacherId = classViewModel.TeacherId;
+            bool ClassExist = _classService.ClassExist(classViewModel.Name);
+            if(ClassExist && Class1.Name!=classViewModel.Name)
+            {
+                var subject2 = _classService.GetSubjects();
+                ViewBag.Subject = subject2;
+                var teacher2 = _userService.GetTeacher();
+                ViewBag.Teacher = teacher2;
+                ViewBag.ErrorMessage = "Class is already exist.";
+                return View("Details",classViewModel);
+                
+            }
             Class1.Name = classViewModel.Name;
             Class1.IsActive = classViewModel.IsActive;
             Class1.Description = classViewModel.Description;
@@ -189,12 +221,10 @@ namespace IMS.Controllers
             return RedirectToAction("Index");
         }
         [HttpGet("People/{id}")]
-        public IActionResult People(int id,int page = 1, int pageSize = 5, string searchTerm = "", string filterCat = "", string filterAuthor = "")
+        [CustomAuthorize]
+        public IActionResult People(int id, string searchString, string filterbyStatus, [FromServices] IChkPgAcessService chkPgAcess)
         {
 
-            
-            
-            Dictionary<string, dynamic> filter = new Dictionary<string, dynamic>(), search = new Dictionary<string, dynamic>();
 
             Class Class = _classService.GetClass(id);
             ClassViewModel ClassViewModel = new ClassViewModel()
@@ -213,18 +243,34 @@ namespace IMS.Controllers
             User teacher = _classService.GetTeacherById(Class.TeacherId?? 0);
             
             IEnumerable<User> students = _classService.GetStudent(id);
-            
             ViewBag.Teacher = teacher;
-            
             ViewBag.Student = students;
             ViewBag.Action = "People";
-           
-            Pagination(page, pageSize, students, searchTerm);
-
+            if (!string.IsNullOrEmpty(searchString) && filterbyStatus != "ALL")
+            {
+                if (filterbyStatus == "true")
+                {
+                    students = students.Where(item => item.Status == true).ToList();
+                }
+                else
+                {
+                    students = students.Where(item => item.Status == false).ToList();
+                }
+            }
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                students = students.Where(item => item.Name.ToLower().Contains(searchString.ToLower()) || 
+                                          item.Email.ToLower().Contains(searchString.ToLower()) ||
+                                          item.Phone.ToLower().Contains(searchString.ToLower())).ToList();
+            }
+            
+            ViewBag.Student = students;
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
             return View("People",ClassViewModel);
         }
         [HttpGet("Milestones/{id}")]
-        public IActionResult Milestones(int id)
+        [CustomAuthorize]
+        public IActionResult Milestones(int id, string searchString, [FromServices] IChkPgAcessService chkPgAcess)
         {
             var milestone = _classService.GetMilestone(id);
             ViewBag.MilestoneList = milestone;
@@ -246,10 +292,19 @@ namespace IMS.Controllers
                 Milestones = Class.Milestones,
                 IssueSettings = Class.IssueSettings
             };
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
+
+            IEnumerable<Milestone> Milestone = _classService.GetMilestone(id);
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                Milestone = Milestone.Where(item => item.Title.ToLower().Contains(searchString.ToLower())).ToList();
+            }
+            ViewBag.MilestoneList = Milestone;
             return View("Milestones",ClassViewModel);
         }
         [HttpGet("IssueSetting/{id}")]
-        public IActionResult IssueSetting(int id)
+        [CustomAuthorize]
+        public IActionResult IssueSetting(int id,string searchString, [FromServices] IChkPgAcessService chkPgAcess)
         {
             var Class = _classService.GetClass(id);
             if (Class == null)
@@ -269,6 +324,15 @@ namespace IMS.Controllers
                 Milestones = Class.Milestones,
                 IssueSettings = Class.IssueSettings
             };
+            List<IssueSetting> issueSettings = _isDAO.GetIssueSettingClass(id);
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                issueSettings = issueSettings.Where(item => item.Type.ToLower().Contains(searchString.ToLower())
+                || item.Value.ToLower().Contains(searchString.ToLower())).ToList();
+            }
+            ViewBag.IssueSettingList = issueSettings;
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
+
             return View("IssueSetting", ClassViewModel);
         }
         [HttpPost("CreateMilestone")]
@@ -280,8 +344,7 @@ namespace IMS.Controllers
                 Description = model.Description,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
-                ClassId = model.ClassId,
-                ProjectId = model.ProjectId
+                ClassId = model.ClassId
             };
             _milestoneService.AddMilestone(milestone);
 
@@ -291,7 +354,10 @@ namespace IMS.Controllers
         [HttpPost("AddStudent")]
         public IActionResult AddStudent(int ClassId, string Name)
         {
-            _classService.AddStudentToClass(ClassId, Name);
+           if (_classService.AddStudentToClass(ClassId, Name) == false)
+            {
+                ViewBag.ErrorMessage = "Class is already exist.";
+            };
             return RedirectToAction("Index");
         }
         [HttpPost("People/{id}")]
@@ -336,6 +402,32 @@ namespace IMS.Controllers
             ViewBag.Search = searchTerm;
             ViewBag.PostList = itemsOnPage;
         }
-        
+        [HttpPost("ClosedMilestone")]
+        public IActionResult CloseMilestone(int id,int classid)
+        {
+            var milestone = _milestoneService.GetMilestone(id);
+
+
+            milestone.Status = !milestone.Status;
+            var Class = _classService.GetClass(classid);
+            _milestoneService.UpdateMilestone(milestone);
+            ClassViewModel ClassViewModel = new ClassViewModel()
+            {
+                Id = Class.Id,
+                Name = Class.Name,
+                Description = Class.Description,
+                TeacherId = Class.TeacherId,
+                SubjectId = Class.SubjectId,
+                IsActive = Class.IsActive,
+                Teacher = Class.Teacher,
+                Subject = Class.Subject,
+                Milestones = Class.Milestones,
+                IssueSettings = Class.IssueSettings
+            };
+            IEnumerable<Milestone> Milestone = _classService.GetMilestone(id);
+            ViewBag.MilestoneList = Milestone;
+            return View("Milestones", ClassViewModel);
+        }
     }
+   
 }

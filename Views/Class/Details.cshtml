@@ -1,4 +1,7 @@
 ﻿@model IMS.ViewModels.Class.ClassViewModel;
+@{
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
+}
 
 <html lang="en">
 
@@ -18,7 +21,33 @@
                     
                     <form method="post" asp-action="Update" enctype="multipart/form-data">
 
-
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    @if (ViewBag.SuccessMessage != null)
+                    {
+                        <div class="alert alert-success">
+                            <ul>
+                                <li>@ViewBag.SuccessMessage</li>
+                            </ul>
+                        </div>
+                    }
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger">
+                            <ul>
+                                <li>@ViewBag.ErrorMessage</li>
+                            </ul>
+                        </div>
+                    }
                     <div class="row">
                       
                         <input type="hidden" asp-for="Id" value="@Model.Id" />
@@ -81,7 +110,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <button type="submit" class="btn btn-primary">Save</button>
-                                <a href="/Class" class="btn btn-primary">Back to Class List</a>
+                            <a href="/Class/Index" class="btn btn-primary">Back to Class List</a>
                             </div>
                         </div>
                     </form>
