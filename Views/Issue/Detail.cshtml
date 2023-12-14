@@ -84,32 +84,32 @@
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.StatusId, "Status")
-                @Html.DropDownListFor(model => model.StatusId, new SelectList(ViewBag.Statuses, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('StatusId', 'UpdateStatus', 'updateStatusResult')" })
+                @Html.DropDownListFor(model => model.StatusId, new SelectList(ViewBag.Statuses, "Id", "Value"), new { @class = "form-select", onchange = "updateDropdown('StatusId', 'UpdateStatus', 'updateStatusResult')" })
             </div>
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.TypeId, "Type")
-                @Html.DropDownListFor(model => model.TypeId, new SelectList(ViewBag.Types, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('TypeId', 'UpdateType', 'updateTypeResult')" })
+                @Html.DropDownListFor(model => model.TypeId, new SelectList(ViewBag.Types, "Id", "Value"), new { @class = "form-select", onchange = "updateDropdown('TypeId', 'UpdateType', 'updateTypeResult')" })
             </div>
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.ProcessId, "Process")
-                @Html.DropDownListFor(model => model.ProcessId, new SelectList(ViewBag.Processes, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('ProcessId', 'UpdateProcess', 'updateProcessResult')" })
+                @Html.DropDownListFor(model => model.ProcessId, new SelectList(ViewBag.Processes, "Id", "Value"), new { @class = "form-select", onchange = "updateDropdown('ProcessId', 'UpdateProcess', 'updateProcessResult')" })
             </div>
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.MilestoneId, "Milestone")
-                @Html.DropDownListFor(model => model.MilestoneId, new SelectList(ViewBag.Milestones, "Id", "Title"), "Select a manager", new { @class = "form-control", onchange = "updateDropdown('MilestoneId', 'UpdateMilestone', 'updateMilestoneResult')" })
+                @Html.DropDownListFor(model => model.MilestoneId, new SelectList(ViewBag.Milestones, "Id", "Title"), "Select a milestone", new { @class = "form-control", onchange = "updateDropdown('MilestoneId', 'UpdateMilestone', 'updateMilestoneResult')" })
             </div>
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.AssigneeId, "Assignee")
-                @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Assignees, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('AssigneeId', 'UpdateAssignee', 'updateAssigneeResult')" })
+                @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Assignees, "Id", "Name"), "Select an assignee", new { @class = "form-select", onchange = "updateDropdown('AssigneeId', 'UpdateAssignee', 'updateAssigneeResult')" })
             </div>
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.ParentIssueId, "Parent")
-                @Html.DropDownListFor(model => model.ParentIssueId, new SelectList(ViewBag.Issues, "Id", "Title"), new { @class = "form-select", onchange = "updateDropdown('ParentIssueId', 'UpdateParentIssue', 'updateParentIssueResult')" })
+                @Html.DropDownListFor(model => model.ParentIssueId, new SelectList(ViewBag.Issues, "Id", "Title"), "Select a parent", new { @class = "form-select", onchange = "updateDropdown('ParentIssueId', 'UpdateParentIssue', 'updateParentIssueResult')" })
             </div>
 
             <h5 class="mb-3">Related Issues</h5>
@@ -154,12 +154,10 @@
         var parentIssueLink = $("#parentIssueLink");
         var selectedOption = $("#" + dropdownId + " option:selected");
 
-        // Update parent issue link based on the selected option text
         if (selectedOption.length > 0) {
             parentIssueLink.attr("href", "/@projectId/issues/" + selectedOption.val());
             parentIssueLink.text(selectedOption.text());
         } else {
-            // If there is no selected option, hide the container
             parentIssueLink.closest("#parentIssueContainer").hide();
         }
     }

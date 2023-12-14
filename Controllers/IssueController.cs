@@ -86,13 +86,13 @@ namespace IMS.Controllers
                         issue.ProcessId = selectedValue;
                         break;
                     case "MilestoneId":
-                        issue.MilestoneId = selectedValue;
+                        issue.MilestoneId = selectedValue == 0 ? null : selectedValue;
                         break;
                     case "AssigneeId":
-                        issue.AssigneeId = selectedValue;
+                        issue.AssigneeId = selectedValue == 0 ? null : selectedValue;
                         break;
                     case "ParentIssueId":
-                        issue.ParentIssueId = selectedValue;
+                        issue.ParentIssueId = selectedValue == 0 ? null : selectedValue ;
                         break;
                     default:
                         return RedirectToAction("NotFound", "Error");
