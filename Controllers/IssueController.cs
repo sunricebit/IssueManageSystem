@@ -204,6 +204,7 @@ namespace IMS.Controllers
                 issueToUpdate.StatusId = issue.StatusId;
                 issueToUpdate.ProcessId = issue.ProcessId;
                 issueToUpdate.ParentIssueId = issue.ParentIssueId;
+                issueToUpdate.UpdatedAt = DateTime.Now;
                 await context.SaveChangesAsync();
                 errorHelper.Success = "Update issue successfull";
             }
