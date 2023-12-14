@@ -408,16 +408,16 @@ namespace IMS.Controllers
             switch (vm.Tab)
             {
                 case "requirement":
-                    issues = issues.Where(issue => issue.Type.Value == "R");
+                    issues = issues.Where(issue => issue.Type.Value == "Requirement");
                     break;
                 case "task":
-                    issues = issues.Where(issue => issue.Type.Value == "T");
+                    issues = issues.Where(issue => issue.Type.Value == "Task");
                     break;
                 case "question":
-                    issues = issues.Where(issue => issue.Type.Value == "Q");
+                    issues = issues.Where(issue => issue.Type.Value == "Q&A");
                     break;
                 case "defect":
-                    issues = issues.Where(issue => issue.Type.Value == "D");
+                    issues = issues.Where(issue => issue.Type.Value == "Defect");
                     break;
             }
 
