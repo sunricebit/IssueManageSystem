@@ -1,4 +1,4 @@
-﻿@model PaginateEnginee<Subject, SubjectSearchViewModel>;
+﻿@model SubjectListViewModel
 @inject Intermediate intermediate
 
 @{
@@ -9,222 +9,220 @@
     {
         intermediate.Error = "";
     }
+
+    var types = new List<object>() { new { Type = "all", Text = "All" }, new { Type = "active", Text = "Active" }, new { Type = "deactive", Text = "Deactive" } };
 }
 
-<div class="container-fluid mt-5">
-    <div class="card p-4">
-        <div class="mb-3">
-            @using (Html.BeginForm("Index", "Subject", new { page = Model.PageIndex, search = Model.Additional.Search, type = Model.Additional.Type }, FormMethod.Get))
-            {
+
+<h4 class="mt-5 fw-bold">Subjects</h4>
+
+@using (Html.BeginForm("Index", "Subject", FormMethod.Get))
+{
+    <div class="container-fluid mt-5">
+        <div class="card p-4">
+            <div class="mb-3">
                 <div class="row align-items-end">
-                    <input type="hidden" class="form-control" asp-for="PageIndex" placeholder="Searh subject code or name" name="page">
                     <div class="col-md-2">
-                        <label class="form-label">Type</label>
-                        <select class="form-select" name="type" asp-for="Additional.Type">
-                            <option value="all">All</option>
-                            <option value="activate">Activate</option>
-                            <option value="deactivate">Deactivate</option>
-                        </select>
+                        @Html.LabelFor(model => model.Type, new { @class = "control-label mb-1" })
+                        @Html.DropDownListFor(model => model.Type, new SelectList(types, "Type", "Text"), new { @class = "form-control" })
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Search</label>
-                        <input type="text" class="form-control" placeholder="Searh subject code or name" name="search" asp-for="Additional.Search">
+                        @Html.LabelFor(model => model.Search, new { @class = "control-label mb-1" })
+                        @Html.TextBoxFor(model => model.Search, new { @class = "form-control", @placeholder = "Search by code or name" })
                     </div>
                     <div class="col-md-4">
                         <button type="submit" class="btn btn-primary">Search</button>
                     </div>
-
-
                     <div class="col-md-2 text-end">
-                        <button type="button" class="btn btn-primary" onclick="openPopupAddSubject()">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
                             New subject
                         </button>
                     </div>
 
                 </div>
-            }
+            </div>
+
+            <table style="border-width: 1px;  border-color: #e0e0e0" class="table table-bordered " id="sorttable-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Id</th>
+                        <th>Code</th>
+                        <th>Name</th>
+                        <th>Manager</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (Model.ItemCount == 0)
+                    {
+                        <tr> <td colspan=5>  <div class="text-secondary text-center">No item not found</div></td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var subject in Model.Subjects)
+                        {
+                            <tr>
+                                <td style="vertical-align: middle">@subject.Id</td>
+                                <td style="vertical-align: middle">@subject.Code</td>
+                                <td style="vertical-align: middle">@subject.Name</td>
+                                <td style="vertical-align: middle">@subject.SubjectManager.Name</td>
+                                <td style="vertical-align: middle">@(subject.IsActive == true ? "Active": "Deactive")</td>
+                                <td style="vertical-align: middle">
+                                    <a class="btn btn-link" href="@Url.Action("Active", "Subject", new {subjectId = subject.Id, PageIndex = Model.PageIndex,Search = Model.Search, Type = Model.Type })">@(subject.IsActive == true ? "Deactivate":"Activate")</a>
+                                    <a class="btn btn-link" href="/subjects/@subject.Code/information">Detail</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div>
+                @if (@Model.ItemCount != 0)
+                {
+                    <nav>
+                        <ul class="pagination justify-content-center">
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item"><button type="submit" name="PageIndex" value="@i" class="page-link">@i</button></li>
+                            }
+                        </ul>
+                    </nav>
+                }
+            </div>
         </div>
 
-        <table style="border-width: 1px;  border-color: #e0e0e0" class="table table-bordered " id="sorttable-table">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Id</th>
-                    <th>Code</th>
-                    <th>Name</th>
-                    <th>Manager</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-            </thead>
+        <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none; z-index: 20" id="_messageError" class="alert alert-danger"></div>
+        <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none; z-index: 20" id="_messageSuccess" class="alert alert-success"></div>
 
-            <tbody>
-                @if (Model.NoItemsFound)
-                {
-                    <tr>
-                        <td colspan=4>
-                            <div class="text-secondary text-center">No item not found</div>
-                        </td>
-                    </tr>
-                }
-                else
-                {
-                    @foreach (var subject in Model.Items)
-                    {
-                        <tr style="cursor:pointer" onclick="window.location.href = '/subjects/@subject.Code/information'">
-                            <td>@subject.Id</td>
-                            <td>@subject.Code</td>
-                            <td>@subject.Name</td>
-                            <td>@subject.SubjectManager.Name</td>
-                            <td>
-                                <input class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" readonly @(subject.IsActive == true ? "checked" : "") />
-                            </td>
-                            <td>
-                                <a class="page-link text-decoration text-primary" href="@Url.Action("Active", "Subject", new {subjectId = subject.Id, page = Model.PageIndex,search = Model.Additional.Search, type = Model.Additional.Type })">@(subject.IsActive == true ? "Deactivate":"Activate")</a>
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-
-        <nav aria-label="Page navigation example">
-            <ul class="pagination">
-
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    <li class="page-item"><a class="page-link" href="@Url.Action("Index", "Subject", new { page = i,search = Model.Additional.Search, type = Model.Additional.Type })">@i</a></li>
-                }
-
-            </ul>
-        </nav>
     </div>
-</div>
+}
 
-<div class="modal" id="exampleModal" tabindex="-1" style="background-color:#2220208c">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            @using (Html.BeginForm("AddSubject", "Subject", new { page = Model.PageIndex, search = Model.Additional.Search, type = Model.Additional.Type }, FormMethod.Post))
-            {
-                    
+
+@using (Html.BeginForm("AddSubject", "Subject", FormMethod.Post, new { @id = "createSubjectForm" }))
+{
+    CreateSubjectViewModel vm = new CreateSubjectViewModel();
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">New subject</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup()"></button>
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    @Html.AntiForgeryToken()
-
                     <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Additional.Code, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
-                        @Html.TextBoxFor(model => model.Additional.Code, new { @class = "form-control", @id = "code" })
-                        @Html.ValidationMessageFor(model => model.Additional.Code, "", new { @class = "text-danger" })
+                        @Html.LabelFor(model => vm.Code, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                        @Html.TextBoxFor(model => vm.Code, new { @class = "form-control", @id = "code" })
+                        @Html.ValidationMessageFor(model => vm.Code, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Additional.Name, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
-                        @Html.TextBoxFor(model => model.Additional.Name, new { @class = "form-control", @id = "name" })
-                        @Html.ValidationMessageFor(model => model.Additional.Name, "", new { @class = "text-danger" })
+                        @Html.LabelFor(model => vm.Name, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                        @Html.TextBoxFor(model => vm.Name, new { @class = "form-control", @id = "name" })
+                        @Html.ValidationMessageFor(model => vm.Name, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Additional.Description, new { @class = "control-label mb-1" })
-                        @Html.TextBoxFor(model => model.Additional.Description, new { @class = "form-control", @id = "description" })
+                        @Html.RadioButtonFor(model => vm.IsActive, true, new { @id = "isActive" }) Active
+                        @Html.RadioButtonFor(model => vm.IsActive, false, new { @id = "isActive", @class = "ml-4" }) Deactive
                     </div>
 
                     <div class="form-group mb-3">
-                        <label class="control-label">Activate </label>
-                        <div class="custom-control custom-switch">
-                            <input type="checkbox" id="isActive" name="isActive" />
-                            <label class="custom-control-label" for="isActiveSwitch"></label>
-                        </div>
+                        @Html.LabelFor(model => vm.SubjectManagerId, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                        @Html.DropDownListFor(model => vm.SubjectManagerId, new SelectList(ViewBag.SubjectManagers, "Id", "Name"), "Select a manager", new { @class = "form-control", @id = "subjectManagerId" })
+                        @Html.ValidationMessageFor(model => vm.SubjectManagerId, "", new { @class = "text-danger" })
                     </div>
 
-                    <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Additional.SubjectManagerId, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
-                        @Html.DropDownListFor(model => model.Additional.SubjectManagerId, ViewBag.SubjectManagers as SelectList, "Select a manager", new { @class = "form-control", @id = "subjectManagerId" })
-                        @Html.ValidationMessageFor(model => model.Additional.SubjectManagerId, "", new { @class = "text-danger" })
-                    </div>
-
-                    @if (!string.IsNullOrEmpty(@errorMessage))
-                    {
-                        <div class="text-danger text-center mt-3">
-                            @errorMessage
-                        </div>
-                    }
+                    <div id="messageError" class="text-danger text-center mt-3"></div>
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup()">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="onSubmit()">Save changes</button>
                 </div>
-            }
+            </div>
         </div>
     </div>
-</div>
+}
 
-<script>
-
-
-    var error = '@errorMessage';
-
-    if (sessionStorage.getItem("checked") === null) {
-        sessionStorage.setItem("checked", "false")
-    }
-
-    document.getElementById("isActive").addEventListener("change", function (e) {
-        sessionStorage.setItem("checked", this.checked)
-    })
-
-
-    if (error) {
-        openPopupAddSubject(error)
-    }
-
-    function openPopupAddSubject(error) {
-        var popup = document.getElementById("exampleModal");
-
-        if (error) {
-            document.getElementById("code").value = "@intermediate.Code";
-            document.getElementById("name").value = "@(intermediate.Name)";
-            document.getElementById("description").value = "@(intermediate.Description)";
-            document.getElementById("isActive").checked = sessionStorage.getItem("checked") === "true";
-            document.getElementById("subjectManagerId").value = "@(intermediate.SubjectManagerId)";
-        } else {
-            document.getElementById("code").value = "";
-            document.getElementById("name").value = "";
-            document.getElementById("description").value = "";
-            document.getElementById("isActive").checked = false;
-            document.getElementById("subjectManagerId").value = null;
+<script>function onSubmit() {
+        if ($("#createSubjectForm").valid()) {
+            var code = $("#code").val();
+            if (!code) return;
+            $.ajax({
+                type: "GET",
+                url: "/Subject/ProjectExist",
+                data: { code: code },
+                success: function (result) {
+                    if (result.exist) {
+                        document.getElementById("messageError").innerHTML = result.message;
+                    } else {
+                        $("#createSubjectForm").submit()
+                    }
+                },
+                error: function () {
+                    document.getElementById("messageError").innerHTML = "Something error";
+                }
+            });
         }
-        popup.style.display = 'block';
-    }
-
-    function closePopup() {
-        var popup = document.getElementById("exampleModal");
-        popup.style.display = 'none';
     }
 
 
-
-    //document.getElementById("code").addEventListener("change", (event) => {
-    //    sessionStorage.setItem("code", event.target.value)
-    //});
-    //document.getElementById("name").addEventListener("change", (event) => {
-    //    sessionStorage.setItem("name", event.target.value)
-    //});
-    //document.getElementById("description").addEventListener("change", (event) => {
-    //    sessionStorage.setItem("description", event.target.value)
-    //});
-    document.getElementById("isActive").addEventListener("change", (event) => {
-        sessionStorage.setItem("isActive", this.checked)
-    });
-    //document.getElementById("subjectManagerId").addEventListener("change", (event) => {
-    //    sessionStorage.setItem("subjectManagerId", event.target.value)
-    //});
-
-    function redirectToURL(url) {
-        window.location.href = url;
+    function toggleSubjectStatus(subjectId) {
+        // Make an AJAX request to update the subject status
+        $.ajax({
+            url: '/Subject/ActiveSubject/' + subjectId,
+            type: 'POST',
+            data: { data: subjectId },
+            success: function (result) {
+                // Update the button text based on the new status
+                if (result.success) {
+                    var buttonText = result.newStatus ? "Deactivate" : "Activate";
+                    $(".subject-toggle-btn[data-subject-id='" + subjectId + "']").text(buttonText);
+                } else {
+                    alert('Failed to update subject status');
+                }
+            },
+            error: function () {
+                alert('An error occurred while processing your request.');
+            }
+        });
     }
 
+    var errorTimeout
 
+    function showErrorMessage(message) {
+        var notification = document.getElementById("_messageError");
+        notification.innerHTML = message;
+        notification.style.display = 'block';
 
-</script>
+        function closeNotification() {
+            notification.innerHTML = "";
+            notification.style.display = 'none';
+        }
+
+        if (errorTimeout) clearTimeout(errorTimeout);
+        errorTimeout = setTimeout(closeNotification, 5000);
+    }
+
+    var successTimeout
+
+    function showSuccessMessage(message) {
+        var notification = document.getElementById("_messageSuccess");
+        notification.innerHTML = message;
+        notification.style.display = 'block';
+
+        function closeNotification() {
+            notification.innerHTML = "";
+            notification.style.display = 'none';
+        }
+
+        if (successTimeout) clearTimeout(successTimeout);
+        successTimeout = setTimeout(closeNotification, 5000);
+    }</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

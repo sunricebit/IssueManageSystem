@@ -1,0 +1,199 @@
+﻿@model Issue;
+
+@functions {
+    string GetTimeAgoString(DateTime pastDate)
+    {
+        TimeSpan timeDifference = DateTime.Now - pastDate;
+
+        if (timeDifference.TotalMinutes < 1)
+            return "Just now";
+
+        if (timeDifference.TotalHours < 1)
+            return $"{(int)timeDifference.TotalMinutes} minute{((int)timeDifference.TotalMinutes != 1 ? "s" : "")} ago";
+
+        if (timeDifference.TotalDays < 1)
+            return $"{(int)timeDifference.TotalHours} hour{((int)timeDifference.TotalHours != 1 ? "s" : "")} ago";
+
+        if (timeDifference.TotalDays < 7)
+            return $"{(int)timeDifference.TotalDays} day {((int)timeDifference.TotalDays != 1 ? "s" : "")} ago";
+
+        if (timeDifference.TotalDays < 30)
+            return $"{(int)(timeDifference.TotalDays / 7)} week{((int)(timeDifference.TotalDays / 7) != 1 ? "s" : "")} ago";
+
+        return pastDate.ToString("dd/MM/yyyy");
+    }
+}
+
+@{
+    var projectId = Context.Request.RouteValues["projectId"]?.ToString();
+    var issueId = Context.Request.RouteValues["issueId"]?.ToString();
+}
+<div class="container mt-4 h-100" style="position: relative">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h1 class="mb-0">@Model.Title</h1>
+                <a style="min-width: 70px" href="/@projectId/issues/@issueId/edit" class="btn btn-primary">Edit</a>
+            </div>
+
+            <p class="text-muted">
+                <span class="fw-bold"><span class="text-secondary fw-normal">Created at</span> @GetTimeAgoString(Model.CreatedAt) <span class="text-secondary fw-normal">by</span> @Model.Author.Name</span>
+            </p>
+
+            <p class="text-muted">
+                Project: @Model.Project.Name
+            </p>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Description</h5>
+                    <p class="card-text">@Html.Raw(@Model.Description)</p>
+                </div>
+            </div>
+
+            @if (Model.ParentIssue != null)
+            {
+                <div id="parentIssueContainer" class="mt-4">
+                    <p class="text-muted">
+                        Parent Issue: <a id="parentIssueLink" href="/@projectId/issues/@Model.ParentIssue.Id">@Model.ParentIssue.Title</a>
+                    </p>
+                </div>
+            }
+
+            <div class="mt-4">
+                <h5 class="mb-3">Inverse Parent Issues</h5>
+                @if (Model.InverseParentIssue.Any())
+                {
+                    <ul class="list-group">
+                        @foreach (var inverseIssue in Model.InverseParentIssue)
+                        {
+                            <li class="list-group-item">
+                                <a href="/@projectId/issues/@inverseIssue.Id">@inverseIssue.Title</a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No Inverse Parent Issues</p>
+                }
+            </div>
+        </div>
+        <div class="col-md-4">
+            <h5 class="mb-3">Actions</h5>
+
+            <div class="mb-3">
+                @Html.LabelFor(model => model.StatusId, "Status")
+                @Html.DropDownListFor(model => model.StatusId, new SelectList(ViewBag.Statuses, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('StatusId', 'UpdateStatus', 'updateStatusResult')" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(model => model.TypeId, "Type")
+                @Html.DropDownListFor(model => model.TypeId, new SelectList(ViewBag.Types, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('TypeId', 'UpdateType', 'updateTypeResult')" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(model => model.ProcessId, "Process")
+                @Html.DropDownListFor(model => model.ProcessId, new SelectList(ViewBag.Processes, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('ProcessId', 'UpdateProcess', 'updateProcessResult')" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(model => model.MilestoneId, "Milestone")
+                @Html.DropDownListFor(model => model.MilestoneId, new SelectList(ViewBag.Milestones, "Id", "Title"), "Select a manager", new { @class = "form-control", onchange = "updateDropdown('MilestoneId', 'UpdateMilestone', 'updateMilestoneResult')" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(model => model.AssigneeId, "Assignee")
+                @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Assignees, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('AssigneeId', 'UpdateAssignee', 'updateAssigneeResult')" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(model => model.ParentIssueId, "Parent")
+                @Html.DropDownListFor(model => model.ParentIssueId, new SelectList(ViewBag.Issues, "Id", "Title"), new { @class = "form-select", onchange = "updateDropdown('ParentIssueId', 'UpdateParentIssue', 'updateParentIssueResult')" })
+            </div>
+
+            <h5 class="mb-3">Related Issues</h5>
+            <ul class="list-group">
+                <li class="list-group-item"><a href="#">Related Issue 1</a></li>
+                <li class="list-group-item"><a href="#">Related Issue 2</a></li>
+                <li class="list-group-item"><a href="#">Related Issue 3</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none; z-index: 20" id="_messageError" class="alert alert-danger"></div>
+    <div style="position: absolute; left: 0; right: 0; margin: 0 auto; bottom: 20px; max-width: 400px; display: none; z-index: 20" id="_messageSuccess" class="alert alert-success"></div>
+</div>
+
+<script>
+    function updateDropdown(dropdownId, updateAction, resultId) {
+        var selectedValue = $("#" + dropdownId).val();
+        var issueId = @Model.Id;
+
+        $.ajax({
+            type: "POST",
+            url: "/Issue/UpdateStatus",
+            data: { issueId: issueId, type: dropdownId, selectedValue: selectedValue },
+            success: function (result) {
+                if (result.success) {
+                    showSuccessMessage(result.message)
+                    if (dropdownId === 'ParentIssueId') {
+                        updateParentIssueDisplay(dropdownId);
+                    }
+                } else {
+                    showErrorMessage(result.message)
+                }
+            },
+            error: function () {
+                showErrorMessage('Something error')
+            }
+        });
+    }
+
+    function updateParentIssueDisplay(dropdownId) {
+        var parentIssueLink = $("#parentIssueLink");
+        var selectedOption = $("#" + dropdownId + " option:selected");
+
+        // Update parent issue link based on the selected option text
+        if (selectedOption.length > 0) {
+            parentIssueLink.attr("href", "/@projectId/issues/" + selectedOption.val());
+            parentIssueLink.text(selectedOption.text());
+        } else {
+            // If there is no selected option, hide the container
+            parentIssueLink.closest("#parentIssueContainer").hide();
+        }
+    }
+
+    var errorTimeout
+
+    function showErrorMessage(message) {
+        var notification = document.getElementById("_messageError");
+        notification.innerHTML = message;
+        notification.style.display = 'block';
+
+        function closeNotification() {
+            notification.innerHTML = "";
+            notification.style.display = 'none';
+        }
+
+        if (errorTimeout) clearTimeout(errorTimeout);
+        errorTimeout = setTimeout(closeNotification, 5000);
+    }
+
+    var successTimeout
+
+    function showSuccessMessage(message) {
+        var notification = document.getElementById("_messageSuccess");
+        notification.innerHTML = message;
+        notification.style.display = 'block';
+
+        function closeNotification() {
+            notification.innerHTML = "";
+            notification.style.display = 'none';
+        }
+
+        if (successTimeout) clearTimeout(successTimeout);
+        successTimeout = setTimeout(closeNotification, 5000);
+    }
+
+</script>

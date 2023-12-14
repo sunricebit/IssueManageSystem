@@ -13,11 +13,12 @@ namespace IMS.Models
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
-        public int? SubjectId { get; set; }
+        public int SubjectId { get; set; }
+        public int Weight { get; set; }
         public bool? IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
 
-        public virtual Subject? Subject { get; set; }
+        public virtual Subject Subject { get; set; } = null!;
         public virtual ICollection<Milestone> Milestones { get; set; }
     }
 }
