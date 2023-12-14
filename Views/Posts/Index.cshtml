@@ -152,7 +152,7 @@
 
             @for (int i = 1; i <= ViewBag.TotalPages; i++)
             {
-                <a class="@((i == ViewBag.CurrentPage) ? "active" : "") btn btn-outline-success m-2" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search })">@i</a>
+                <a class="@((i == ViewBag.CurrentPage) ? "active" : "") btn btn-outline-success m-2" href="@Url.Action("Index", new { page = i, pageSize = ViewBag.PageSize, searchTerm = ViewBag.Search, filterCat = ViewBag.filterCat, filterAuthor = ViewBag.filterAuthor, filterPublic = ViewBag.filterPublic })">@i</a>
             }
 
         </div>

@@ -65,7 +65,7 @@ namespace IMS.Models
                 entity.HasOne(d => d.Subject)
                     .WithMany(p => p.Assignments)
                     .HasForeignKey(d => d.SubjectId)
-                    .OnDelete(DeleteBehavior.SetNull)
+                    .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("Assignment_SubjectId_fkey");
             });
 
@@ -240,6 +240,10 @@ namespace IMS.Models
                 entity.HasIndex(e => e.Id, "IssueSetting_Id_idx");
 
                 entity.HasIndex(e => e.ProjectId, "IssueSetting_ProjectId_fkey");
+
+                entity.Property(e => e.Color)
+                    .HasMaxLength(10)
+                    .HasDefaultValueSql("'#009966'");
 
                 entity.Property(e => e.Description).HasMaxLength(200);
 

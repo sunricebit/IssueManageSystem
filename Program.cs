@@ -1,7 +1,5 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NHaF1cWWhIYVJ2WmFZfVpgcF9FYFZTQ2YuP1ZhSXxQd0diWH9ac3RXTmJVV0c=");
-
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<IMSContext>(options => new IMSContext());
 builder.Services.AddSingleton<IHashService, HashService>();

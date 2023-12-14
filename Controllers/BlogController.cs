@@ -20,6 +20,8 @@ namespace IMS.Controllers
             int? id = HttpContext.Session.GetUser()?.Id;
             ViewBag.CheckAccount = id;
             ViewBag.Search = searchTerm;
+            ViewBag.filterCat = filterCat;
+            ViewBag.filterAuthor = filterAuthor;
             var cate = _context.Settings.Where(c => c.Type
             == "POST_CATEGORY").ToList();
             ViewBag.Setting = new SelectList(cate, "Value", "Value");
