@@ -6,7 +6,7 @@ namespace IMS.ViewModels.Class
         public ClassViewModel()
         {
             IssueSettings = new HashSet<IssueSetting>();
-            Milestones = new HashSet<Milestone>();
+            Milestones = new HashSet<IMS.Models.Milestone>();
             Projects = new HashSet<Project>();
             Students = new HashSet<Models.User>();
         }
@@ -23,7 +23,7 @@ namespace IMS.ViewModels.Class
         public virtual Models.Subject? Subject { get; set; }
         public virtual Models.User? Teacher { get; set; }
         public virtual ICollection<IssueSetting> IssueSettings { get; set; }
-        public virtual ICollection<Milestone> Milestones { get; set; }
+        public virtual ICollection<IMS.Models.Milestone> Milestones { get; set; }
         public virtual ICollection<Project> Projects { get; set; }
 
         public virtual ICollection<Models.User> Students { get; set; }

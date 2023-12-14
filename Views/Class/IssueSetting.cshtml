@@ -1,0 +1,14 @@
+﻿@model IMS.ViewModels.Class.ClassViewModel;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<div class="container-fluid px-4">
+    <div class="d-flex">
+        <a asp-action="Details" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">General</a>
+        <a asp-action="People" asp-controller="Class" asp-route-id="@Model.Id" class="btn btn-outline-primary text-decoration-none">People</a>
+        <a asp-action="Milestones" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Milestone</a>
+        <a asp-action="IssueSetting" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Issue Setting</a>
+    </div>
+</div>

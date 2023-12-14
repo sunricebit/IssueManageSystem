@@ -16,6 +16,54 @@ namespace IMS.Services
             if (user != null) return true; else return false;
             
         }
+        public bool AddStudentToClass(int classId, string email)
+        {
+            var @class = _context.Classes.FirstOrDefault(c=> c.Id ==classId);
+            var student = _context.Users.FirstOrDefault(u=> u.Email == email);
+
+            if (@class == null || student == null)
+            {
+                return false; 
+            }
+
+            if (@class.Students.Contains(student))
+            {
+                return false;
+            }
+
+            @class.Students.Add(student);
+
+            _context.SaveChanges();
+
+            return true; 
+        }
+        public bool RemoveStudentFromClass(int classId, string email)
+        {
+            var @class = _context.Classes.FirstOrDefault(c => c.Id == classId);
+            var student = _context.Users.FirstOrDefault(u => u.Email == email);
+
+            if (@class == null || student == null)
+            {
+                return false; 
+            }
+
+            if (!@class.Students.Contains(student))
+            {
+                return false;
+            }
+
+            @class.Students.Remove(student);
+
+            _context.SaveChanges();
+
+            return true; 
+        }
+
+        public List<Milestone> GetMilestone(int id)
+        {
+            var milestone = _context.Milestones.Where(m => m.ClassId == id).ToList();
+            return milestone;
+        }
         public IEnumerable<Class> GetClasses()
         {
             return _context.Classes.Include(c => c.Students).Include(c => c.Teacher).Include(c => c.Subject).ToList();
@@ -36,8 +84,7 @@ namespace IMS.Services
         {
             return _context.Classes.Include(c => c.Subject).Include(c => c.Students).Include(c => c.Teacher).Include(c => c.Milestones).FirstOrDefault(c => c.Id == id);
         }
-
-        public List<User> GetStudent(int classId) 
+        public IEnumerable<User> GetStudent(int classId) 
         {
             var students = _context.Classes.Where(c => c.Id == classId).SelectMany(c => c.Students).ToList();
             return students;
@@ -56,6 +103,11 @@ namespace IMS.Services
             var user = _context.Users.FirstOrDefault(u => u.Name == name || u.Email == name);
             if (user != null) { return user.Id; }
             else { return 0; }
+        }
+        public int GetSubjectId(string name)
+        {
+            var subject = _context.Subjects.FirstOrDefault(u => u.Name == name);
+            return subject != null ? subject.Id : 0;
         }
         public void AddClass(Class Class) 
         {

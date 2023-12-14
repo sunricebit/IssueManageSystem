@@ -8,10 +8,14 @@ namespace IMS.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly IUserService _userService;
+    private readonly ICommonService _commonService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger,IUserService userService,ICommonService commonService)
     {
+        _userService = userService;
         _logger = logger;
+        _commonService = commonService;
     }
 
     [Route("")]
@@ -34,6 +38,14 @@ public class HomeController : Controller
         User user = HttpContext.Session.GetUser();
         ViewBag.LstTimeAccess = user.LstAccessTime == null ? "New account" : user.LstAccessTime.Value.ToString();
         return View("BlankDashboard");
+    }
+    [Route("UserDashboard")]
+    public IActionResult UserDashboard()
+    {
+        var user = HttpContext.Session.GetUser();
+       
+        ViewBag.StatusData = _userService.GetPost(user.Id);
+        return View("UserDashboard");
     }
 
     //test

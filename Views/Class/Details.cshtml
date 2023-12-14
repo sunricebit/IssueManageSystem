@@ -5,75 +5,68 @@
 <body>
     
         <div class="container-fluid px-4">
-            <h1>@Model.Name</h1>
+        <div class="d-flex">
+            <a asp-action="Details" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">General</a>
+            <a asp-action="People" asp-controller="Class" asp-route-id="@Model.Id" class="btn btn-outline-primary text-decoration-none">People</a>
+            <a asp-action="Milestones" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Milestone</a>
+            <a asp-action="IssueSetting" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Issue Setting</a>
+        </div>
 
             <div class="card mb-4">
                 <div class="card-body">
+              
                     
                     <form method="post" asp-action="Update" enctype="multipart/form-data">
 
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div> 
-                            <a asp-action="General" asp-controller="Class" class="btn btn-link text-decoration-none">General</a>
-                        </div>
-                        <div>
-                            <a asp-action="People" asp-controller="Class" class="btn btn-link text-decoration-none">People</a>
-                        </div>
-                        <div>
-                            <a asp-action="Milestone" asp-controller="Class" class="btn btn-link text-decoration-none">Milestone</a>
-                        </div>
-                        <div>
-                            <a asp-action="IssueSetting" asp-controller="Class" class="btn btn-link text-decoration-none">Issue Setting</a>
-                        </div>
-                    </div>
+
                     <div class="row">
-                        <!-- General Section -->
+                      
                         <input type="hidden" asp-for="Id" value="@Model.Id" />
-                            <div id="generalSection">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="name">Class Name*</label>
-                                        <input type="text" asp-for="Name" class="form-control" value="@Model.Name" required />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group ">
-                                            <label for="description">Description</label>
-                                            <textarea name="description" class="form-control">@Model.Description</textarea>
-                                        </div>
-                                    </div>
+                        <div id="generalSection">
+                       
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="name">Class Name*</label>
+                                    <input type="text" name="Name" asp-for="Name" class="form-control" value="@Model.Name" required />
                                 </div>
+                            </div>
 
-                                <div class="row">
-                               <div class="col-md-6">
-                                     <div class="form-group">
-                                        <label for="TeacherId">Teacher</label>
-                                        <select name="TeacherId" class="form-control">
-                                            @foreach (var teacher in ViewBag.Teacher)
-                                            {
-                                                <option value="@teacher.Id" name="TeacherId" selected="@(teacher.Id == Model.TeacherId)" )>@teacher.Name</option>
-                                            }
-                                        </select>
-                                        <input type="hidden" name="TeacherId" value="@Model.TeacherId" />
-                                    </div> 
-                                   
+                          
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="TeacherId">Teacher</label>
+                                    <select name="TeacherId" class="form-control">
+                                        @foreach (var teacher in ViewBag.Teacher)
+                                        {
+                                            <option value="@teacher.Id" name="TeacherId" selected="@(teacher.Id == Model.TeacherId)">@teacher.Name</option>
+                                        }
+                                    </select>
+                                    <input type="hidden" name="TeacherId" value="@Model.TeacherId" />
                                 </div>
-                                    <div class="col-md-6">
+                            </div>
 
-                                    <div class="form-group">
-                                        <label for="SubjectId">Subject</label>
-                                        <select name="SubjectId" class="form-control">
-                                            @foreach (var subject in ViewBag.Subject)
-                                            {
-                                                <option value="@subject.Id" name="SubjectId" selected="@(subject.Id == Model.SubjectId)" )>@subject.Name</option>
-                                            }
-                                        </select>
-                                        <input type="hidden" name="SubjectId" value="@Model.SubjectId" />
-                                    </div>
-                                    </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="SubjectId">Subject</label>
+                                    <select name="SubjectId" class="form-control">
+                                        @foreach (var subject in ViewBag.Subject)
+                                        {
+                                            <option value="@subject.Id" name="SubjectId" selected="@(subject.Id == Model.SubjectId)">@subject.Name</option>
+                                        }
+                                    </select>
+                                    <input type="hidden" name="SubjectId" value="@Model.SubjectId" />
                                 </div>
+                            </div>
 
+                          
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea name="description" class="form-control">@Model.Description</textarea>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="statusToggle">Status</label>
                                     <div class="form-check form-switch">
@@ -82,7 +75,7 @@
                                     </div>
                                 </div>
                             </div>
-                        
+                        </div>
                     </div>
 
                         <div class="row">
@@ -111,6 +104,37 @@
 
     }
 </script>
+    <script>
+        function validateForm() {
+            var nameInput = document.getElementById('Name');
+            var emailInput = document.getElementById('Email');
+            var nameError = document.getElementById('nameError');
+            var emailError = document.getElementById('emailError');
+
+            // Reset previous errors
+            nameError.innerHTML = "";
+            emailError.innerHTML = "";
+
+            // Validate Name (non-empty)
+            if (nameInput.value.trim() === "") {
+                nameError.innerHTML = "Name is required.";
+                return false; // Prevent form submission
+            }
+
+            // Validate Email (non-empty and valid format)
+            var emailRegex = ;
+            if (emailInput.value.trim() === "") {
+                emailError.innerHTML = "Email is required.";
+                return false; // Prevent form submission
+            } else if (!emailRegex.test(emailInput.value)) {
+                emailError.innerHTML = "Invalid email format.";
+                return false; // Prevent form submission
+            }
+
+            // Form is valid
+            return true;
+        }
+    </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script src="~/js/scripts.js"></script>
 </body>
