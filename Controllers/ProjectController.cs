@@ -140,7 +140,7 @@ namespace IMS.Controllers
                 Status = project.Status,
             };
             User user = HttpContext.Session.GetUser();
-            if (user.Id == project.LeaderId)
+            if (user.Id == project.LeaderId || user.Role.Value.Equals(RoleUser.Teacher))
             {
                 ViewBag.Leader = true;
             }
