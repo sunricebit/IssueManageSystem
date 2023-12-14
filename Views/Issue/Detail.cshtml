@@ -51,14 +51,11 @@
                 </div>
             </div>
 
-            @if (Model.ParentIssue != null)
-            {
-                <div id="parentIssueContainer" class="mt-4">
-                    <p class="text-muted">
-                        Parent Issue: <a id="parentIssueLink" href="/@projectId/issues/@Model.ParentIssue.Id">@Model.ParentIssue.Title</a>
-                    </p>
-                </div>
-            }
+            <div id="parentIssueContainer mt-4">
+                <p class="text-muted">
+                    Parent Issue: <a id="parentIssueLink" href="@(Model.ParentIssue!= null ? "/" +projectId+ "/issues/"+ Model.ParentIssue.Id:"#") "> @(Model.ParentIssue!= null ? Model.ParentIssue.Title : "No parent")</a>
+                </p>
+            </div>
 
             <div class="mt-4">
                 <h5 class="mb-3">Inverse Parent Issues</h5>
@@ -153,12 +150,14 @@
     function updateParentIssueDisplay(dropdownId) {
         var parentIssueLink = $("#parentIssueLink");
         var selectedOption = $("#" + dropdownId + " option:selected");
+        var value = selectedOption.val()
 
-        if (selectedOption.length > 0) {
-            parentIssueLink.attr("href", "/@projectId/issues/" + selectedOption.val());
+        if (value) {
+            parentIssueLink.attr("href", "/@projectId/issues/" + value);
             parentIssueLink.text(selectedOption.text());
         } else {
-            parentIssueLink.closest("#parentIssueContainer").hide();
+            parentIssueLink.attr("href", "#");
+            parentIssueLink.text("No parent");
         }
     }
 
