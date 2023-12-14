@@ -68,7 +68,7 @@
                                 <td style="vertical-align: middle">@subject.Code</td>
                                 <td style="vertical-align: middle">@subject.Name</td>
                                 <td style="vertical-align: middle">@subject.SubjectManager.Name</td>
-                                <td style="vertical-align: middle">@(subject.IsActive == true ? "Deactive":"Active")</td>
+                                <td style="vertical-align: middle">@(subject.IsActive == true ? "Active": "Deactive")</td>
                                 <td style="vertical-align: middle">
                                     <a class="btn btn-link" href="@Url.Action("Active", "Subject", new {subjectId = subject.Id, PageIndex = Model.PageIndex,Search = Model.Search, Type = Model.Type })">@(subject.IsActive == true ? "Deactivate":"Activate")</a>
                                     <a class="btn btn-link" href="/subjects/@subject.Code/information">Detail</a>
@@ -147,8 +147,7 @@
     </div>
 }
 
-<script>
-    function onSubmit() {
+<script>function onSubmit() {
         if ($("#createSubjectForm").valid()) {
             var code = $("#code").val();
             if (!code) return;
@@ -222,9 +221,7 @@
 
         if (successTimeout) clearTimeout(successTimeout);
         successTimeout = setTimeout(closeNotification, 5000);
-    }
-
-    </script>
+    }</script>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

@@ -117,9 +117,9 @@
                             <span class="fw-bold"><span class="text-secondary fw-normal">Created at</span> @GetTimeAgoString(item.CreatedAt) <span class="text-secondary fw-normal">by</span> <span>@item.Author.Name</span> <span class="text-secondary fw-normal">-</span> @(item.Project.Name) @(item.Milestone != null ? " - " + item.Milestone.Title:"" )<span></span></span>
 
                             <div class="d-flex" style="gap: 6px">
-                                <span class="badge rounded-pill bg-primary">@item.Type.Name</span>
-                                <span class="badge rounded-pill bg-secondary">@item.Status.Name</span>
-                                <span class="badge rounded-pill bg-success">@item.Process.Name</span>
+                                <span class="badge rounded-pill bg-primary">@item.Type.Value</span>
+                                <span class="badge rounded-pill bg-secondary">@item.Status.Value</span>
+                                <span class="badge rounded-pill bg-success">@item.Process.Value</span>
                             </div>
                         </div>
                         <div>

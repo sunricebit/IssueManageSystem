@@ -8,41 +8,22 @@
 
 <div class="card p-4">
     <div class="mb-3">
-        @using (Html.BeginForm("Assignments", "Subject", FormMethod.Get))
-        {
-            @*<input type="hidden" class="form-control" asp-for="PageIndex" placeholder="Searh subject code or name" name="page">*@
-            <div class="row align-items-end">
-                @*<div class="col-md-2">
-                    <label class="form-label">Type</label>
-                    <select class="form-select" name="type" asp-for="Type">
-                        <option value="all">All</option>
-                        <option value="activate">Activate</option>
-                        <option value="deactivate">Deactivate</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Search</label>
-                    <input type="text" class="form-control" placeholder="Searh assignment name" name="search" asp-for="Search">
-                </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary">Search</button>
-                </div>*@
-
-                <div class="col-md-12 text-end">
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                        New Assignment
-                    </button>
-                </div>
-
+        <div class="row align-items-end">
+            <div class="col-md-12 text-end">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    New Assignment
+                </button>
             </div>
-        }
+
+        </div>
     </div>
 
     <table style="border-width: 1px;  border-color: #e0e0e0" class="table table-bordered " id="sorttable-table">
         <thead class="thead-dark">
             <tr>
                 <th>Name</th>
-                <th>Activate</th>
+                <th>Weight</th>
+                <th>Description</th>
                 <th></th>
             </tr>
         </thead>
@@ -62,11 +43,10 @@
                 {
                     <tr>
                         <td>@assignment.Name</td>
-                        <td>
-                            <input class="is-public-checkbox" style="height:15px; width:15px" type="checkbox" readonly @(assignment.IsActive == true ? "checked" : "") />
-                        </td>
+                        <td>@assignment.Weight</td>
+                        <td>@assignment.Description</td>
                         <td class="d-flex">
-                            <a class="btn btn-link btn-sm" role="button" href="@Url.Action("AssignmentsActive", "Subject", new {code = code,  assignmentId = assignment.Id, page = Model.PageIndex, search = Model.Search, type = Model.Type})">@(assignment.IsActive == true ? "Deactivate":"Activate")</a>
+                            <a class="btn btn-link btn-sm" role="button" href="@Url.Action("AssignmentsActive", "Subject", new {code = code,  assignmentId = assignment.Id })">@(assignment.IsActive == true ? "Deactivate":"Activate")</a>
                             <button class="btn btn-link btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal_@assignment.Id">Update</button>
                         </td>
                     </tr>
@@ -79,14 +59,14 @@
         <div class="modal fade" id="exampleModal_@assignment.Id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    @using (Html.BeginForm("UpdateAssignment", "Subject", new { code = Context.Request.RouteValues["code"], page = Model.PageIndex, search = Model.Search, type = Model.Type }, FormMethod.Post))
+                    @using (Html.BeginForm("UpdateAssignment", "Subject", new { code = Context.Request.RouteValues["code"] }, FormMethod.Post))
                     {
                         AssignmentViewModel2 vm = new AssignmentViewModel2()
                         {
                             Id = assignment.Id,
                             Name = assignment.Name,
                             Description = assignment.Description,
-                            IsActive = assignment.IsActive ?? false,
+                            Weight = assignment.Weight
                         };
 
                         <div class="modal-header">
@@ -102,27 +82,21 @@
                             </div>
 
                             <div class="form-group mb-3">
-                                <label for="name" class="control-label mb-1">Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="name" asp-for="@vm.Name">
-                                <span asp-validation-for="@vm.Name" class="text-danger"></span>
+                                @Html.LabelFor(model => vm.Name, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                                @Html.TextBoxFor(model => vm.Name, new { @class = "form-control", @id = "code" })
+                                @Html.ValidationMessageFor(model => vm.Name, "", new { @class = "text-danger" })
                             </div>
 
                             <div class="form-group mb-3">
-                                <label for="description" class="control-label mb-1">Description</label>
-                                <textarea asp-for="@vm.Description" class="form-control" id="description"></textarea>
+                                @Html.LabelFor(model => vm.Weight, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                                @Html.TextBoxFor(model => vm.Weight, new { @class = "form-control", @id = "code" })
+                                @Html.ValidationMessageFor(model => vm.Weight, "", new { @class = "text-danger" })
                             </div>
 
-
-                            <div class="form-group">
-                                <label for="isActive" class="control-label mb-1">Description</label>
-                                <div class="input-group">
-                                    <span class="input-group-prepend">
-                                        <input type="checkbox" asp-for="@vm.IsActive" />
-                                        @*@Html.CheckBoxFor(model => assignment.IsActive)*@
-                                    </span>
-                                </div>
+                            <div class="form-group mb-3">
+                                @Html.LabelFor(model => vm.Description, new { @class = "control-label mb-1" })
+                                @Html.TextAreaFor(model => vm.Description, new { @class = "form-control", @id = "name" })
                             </div>
-
 
                             @if (!string.IsNullOrEmpty(ViewBag.Error))
                             {
@@ -142,16 +116,7 @@
         </div>
     }
 
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
 
-            @for (int i = 1; i <= Model.TotalPages; i++)
-            {
-                <li class="page-item"><a class="page-link" href="@Url.Action("Assignments", "Subject", new { page = i,search = Model.Search, type = Model.Type })">@i</a></li>
-            }
-
-        </ul>
-    </nav>
 </div>
 
 
@@ -175,18 +140,14 @@
                     </div>
 
                     <div class="form-group mb-3">
-                        @Html.LabelFor(model => model.Description, new { @class = "control-label mb-1" })
-                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @id = "name" })
+                        @Html.LabelFor(model => model.Weight, new { @class = "control-label mb-1" }) <span class="text-danger">*</span>
+                        @Html.TextBoxFor(model => model.Weight, new { @class = "form-control", @id = "code" })
+                        @Html.ValidationMessageFor(model => model.Weight, "", new { @class = "text-danger" })
                     </div>
 
-
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.IsActive, new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-prepend">
-                                @Html.CheckBoxFor(model => model.IsActive)
-                            </span>
-                        </div>
+                    <div class="form-group mb-3">
+                        @Html.LabelFor(model => model.Description, new { @class = "control-label mb-1" })
+                        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @id = "name" })
                     </div>
 
 

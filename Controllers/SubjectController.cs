@@ -39,14 +39,6 @@ public class SubjectSearchViewModel
 
 public class AssignmentViewModel : AssignmentViewModel2
 {
-    public string? Search { get; set; }
-    public string? Type { get; set; }
-
-    public int PageIndex { get; set; }
-    public int PageSize { get; set; }
-    public int TotalPages { get; set; }
-    public int ItemCount { get; set; }
-
     public List<Assignment> Assignments { get; set; }
 }
 
@@ -61,9 +53,9 @@ public class AssignmentViewModel2
     [StringLength(10, ErrorMessage = "The code must be at least {2} characters long.", MinimumLength = 3)]
     public string? Description { get; set; }
 
-
-    [Display(Name = "Activate")]
-    public bool IsActive { get; set; }
+    [Required(ErrorMessage = "Please enter weight assignment")]
+    [Range(1, 100, ErrorMessage = "The value must be greater than 0.")]
+    public int Weight { get; set; }
 }
 
 public class SubjectListViewModel
@@ -76,8 +68,6 @@ public class SubjectListViewModel
     public int ItemCount { get; set; }
     public int TotalPages { get; set; }
     public List<Subject> Subjects { get; set; } = new();
-
-
 }
 
 public class CreateSubjectViewModel
@@ -196,8 +186,6 @@ namespace IMS.Controllers
             }
         }
 
-
-
         [Route("/subjects/{code}/information")]
         public IActionResult SubjectInformation(string code)
         {
@@ -216,7 +204,7 @@ namespace IMS.Controllers
                 };
                 return View(vm);
             }
-            catch (Exception ex)
+            catch
             {
                 return RedirectToAction("Index", new { code = code });
             }
@@ -250,7 +238,7 @@ namespace IMS.Controllers
 
                 return View(vm);
             }
-            catch (Exception ex)
+            catch
             {
                 errorHelper.Error = "Something error";
                 return View(vm);
@@ -258,61 +246,37 @@ namespace IMS.Controllers
         }
 
         [Route("/subjects/{code}/assignments")]
-        public IActionResult Assignments(string code, string? search, int? page, string? type, [FromServices] ErrorHelper errorHelper)
+        public IActionResult Assignments(string code, [FromServices] ErrorHelper errorHelper)
         {
             try
             {
-                var assignments = _context.Assignments.AsQueryable();
-                assignments = assignments.Where(ass => ass.Subject != null && ass.Subject.Code.ToLower().Contains(code.ToLower()));
-
-                if (!string.IsNullOrEmpty(search?.Trim()))
-                {
-                    assignments = assignments.Where(ass => ass.Name.ToLower().Contains(search.Trim().ToLower()));
-                }
-
-                switch (type)
-                {
-                    case "activate":
-                        assignments = assignments.Where(assignment => assignment.IsActive == true);
-                        break;
-                    case "deactivate":
-                        assignments = assignments.Where(assignment => assignment.IsActive == false);
-                        break;
-                }
-
-                int pageIndex = page ?? 1;
-                int pageSize = 5;
-                int itemCount = assignments.Count();
-                int totalPages = (int)Math.Ceiling((double)itemCount / pageSize);
-
-                if (pageIndex > totalPages) pageIndex = 1;
-                assignments = assignments.Skip((pageIndex - 1) * pageSize).Take(pageSize).OrderBy(a => a.CreatedAt);
-
-                return View(new AssignmentViewModel() { Assignments = assignments.ToList(), Search = search, PageIndex = pageIndex, PageSize = pageSize, TotalPages = totalPages, ItemCount = itemCount });
+              var assignments = _context.Assignments.Where(ass => ass.Subject.Code == code);
+                return View(new AssignmentViewModel() { Assignments = assignments.ToList() });
             }
-            catch (Exception ex)
+            catch
             {
                 errorHelper.Error = "Something error";
                 return RedirectToAction("NotFound", "Error");
             }
         }
 
-        public async Task<IActionResult> AssignmentsActive(string code, int assignmentId, int? page, string? search, string? type, [FromServices] ErrorHelper errorHelper)
+
+        //WARMING: DELETING ASSIGNMENT
+        public async Task<IActionResult> AssignmentsActive(string code, int assignmentId, [FromServices] ErrorHelper errorHelper)
         {
             try
             {
-
                 var assignment = _context.Assignments.SingleOrDefault(s => s.Id == assignmentId);
-                if (assignment == null) return RedirectToAction("Assignments", new { code = code });
-                assignment.IsActive = !assignment.IsActive;
+                if (assignment == null) return RedirectToAction("Assignments");
+                _context.Assignments.Remove(assignment);
                 await _context.SaveChangesAsync();
-                errorHelper.Success = "Update successfully";
-                return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
+                errorHelper.Success = "Delete successfully";
+                return RedirectToAction("Assignments", new { code });
             }
-            catch (Exception ex)
+            catch
             {
                 errorHelper.Error = "Update fail, something error";
-                return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
+                return RedirectToAction("Assignments", new { code });
             }
         }
 
@@ -323,7 +287,6 @@ namespace IMS.Controllers
 
             try
             {
-
                 var subject = _context.Subjects.SingleOrDefault(s => s.Code == code);
                 if (subject == null) return NotFound();
 
@@ -331,40 +294,40 @@ namespace IMS.Controllers
                 {
                     Name = vm.Name,
                     Description = vm.Description,
-                    IsActive = vm.IsActive,
+                    Weight = vm.Weight,
                     SubjectId = subject.Id
                 };
                 _context.Assignments.Add(assignment);
                 await _context.SaveChangesAsync();
                 errorHelper.Success = "Add assignment successfully";
             }
-            catch (Exception ex)
+            catch
             {
                 errorHelper.Error = "Something error";
             }
-            return RedirectToAction("Assignments", new { code = code });
+            return RedirectToAction("Assignments", new { code });
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateAssignment(AssignmentViewModel2 vm, string code, int? page, string? search, string? type, [FromServices] ErrorHelper errorHelper)
+        public async Task<IActionResult> UpdateAssignment(AssignmentViewModel2 vm, string code, [FromServices] ErrorHelper errorHelper)
         {
             try
             {
                 var assignment = _context.Assignments.SingleOrDefault(ass => ass.Id == vm.Id);
-                if (assignment == null) return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
+                if (assignment == null) return RedirectToAction("Assignments", new { code });
 
                 assignment.Name = vm.Name;
                 assignment.Description = vm.Description;
-                assignment.IsActive = vm.IsActive;
+                assignment.Weight = vm.Weight;
                 errorHelper.Success = "Update assignment successfully";
                 await _context.SaveChangesAsync();
             }
-            catch (Exception ex)
+            catch
             {
                 errorHelper.Error = "Something error";
             }
 
-            return RedirectToAction("Assignments", new { code = code, page = page, search = search, type = type });
+            return RedirectToAction("Assignments", new { code });
         }
     }
 }
