@@ -145,7 +145,8 @@ CREATE TABLE `IssueSetting` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Type` VARCHAR(20) NOT NULL,
     `Value` VARCHAR(100) NOT NULL,
-    `Name` VARCHAR(50) NOT NULL,
+    `Description` VARCHAR(200) NULL,
+    `Color` VARCHAR(10) NOT NULL DEFAULT '#009966',
     `Status` BOOLEAN NOT NULL DEFAULT true,
     `ClassId` INTEGER NULL,
     `ProjectId` INTEGER NULL,
@@ -232,6 +233,8 @@ CREATE TABLE `Subject` (
     INDEX `Subject_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
 
 -- AddForeignKey
 ALTER TABLE `Contact` ADD CONSTRAINT `Contact_ContactTypeId_fkey` FOREIGN KEY (`ContactTypeId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -332,6 +335,8 @@ ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FORE
 -- AddForeignKey
 ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
+
+
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (1,'ROLE','Admin',1,1,NULL);
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (2,'ROLE','Manager',1,1,NULL);
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (3,'ROLE','Marketer',1,1,NULL);
@@ -365,20 +370,19 @@ INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`)
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (31,'PAGE_LINK','/Subject/Index',0,0,NULL);
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (32,'PAGE_LINK','/UserProfile/User',0,0,NULL);
 
-INSERT INTO `IMS`.`IssueSetting` (`Type`,`Value`,`Name`)
+INSERT INTO `IMS`.`IssueSetting` (`Type`,`Value`)
 VALUES
-        ('TYPE', 'R','Requirement'),
-        ('TYPE', 'T','Task'),
-        ('TYPE', 'Q','Q&A'),
-        ('TYPE', 'D','Defect'),
-        ('STATUS', 'Todo','Todo'),
-        ('STATUS', 'Process','Process'),
-        ('STATUS', 'Test','Test'),
-        ('STATUS', 'Done','Done'),
-        ('PROCESS', 'Process Name 1','Process Name 1'),
-        ('PROCESS', 'Process Name 1','Process Name 1'),
-        ('PROCESS', 'Process Name 1','Process Name 1'),
-        ('PROCESS', 'Process Name 1','Process Name 1');
+        ('TYPE', 'Requirement'),
+        ('TYPE', 'Task'),
+        ('TYPE', 'Q&A'),
+        ('TYPE', 'Defect'),
+        ('STATUS', 'To do'),
+        ('STATUS', 'Doing'),
+        ('STATUS', 'Done'),
+        ('PROCESS', 'Coding'),
+        ('PROCESS', 'Req'),
+        ('PROCESS', 'Testing'),
+        ('PROCESS', 'Design');
 
        
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);

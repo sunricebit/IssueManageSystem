@@ -31,7 +31,8 @@ namespace IMS.Controllers
 
         [Route("Update"), HttpPost]
         [CustomAuthorize]
-        public IActionResult UpdatePermission([FromBody]List<PermissionViewModel> permissionViewModels, [FromServices] IPermissionService permissionService)
+        public IActionResult UpdatePermission([FromBody]List<PermissionViewModel> permissionViewModels, [FromServices] IPermissionService permissionService,
+                [FromServices] ErrorHelper errorMessage)
         {
             _permissionDAO.UpdatePermission(permissionViewModels);
             // Get permission of user
@@ -39,7 +40,24 @@ namespace IMS.Controllers
             PermissionViewModel permissionVM = permissionService.GetPermissionViewModel(user.RoleId);
             string permissionString = JsonSerializer.Serialize(permissionVM);
             HttpContext.Session.SetString("Permission", permissionString);
+
+            errorMessage.Success = "Update permission success";
             return RedirectToAction("PermissionManage");
+        }
+
+        [Route("ManageSearch")]
+        [CustomAuthorize]
+        public IActionResult SearchPage(string page)
+        {
+            List<PermissionViewModel> permissionList = _permissionDAO.GetPermissionByKeyword(page);
+            List<string> roles = new List<string>();
+            foreach (var permission in permissionList)
+            {
+                roles.Add(permission.Role);
+            }
+            ViewBag.Roles = roles;
+            ViewBag.SearchValue = page;
+            return View("PermissionManage",permissionList);
         }
     }
 }

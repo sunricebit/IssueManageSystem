@@ -13118,3 +13118,45 @@ th {
         position: absolute;
         right: 8px;
     }
+
+.suggest-colors {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.has-tooltip {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 20%;
+    margin: 5px;
+}
+
+#color-input {
+    width: 100px;
+}
+
+.issue-label {
+    align-items: center;
+    text-decoration: none;
+    
+}
+
+    .issue-label span {
+        font-size: 13px;
+        color: black;
+        margin-right: 5px;
+    }
+
+
+.label-column {
+    width: 150px;
+}
+
+.action-column {
+    width: 200px;
+}
+
+.description-column {
+    text-align: left;
+}
