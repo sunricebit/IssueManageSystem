@@ -2,7 +2,11 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<style>
+    img{
+        width:100%;
+    }
+</style>
 
     <h1>Post Details</h1>
     <hr />
@@ -26,6 +30,10 @@
                 @Model.Title
             </h2>
             <p>@Model.Excerpt</p>
+        @if (@Model.ImageUrl != null)
+        {
+            <img src="@Model.ImageUrl" />
+        }
             <div>
                 @Html.Raw(Model.Description)
             </div>

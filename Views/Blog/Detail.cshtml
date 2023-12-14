@@ -47,6 +47,11 @@
                @Model.Title
             </h2>
             <p>@Model.Excerpt</p>
+            @if (@Model.ImageUrl!=null)
+            {
+                 <img src="@Model.ImageUrl" />
+            }
+           
             <div>
                 @Html.Raw(Model.Description)
             </div>
