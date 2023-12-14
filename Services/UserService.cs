@@ -78,7 +78,11 @@ namespace IMS.Services
                     || u.Email.Contains(searchTerm) || u.Phone.Contains(searchTerm));
         }
 
-       
+       public IEnumerable<Post> GetPost(int id) 
+        {
+
+            return _context.Posts.Where( p => p.AuthorId == id).ToList();
+        }
       
     }
 }

@@ -174,19 +174,19 @@ namespace IMS.Common
             _context.Dispose();
         }
 
-        //public IEnumerable<T> GetListPaginate<T>() where T : class
-        //{
-        //    int countObject = _context.Set<T>().Count();
-        //    if (countObject % pageSize > 0)
-        //    {
-        //        this.numberOfPage = _context.Set<T>().Count() / pageSize + 1;
-        //    }
-        //    else
-        //    {
-        //        this.numberOfPage = countObject / pageSize;
-        //    }
-        //    return _context.Set<T>().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-        //}
+        public IEnumerable<T> GetListPaginate<T>() where T : class
+        {
+           int countObject = _context.Set<T>().Count();
+            if (countObject % pageSize > 0)
+            {
+                this.numberOfPage = _context.Set<T>().Count() / pageSize + 1;
+            }
+            else
+            {
+                this.numberOfPage = countObject / pageSize;
+            }
+            return _context.Set<T>().Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+        }
 
         public List<T> GetListPaginate(List<T> listObject)
         {

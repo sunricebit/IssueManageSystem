@@ -1,0 +1,155 @@
+﻿@model IMS.ViewModels.Class.ClassViewModel;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<body>
+    <div class="container-fluid px-4">
+        <div class="d-flex">
+            <a asp-action="Details" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">General</a>
+            <a asp-action="People" asp-controller="Class" asp-route-id="@Model.Id" class="btn btn-outline-primary text-decoration-none">People</a>
+            <a asp-action="Milestones" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Milestone</a>
+            <a asp-action="IssueSetting" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Issue Setting</a>
+            <input type="hidden" id="classid" value="@Model.Id" />
+        </div>
+        
+  
+            <h1> Class @Model.Name</h1>
+            <!-- Header Section -->
+            <div class="container-fluid container-limited project-highlight-puc">
+             
+                <main class="content" id="content-body" itemscope itemtype="http://schema.org/SoftwareSourceCode">
+                    <!-- Header Section -->
+                    <div class="row bg-light p-3">
+                       
+                        <div class="col-md-4">
+                            <form action="#" method="get" class="form-inline">
+                                <input type="search" name="search_title" id="search_title" placeholder="Filter by milestone name" class="form-control mr-2" spellcheck="false" />
+                                <input type="hidden" name="state" id="state" autocomplete="off" />
+                                <input type="hidden" name="sort" id="sort" autocomplete="off" />
+                            </form>
+                        </div>
+                        <div class="col-md-2 text-right">
+
+                        <a class="btn btn-success ml-3" title="New milestone" onclick="openPopupAddMilestone()">
+                                New milestone
+                            </a>
+                        </div>
+                    </div>
+
+                  
+                </main>
+            </div>
+    <div class="row">
+        @foreach (var milestone in ViewBag.MilestoneList)
+        {
+            <div class="col-md-6 mb-3">
+                <strong data-qa-milestone-title="123" data-testid="milestone-link">
+                    <a >@milestone.Title</a>
+                </strong>
+                <div class="text-tertiary mb-2">
+                    @(milestone.StartDate != DateTime.MinValue ? milestone.StartDate.ToString("MMM d, yyyy") + "–" + (milestone.EndDate != DateTime.MinValue ? milestone.EndDate.ToString("MMM d, yyyy") : "") : "")
+                </div>
+                <div>
+                    
+                    <span class="badge badge-pill badge-muted mb-2">@milestone.Project?.Name</span>
+                </div>
+            </div>
+            <div class="col-md-4 milestone-progress">
+               
+            </div>
+            <div class="col-md-2">
+                <div class="milestone-actions d-flex justify-content-sm-start justify-content-md-end">
+                    <a class="btn btn-sm btn-secondary ml-3" rel="nofollow" data-method="put">
+                        <span class="gl-button-text">Close Milestone</span>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+    </div>
+    <div class="modal" id="exampleModal" tabindex="-1" style="background-color: #2220208c">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Milestone</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup()"></button>
+                </div>
+                <div class="modal-body">
+                   
+                    <form id="milestoneForm" onsubmit="saveMilestone(event)">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="startDate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="endDate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectId" class="form-label">Project ID</label>
+                            <input type="number" class="form-control" id="projectId">
+                        </div>
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup()">Close</button>
+
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openPopupAddMilestone() {
+            var popup = document.getElementById("exampleModal");
+            document.getElementById("title").value = "";
+            document.getElementById("description").value = "";
+            document.getElementById("startDate").value = "";
+            document.getElementById("endDate").value = "";
+            document.getElementById("projectId").value = "";
+            popup.style.display = 'block';
+        }
+
+        function closePopup() {
+            var popup = document.getElementById("exampleModal");
+            popup.style.display = 'none';
+        }
+
+        function saveMilestone(event) {
+            event.preventDefault(); 
+
+            var formData = {
+                Title: document.getElementById("title").value,
+                Description: document.getElementById("description").value,
+                StartDate: document.getElementById("startDate").value,
+                EndDate: document.getElementById("endDate").value,
+                ProjectId: document.getElementById("projectId").value,
+                ClassId: document.getElementById("classid").value,
+            };
+
+            $.ajax({
+                url: "/Class/AddStudent",
+                method: "POST",
+                data: formData,
+                success: function (response) {
+                    closePopup();
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+    </script>
+</body>
