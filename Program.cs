@@ -12,6 +12,7 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IChkPgAcessService, ChkPgAcessService>();
 builder.Services.AddScoped<SettingDAO>();
 builder.Services.AddScoped<PermissionDAO>();
+builder.Services.AddScoped<IssueSettingDAO>();
 builder.Services.AddSingleton<ErrorHelper>();
 builder.Services.AddHttpContextAccessor();
 

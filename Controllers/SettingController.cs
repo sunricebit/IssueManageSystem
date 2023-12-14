@@ -16,7 +16,8 @@ namespace IMS.Controllers
 
         [Route("List")]
         [CustomAuthorize]
-        public IActionResult SettingList(int? pageNumber, string? filterByType, bool? filterByStatus, string? searchByValue)
+        public IActionResult SettingList(int? pageNumber, string? filterByType, bool? filterByStatus, 
+                                    string? searchByValue, [FromServices] IChkPgAcessService chkPgAcess)
         {
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
@@ -44,14 +45,15 @@ namespace IMS.Controllers
             ViewBag.SettingList = paginate.GetListPaginate<Setting>(filter, search);
             ViewBag.Action = "SettingList";
             ViewBag.Pagination = paginate.GetPagination();
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
             return View();
         }
 
         [Route("Add")]
         [CustomAuthorize]
-        public IActionResult AddSetting()
+        public IActionResult AddSetting([FromServices] IChkPgAcessService chkPgAcess)
         {
-
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
             return View();
         }
 
@@ -108,7 +110,7 @@ namespace IMS.Controllers
 
         [Route("Details")]
         [CustomAuthorize]
-        public IActionResult SettingDetail(int id)
+        public IActionResult SettingDetail(int id, [FromServices] IChkPgAcessService chkPgAcess)
         {
             Setting setting = _settingDAO.GetSettingById(id);
             SettingViewModel settingView = new SettingViewModel()
@@ -120,6 +122,7 @@ namespace IMS.Controllers
                 Order = setting.Order,
                 Status = setting.Status,
             };
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
             return View(settingView);
         }
 

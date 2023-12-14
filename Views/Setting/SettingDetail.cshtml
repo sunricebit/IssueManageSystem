@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Setting Detail";
     string confirmMessage = "Are you want to update this setting ?";
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
 }
 <div class="container mt-5">
     <h2>Update Setting</h2>
@@ -50,7 +51,6 @@
                 <select class="form-control" id="Type" name="Type" asp-for="Type" required readonly>
                     <option value="ROLE" selected="@(Model.Type == "ROLE")">Role Names</option>
                 </select>
-                <div class="invalid-feedback">Please select a Type.</div>
             </div>
         }
         else
@@ -63,7 +63,7 @@
                     <option value="CONTACT_TYPE" selected="@(Model.Type == "CONTACT_TYPE")">Contact Type</option>
                     <option value="POST_CATEGORY" selected="@(Model.Type == "POST_CATEGORY")">Post Category</option>
                 </select>
-                <div class="invalid-feedback">Please select a Type.</div>
+                <span asp-validation-for="Type" class="text-danger"></span>
             </div>
         }
 
@@ -73,7 +73,6 @@
             <div class="form-group">
                 <label for="Value">Value*:</label>
                 <input type="text" class="form-control" id="Value" name="Value" asp-for="Value" required value="@Model.Value" readonly>
-                <div class="invalid-feedback">Please enter the Value.</div>
             </div>
         }
         else
@@ -81,15 +80,15 @@
             <div class="form-group">
                 <label for="Value">Value*:</label>
                 <input type="text" class="form-control" id="Value" name="Value" asp-for="Value" required value="@Model.Value">
-                <div class="invalid-feedback">Please enter the Value.</div>
+                <span asp-validation-for="Value" class="text-danger"></span>
             </div>
         }
 
         <!-- Order -->
         <div class="form-group">
-            <label for="Order">Order:</label>
+            <label for="Order">Order*:</label>
             <input type="text" class="form-control" id="Order" name="Order" asp-for="Order">
-            <div class="invalid-feedback">Input integer from 1 to 255</div>
+            <span asp-validation-for="Order" class="text-danger"></span>
         </div>
 
         <!-- Description -->
@@ -99,25 +98,24 @@
         </div>
 
         <!-- Status -->
-        <div class="form-group">
-            <label for="statusToggle">Status</label>
-            <div class="form-check form-switch">
-                <input type="hidden" name="Status" value="false" id="StatusId" />
-                <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" onchange="changeStatus()" @((bool)Model.Status ? "checked" :"") />
-            </div>
+        <label for="Status">Status:</label><br />
+        <div class="form-check" style="display: inline-block; margin-right: 10px;">
+            <input class="form-check-input" type="radio" name="status" value="true" @(Model.Status ? "checked" : "")>
+            <label class="form-check-label" asp-for="Status">
+                True
+            </label>
+        </div>
+        <div class="form-check" style="display: inline-block;">
+            <input class="form-check-input" type="radio" name="status" value="false" @(!Model.Status ? "checked" : "")>
+            <label class="form-check-label" asp-for="Status">
+                False
+            </label>
         </div>
 
         <br />
         <!-- Button submit -->
-        <button type="submit" class="btn btn-primary" id="btnSubmit">Update Setting</button>
+        <button type="submit" class="btn btn-primary" id="btnSubmit" style="display: inline-block; margin-right: 10px;">Update Setting</button>
+        <a class="btn btn-primary" href="@Url.Action("SettingList")" style="display: inline-block;">Back To Setting List</a>
     </form>
 </div>
 @Html.Partial("_ConfirmPartial", confirmMessage)
-
-<script>
-    function changeStatus() {
-        var statusToggle = document.getElementById('statusToggle');
-        var statusId = document.getElementById('StatusId');
-        statusId.value = statusToggle.checked ? "true" : "false";
-    }
-</script>

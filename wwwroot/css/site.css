@@ -13137,15 +13137,21 @@ th {
 }
 
 .issue-label {
+    justify-content: space-between; /* Cách nhau bằng khoảng trống */
     align-items: center;
     text-decoration: none;
-    
 }
 
     .issue-label span {
+        flex: 1; /* Chia chiều rộng của thẻ cha cho cả hai span */
         font-size: 13px;
         color: black;
-        margin-right: 5px;
+        margin-top: 1px;
+        border-radius: 10%;
+        height: 90%;
+        text-align: center;
+        line-height: 1;
+        align-self: stretch;
     }
 
 
@@ -13155,6 +13161,8 @@ th {
 
 .action-column {
     width: 200px;
+    justify-content: space-between; /* Cách nhau bằng khoảng trống */
+    align-items: center;
 }
 
 .description-column {
