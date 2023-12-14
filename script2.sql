@@ -89,7 +89,8 @@ CREATE TABLE `Assignment` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Name` VARCHAR(100) NOT NULL,
     `Description` TEXT NULL,
-    `SubjectId` INTEGER NULL,
+    `SubjectId` INTEGER NOT NULL,
+    `Weight` INTEGER NOT NULL,
     `IsActive` BOOLEAN NOT NULL DEFAULT true,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
@@ -254,7 +255,7 @@ ALTER TABLE `Report` ADD CONSTRAINT `Report_PostId_fkey` FOREIGN KEY (`PostId`) 
 ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Assignment` ADD CONSTRAINT `Assignment_SubjectId_fkey` FOREIGN KEY (`SubjectId`) REFERENCES `Subject`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Assignment` ADD CONSTRAINT `Assignment_SubjectId_fkey` FOREIGN KEY (`SubjectId`) REFERENCES `Subject`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Class` ADD CONSTRAINT `Class_SubjectId_fkey` FOREIGN KEY (`SubjectId`) REFERENCES `Subject`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -329,7 +330,7 @@ ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_ProjectId_fkey` FORE
 ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;      
+ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (1,'ROLE','Admin',1,1,NULL);
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (2,'ROLE','Manager',1,1,NULL);
@@ -460,21 +461,21 @@ insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManag
 insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (16, 'OJS201', 'On the job training	', 1, null, 2);
 
 
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (1, 'Assignment 1', null, 1);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (2, 'Assignment 2', null, 1);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (3, 'Assignment 3', null, 1);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (4, 'Assignment 1', null, 2);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (5, 'Assignment 2', null, 2);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (6, 'Assignment 3', null, 2);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (7, 'Assignment 1', null, 3);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (8, 'Assignment 2', null, 3);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (9, 'Assignment 3', null, 3);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (10, 'Assignment 1', null, 4);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (11, 'Assignment 2', null, 4);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (12, 'Assignment 3', null, 4);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (13, 'Assignment 1', null, 5);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (14, 'Assignment 2', null, 5);
-insert into `IMS`.`Assignment` (Id, Name, Description, SubjectId) values (15, 'Assignment 3', null, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description, Weight, SubjectId) values (1, 'Assignment 1', null, 10, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, Weight, SubjectId) values (2, 'Assignment 2', null, 10, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (3, 'Assignment 3', null,  10,1);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (4, 'Assignment 1', null,  10,2);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (5, 'Assignment 2', null,  10,2);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (6, 'Assignment 3', null,  10,2);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (7, 'Assignment 1', null,  10,3);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (8, 'Assignment 2', null,  10,3);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (9, 'Assignment 3', null,  10,3);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (10, 'Assignment 1', null, 10, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (11, 'Assignment 2', null, 10, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (12, 'Assignment 3', null, 10, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (13, 'Assignment 1', null, 10, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (14, 'Assignment 2', null, 10, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (15, 'Assignment 3', null, 10, 5);
 
 
 

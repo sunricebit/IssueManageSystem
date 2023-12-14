@@ -65,7 +65,7 @@ namespace IMS.Models
                 entity.HasOne(d => d.Subject)
                     .WithMany(p => p.Assignments)
                     .HasForeignKey(d => d.SubjectId)
-                    .OnDelete(DeleteBehavior.SetNull)
+                    .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("Assignment_SubjectId_fkey");
             });
 
