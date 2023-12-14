@@ -44,7 +44,7 @@ public class HomeController : Controller
     {
         var user = HttpContext.Session.GetUser();
        
-        ViewBag.StatusData = _userService.GetPost(user.Id);
+      //  ViewBag.StatusData = _userService.GetPost(user.Id);
         return View("UserDashboard");
     }
 
