@@ -32,10 +32,7 @@ namespace IMS.Controllers
                             return View("UserDetail", User);
                         }
 
-                    case "change-password":
-                        {
-                            return View("PasswordChange", new ChangePasswordViewModel());
-                        }
+                   
 
                 }
                 return View();
@@ -245,34 +242,6 @@ namespace IMS.Controllers
         }
 
 
-        [Route("/userprofile")]
-        [HttpPost]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel vm, [FromServices] IHashService hashService)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View("PasswordChange", vm);
-            }
-            if (vm.OldPassword.Equals(vm.NewPassword))
-            {
-                ViewBag.Error = "Your current password incorrect!!!";
-                return View("PasswordChange", vm);
-            }
-            int userId = HttpContext.Session.GetUser()!.Id;
-            var user = _context.Users.SingleOrDefault(user => user.Id == userId);
-            if (user == null) return RedirectToAction("SignIn");
-
-            if (!hashService.Verify(vm.OldPassword, user.Password))
-            {
-                ViewBag.Error = "Your current password incorrect!!!";
-                return View("PasswordChange", vm);
-            }
-
-            user!.Password = hashService.HashPassword(vm.NewPassword);
-            await _context.SaveChangesAsync();
-            ViewBag.Success = "Your password was updated!!!";
-            ModelState.Clear();
-            return View("PasswordChange", new ChangePasswordViewModel());
-        }
+        
     }
 }

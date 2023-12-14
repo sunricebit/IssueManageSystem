@@ -274,19 +274,52 @@ namespace IMS.Controllers
         }
 
         [Route("logout")]
+        [CustomAuthorize]
         public async Task<IActionResult> Logout()
         {
-            User user = _context.Users.FirstOrDefault(u => u.Id == HttpContext.Session.GetUser().Id);
+            User user = _context.Users.FirstOrDefault(u => u.Id == HttpContext.Session.GetUser()!.Id)!;
             user.LstAccessTime = DateTime.Now;
             await _context.SaveChangesAsync();
             HttpContext.Session.Clear();
             return RedirectToAction("SignIn");
         }
 
-        [Route("changepassword")]
+        [Route("/change-password")]
+        [CustomAuthorize]
         public IActionResult ChangePassword()
         {
-            return View();
+            return View(new ChangePasswordViewModel());
+        }
+
+        [Route("/change-password")]
+        [HttpPost]
+        [CustomAuthorize]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel vm, [FromServices] IHashService hashService)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(vm);
+            }
+            if (vm.OldPassword.Equals(vm.NewPassword))
+            {
+                ViewBag.Error = "The new password matches the old password!!!";
+                return View(vm);
+            }
+            int userId = HttpContext.Session.GetUser()!.Id;
+            var user = _context.Users.SingleOrDefault(user => user.Id == userId);
+            if (user == null) return RedirectToAction("SignIn");
+
+            if (!hashService.Verify(vm.OldPassword, user.Password))
+            {
+                ViewBag.Error = "Your current password incorrect!!!";
+                return View(vm);
+            }
+
+            user!.Password = hashService.HashPassword(vm.NewPassword);
+            await _context.SaveChangesAsync();
+            ViewBag.Success = "Your password was updated!!!";
+            ModelState.Clear();
+            return RedirectToAction("Logout");
         }
     }
 }
