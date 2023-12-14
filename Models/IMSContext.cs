@@ -242,7 +242,9 @@ namespace IMS.Models
 
                 entity.HasIndex(e => e.ProjectId, "IssueSetting_ProjectId_fkey");
 
-                entity.Property(e => e.Name).HasMaxLength(50);
+                entity.Property(e => e.Description).HasMaxLength(200);
+
+                entity.Property(e => e.Color).HasMaxLength(10);
 
                 entity.Property(e => e.Status)
                     .IsRequired()
