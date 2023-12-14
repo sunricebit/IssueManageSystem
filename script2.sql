@@ -527,19 +527,6 @@ INSERT INTO `Milestone` (`Title`, `Description`, `StartDate`, `EndDate`, `Projec
 ('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 1, 1, NULL),
 ('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 1, 1, NULL),
 ('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 1, 1, NULL),
-('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 2, 1, NULL),
-('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 2, 1, NULL),
-('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 2, 1, NULL),
-('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 3, 1, NULL),
-('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 3, 1, NULL),
-('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 3, 1, NULL),
-('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 4, 1, NULL),
-('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 4, 1, NULL),
-('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 4, 1, NULL),
-('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 5, 1, NULL),
-('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 5, 1, NULL),
-('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 5, 1, NULL);
-
 
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('6', '1');
