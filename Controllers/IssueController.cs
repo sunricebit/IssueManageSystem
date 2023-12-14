@@ -1,6 +1,4 @@
-using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 public class IssueViewModel
 {
@@ -52,7 +50,7 @@ public class NewIssue
     public int ProcessId { get; set; }
 
     [Display(Name = "Issue parent")]
-    public int? IssueParentId { get; set; }
+    public int? ParentIssueId { get; set; }
 }
 
 namespace IMS.Controllers
@@ -92,7 +90,7 @@ namespace IMS.Controllers
                         issue.AssigneeId = selectedValue == 0 ? null : selectedValue;
                         break;
                     case "ParentIssueId":
-                        issue.ParentIssueId = selectedValue == 0 ? null : selectedValue ;
+                        issue.ParentIssueId = selectedValue == 0 ? null : selectedValue;
                         break;
                     default:
                         return RedirectToAction("NotFound", "Error");
@@ -122,25 +120,26 @@ namespace IMS.Controllers
 
             var project = context.Projects
                 .Include(p => p.Students)
-                .Include(p => p.Class)
-                .ThenInclude(cls => cls.Milestones)
+                .Include(p => p.Issues)
+                .Include(p => p.Milestones)
+                .Include(p => p.Class).ThenInclude(cls => cls.Milestones)
                 .SingleOrDefault(project => project.Id == projectId);
 
-            if (project == null) return RedirectToAction("NotFound", "Error");
+                if (project == null) return RedirectToAction("NotFound", "Error");
 
+            var assignees = project.Students.ToList();
+            var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
             var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
             var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
             var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
-            var issues = context.Issues.Where(issue => issue.ProjectId == projectId && issue.Id != issueId);
-            var assignees = context.Projects.Include(project => project.Students).FirstOrDefault(project => project.Id == projectId)!.Students.ToList();
-
+            var issues = project.Issues.ToList();
 
             ViewBag.Types = types;
             ViewBag.Assignees = assignees;
-            ViewBag.Milestones = project.Class.Milestones.ToList();
+            ViewBag.Milestones = milestones;
             ViewBag.Statuses = statuses;
             ViewBag.Processes = processes;
-            ViewBag.Issues = issues;
+            ViewBag.ParentIssues = issues;
 
 
             if (issue == null) return RedirectToAction("Index");
@@ -161,29 +160,31 @@ namespace IMS.Controllers
                 .Include(issue => issue.ParentIssue)
                 .FirstOrDefault(i => i.ProjectId == projectId && i.Id == issueId);
 
+            if (issue == null) return RedirectToAction("Index");
+
             var project = context.Projects
                 .Include(p => p.Students)
-                .Include(p => p.Class)
-                .ThenInclude(cls => cls.Milestones)
+                .Include(p => p.Issues)
+                .Include(p => p.Milestones)
+                .Include(p => p.Class).ThenInclude(cls => cls.Milestones)
                 .SingleOrDefault(project => project.Id == projectId);
 
             if (project == null) return RedirectToAction("NotFound", "Error");
 
-
+            var assignees = project.Students.ToList();
+            var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
             var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
             var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
             var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
-            var issues = context.Issues.Where(issue => issue.ProjectId == projectId && issue.Id != issueId);
-            var assignees = context.Projects.Include(project => project.Students).FirstOrDefault(project => project.Id == projectId)!.Students.ToList();
+            var issues = project.Issues.ToList();
 
             ViewBag.Types = types;
             ViewBag.Assignees = assignees;
-            ViewBag.Milestones = project.Class.Milestones.ToList();
+            ViewBag.Milestones = milestones;
             ViewBag.Statuses = statuses;
             ViewBag.Processes = processes;
-            ViewBag.Issues = issues;
+            ViewBag.ParentIssues = issues;
 
-            if (issue == null) return RedirectToAction("Index");
             return View(issue);
         }
 
@@ -205,6 +206,7 @@ namespace IMS.Controllers
                 issueToUpdate.ProcessId = issue.ProcessId;
                 issueToUpdate.ParentIssueId = issue.ParentIssueId;
                 issueToUpdate.UpdatedAt = DateTime.Now;
+
                 await context.SaveChangesAsync();
                 errorHelper.Success = "Update issue successfull";
             }
@@ -216,32 +218,36 @@ namespace IMS.Controllers
         }
 
         [Route("{projectId}/issues/new")]
+        [CustomAuthorize]
         public IActionResult Create(int projectId)
         {
             var project = context.Projects
                 .Include(p => p.Students)
-                .Include(p => p.Class)
-                .ThenInclude(cls => cls.Milestones)
+                .Include(p => p.Issues)
+                .Include(p => p.Milestones)
+                .Include(p => p.Class).ThenInclude(cls => cls.Milestones)
                 .SingleOrDefault(project => project.Id == projectId);
 
             if (project == null) return RedirectToAction("NotFound", "Error");
+
+            var assignees = project.Students.ToList();
+            var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
+            var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
+            var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
+            var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
+            var issues = project.Issues.ToList() ;
+
+            ViewBag.Types = types;
+            ViewBag.Assignees = assignees;
+            ViewBag.Milestones = milestones;
+            ViewBag.Statuses = statuses;
+            ViewBag.Processes = processes;
+            ViewBag.ParentIssues = issues;
 
             NewIssue vm = new()
             {
                 ProjectName = project.Name
             };
-
-            var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
-            var statuses = context.IssueSettings.Where(s => s.Type == "STATUS").ToList();
-            var processes = context.IssueSettings.Where(s => s.Type == "PROCESS").ToList();
-            var issues = context.Issues.Where(issue => issue.ProjectId == projectId);
-
-            ViewBag.Types = types;
-            ViewBag.Assignees = project.Students.ToList();
-            ViewBag.Milestones = project.Class.Milestones.ToList();
-            ViewBag.Statuses = statuses;
-            ViewBag.Processes = processes;
-            ViewBag.Issues = issues;
 
             return View(vm);
         }
@@ -268,7 +274,7 @@ namespace IMS.Controllers
                     ProjectId = project.Id,
                     AuthorId = userId,
                     AssigneeId = vm.AssigneeId,
-                    ParentIssueId = vm.IssueParentId
+                    ParentIssueId = vm.ParentIssueId
                 };
 
                 context.Issues.Add(issue);
@@ -281,8 +287,6 @@ namespace IMS.Controllers
 
             }
             return RedirectToAction("Index");
-
-
         }
 
 
@@ -292,7 +296,6 @@ namespace IMS.Controllers
         {
             var userId = HttpContext.Session.GetUser()!.Id;
 
-            //kiểm tra user có thực sự tồn tại
             User? user = context.Users.Include(user => user.Role).SingleOrDefault(user => user.Id == userId);
             if (user == null) return RedirectToAction("SignIn", "Auth");
 
@@ -301,66 +304,29 @@ namespace IMS.Controllers
             ViewBag.Authors = new List<User>();
             ViewBag.Assignees = new List<User>();
 
-            var roleName = user.Role.Value;
+            var userData = context.Users
+                 .Include(user => user.ProjectsNavigation).ThenInclude(project => project.Class).ThenInclude(cls => cls.Milestones)
+                 .Include(user => user.ProjectsNavigation).ThenInclude(project => project.Students)
+                 .Include(user => user.ProjectsNavigation).ThenInclude(project => project.Milestones)
+                 .AsSplitQuery()
+                 .SingleOrDefault(user => user.Id == userId)!;
 
-            //lấy tất cả các project đã tham gia/
-            List<Project> projectJoined = new();
-            switch (roleName)
-            {
-                case "Teacher":
-                    projectJoined = context.Classes
-                        .Include(cls => cls.Projects)
-                        .ThenInclude(project => project.Students)
-                        .Where(cls => cls.TeacherId != null && cls.TeacherId == userId)
-                        .SelectMany(cls => cls.Projects)
-                        .OrderBy(project => project.Name)
-                        .ToList();
-                    break;
-                case "Student":
-                    projectJoined = context.Users
-                        .Include(t => t.ProjectsNavigation)
-                        .ThenInclude(project => project.Students)
-                        .SingleOrDefault(t => t.Id == userId)!
-                        .ProjectsNavigation
-                        .OrderBy(project => project.Name)
-                        .ToList();
-                    break;
-                default:
-                    return RedirectToAction("Index");
-            };
-            if (projectJoined.Count == 0) return View(vm);
-            ViewBag.Projects = projectJoined;
-
-            //lấy tất cả các milestone
-            List<Milestone> milestones = new();
-            switch (roleName)
-            {
-                case "Teacher":
-                    var teacher = context.Users.Include(t => t.Classes).ThenInclude(cls => cls.Milestones).SingleOrDefault(t => t.Id == userId);
-                    if (teacher != null) milestones = teacher.Classes.SelectMany(c => c.Milestones).ToList();
-                    break;
-                case "Student":
-                    var student = context.Users.Include(t => t.ClassesNavigation).ThenInclude(cls => cls.Milestones).SingleOrDefault(t => t.Id == userId);
-                    if (student != null) milestones = student.Classes.SelectMany(c => c.Milestones).ToList();
-                    break;
-                default:
-                    return RedirectToAction("Index");
-            };
-
-            ViewBag.Milestones = milestones;
-
-            //Get author
-            var authors = projectJoined.SelectMany(project => project.Students).DistinctBy(user => user.Id).OrderBy(user => user.Name);
-            ViewBag.Authors = authors;
-
-            //Get assignees
-            var assignees = authors.Select(user => user).ToList();
+            var projects = userData.ProjectsNavigation.ToList();
+            var milestones = userData.ProjectsNavigation.SelectMany(project => project.Class.Milestones).Union(userData.ProjectsNavigation.SelectMany(project => project.Milestones)).DistinctBy(milestone => milestone.Id).ToList();
+            milestones.Insert(0, new Milestone() { Id = -1, Title = "Not yet" });
+            var authors = userData.ProjectsNavigation.SelectMany(project => project.Students).DistinctBy(students => students.Id).ToList();
+            var assignees = new List<User>(authors);
             assignees.Insert(0, new User() { Id = -1, Name = "Not yet" });
+
+            ViewBag.Projects = projects;
+            ViewBag.Milestones = milestones;
+            ViewBag.Authors = authors;
             ViewBag.Assignees = assignees;
 
+            if (projects.Count == 0) return View(vm);
 
             //-----------MAIN----------
-            IQueryable<Issue> issues = context.Issues.AsQueryable().Where(issue => projectJoined.Contains(issue.Project));
+            IQueryable<Issue> issues = context.Issues.AsQueryable().Where(issue => projects.Contains(issue.Project));
 
 
             if (!string.IsNullOrEmpty(vm.Search?.Trim()))

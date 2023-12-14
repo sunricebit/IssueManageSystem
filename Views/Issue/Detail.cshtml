@@ -106,7 +106,7 @@
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.ParentIssueId, "Parent")
-                @Html.DropDownListFor(model => model.ParentIssueId, new SelectList(ViewBag.Issues, "Id", "Title"), "Select a parent", new { @class = "form-select", onchange = "updateDropdown('ParentIssueId', 'UpdateParentIssue', 'updateParentIssueResult')" })
+                @Html.DropDownListFor(model => model.ParentIssueId, new SelectList(ViewBag.ParentIssues, "Id", "Title"), "Select a parent", new { @class = "form-select", onchange = "updateDropdown('ParentIssueId', 'UpdateParentIssue', 'updateParentIssueResult')" })
             </div>
 
             <h5 class="mb-3">Related Issues</h5>
