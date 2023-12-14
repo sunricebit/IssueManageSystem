@@ -3,6 +3,7 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
 }
 
 <body>
@@ -18,30 +19,26 @@
   
             <h1> Class @Model.Name</h1>
             <!-- Header Section -->
-            <div class="container-fluid container-limited project-highlight-puc">
-             
-                <main class="content" id="content-body" itemscope itemtype="http://schema.org/SoftwareSourceCode">
-                    <!-- Header Section -->
-                    <div class="row bg-light p-3">
-                       
-                        <div class="col-md-4">
-                            <form action="#" method="get" class="form-inline">
-                                <input type="search" name="search_title" id="search_title" placeholder="Filter by milestone name" class="form-control mr-2" spellcheck="false" />
-                                <input type="hidden" name="state" id="state" autocomplete="off" />
-                                <input type="hidden" name="sort" id="sort" autocomplete="off" />
-                            </form>
-                        </div>
-                        <div class="col-md-2 text-right">
+        <div class="container-fluid container-limited project-highlight-puc">
+            <main class="content" id="content-body" itemscope itemtype="http://schema.org/SoftwareSourceCode">
+                <!-- Header Section -->
 
-                        <a class="btn btn-success ml-3" title="New milestone" onclick="openPopupAddMilestone()">
-                                New milestone
-                            </a>
-                        </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <form asp-action="Milestones" asp-controller="Class" asp-route-id="@Model.Id" method="get" class="form-inline">
+                            <input type="search" id="searchString" name="searchString" placeholder="Filter by milestone name" class="form-control mr-2" spellcheck="false" />
+                            <button type="submit" class="btn btn-primary">Search Page</button>
+                        </form>
                     </div>
+                    <div class="col-md-2 text-right">
+                        <a class="btn btn-success ml-3" title="New milestone" onclick="openPopupAddMilestone()">
+                            New milestone
+                        </a>
+                    </div>
+                </div>
 
-                  
-                </main>
-            </div>
+            </main>
+        </div>
     <div class="row">
         @foreach (var milestone in ViewBag.MilestoneList)
         {
@@ -56,16 +53,41 @@
                     
                     <span class="badge badge-pill badge-muted mb-2">@milestone.Project?.Name</span>
                 </div>
+                
+                    <div class ="mt-2">
+                        @if (milestone.Status == false)
+                        {
+                            <span class="btn btn-danger">Closed</span>
+                        }
+                        else
+                        {
+                            <span class="btn btn-success">Open</span>
+                        }
+                        
+                        
+                    </div>
+              
             </div>
             <div class="col-md-4 milestone-progress">
                
             </div>
             <div class="col-md-2">
-                <div class="milestone-actions d-flex justify-content-sm-start justify-content-md-end">
-                    <a class="btn btn-sm btn-secondary ml-3" rel="nofollow" data-method="put">
-                        <span class="gl-button-text">Close Milestone</span>
-                    </a>
-                </div>
+                    <form asp-action="CloseMilestone" asp-route-id="@milestone.Id" asp-route-classid="@Model.Id" asp-controller="Class" method="post">
+                        <div class="milestone-actions d-flex justify-content-sm-start justify-content-md-end">
+                            @if (milestone.Status == true)
+                            {
+                                <button type="submit" class="btn btn-sm btn-secondary ml-3" @(milestone.AssignmentId == null ? "" : "disabled")>
+                                    <span class="gl-button-text">Close Milestone</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="submit" class="btn btn-sm btn-success ml-3" @(milestone.AssignmentId == null ? "" : "disabled")>
+                                    <span class="gl-button-text">Reopen Milestone</span>
+                                </button>
+                            }
+                        </div>
+                    </form>
             </div>
         }
     </div>
@@ -97,10 +119,6 @@
                             <label for="endDate" class="form-label">End Date</label>
                             <input type="date" class="form-control" id="endDate">
                         </div>
-                        <div class="mb-3">
-                            <label for="projectId" class="form-label">Project ID</label>
-                            <input type="number" class="form-control" id="projectId">
-                        </div>
 
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup()">Close</button>
 
@@ -118,7 +136,6 @@
             document.getElementById("description").value = "";
             document.getElementById("startDate").value = "";
             document.getElementById("endDate").value = "";
-            document.getElementById("projectId").value = "";
             popup.style.display = 'block';
         }
 
@@ -135,12 +152,11 @@
                 Description: document.getElementById("description").value,
                 StartDate: document.getElementById("startDate").value,
                 EndDate: document.getElementById("endDate").value,
-                ProjectId: document.getElementById("projectId").value,
                 ClassId: document.getElementById("classid").value,
             };
 
             $.ajax({
-                url: "/Class/AddStudent",
+                url: "/Class/CreateMilestone",
                 method: "POST",
                 data: formData,
                 success: function (response) {

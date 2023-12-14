@@ -13,9 +13,19 @@
             _context.SaveChanges();
             return milestone;
         }
-        public bool CheckMilestoneExist(int classid, int assginmentid, int subjectid)
+        
+        public Milestone GetMilestone(int id)
+        {
+            return _context.Milestones.FirstOrDefault(x => x.Id == id);
+        }
+        public bool CheckMilestoneExist(string name)
         {
             return true;
+        }
+        public void UpdateMilestone(Milestone milestone)
+        {
+            _context.Milestones.Update(milestone);
+            _context.SaveChanges();
         }
     }
 }
