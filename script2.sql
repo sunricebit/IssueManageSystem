@@ -69,9 +69,9 @@ CREATE TABLE `User` (
     `Password` VARCHAR(64) NOT NULL,
     `RoleId` INTEGER NOT NULL,
     `Name` VARCHAR(50) NOT NULL,
+    `Description` VARCHAR(255) NULL,
     `Avatar` VARCHAR(300) NULL,
     `Gender` BOOLEAN NULL,
-    `Description` VARCHAR(255) NULL,
     `Phone` VARCHAR(15) NULL,
     `Address` VARCHAR(191) NULL,
     `Status` BOOLEAN NULL,
@@ -173,7 +173,7 @@ CREATE TABLE `Milestone` (
     `StartDate` DATETIME(3) NULL,
     `EndDate` DATETIME(3) NULL,
     `ProjectId` INTEGER NULL,
-    `ClassId` INTEGER NULL,
+    `ClassId` INTEGER NOT NULL,
     `AssignmentId` INTEGER NULL,
 
     INDEX `Milestone_Id_idx`(`Id`),
@@ -188,9 +188,9 @@ CREATE TABLE `Permission` (
     `CanCreate` BOOLEAN NOT NULL DEFAULT false,
     `CanRead` BOOLEAN NOT NULL DEFAULT false,
     `CanUpdate` BOOLEAN NOT NULL DEFAULT false,
-	`CanExport` BOOLEAN NOT NULL DEFAULT false,
+    `CanExport` BOOLEAN NOT NULL DEFAULT false,
     `CanDelete` BOOLEAN NOT NULL DEFAULT false,
-    
+
     INDEX `Permission_RoleId_PageId_idx`(`RoleId`, `PageId`),
     UNIQUE INDEX `Permission_RoleId_PageId_key`(`RoleId`, `PageId`),
     PRIMARY KEY (`Id`)
@@ -203,7 +203,7 @@ CREATE TABLE `Project` (
     `GroupName` VARCHAR(255) NOT NULL,
     `Status` BOOLEAN NULL DEFAULT true,
     `Description` TEXT NULL,
-    `ClassId` INTEGER NULL,
+    `ClassId` INTEGER NOT NULL,
     `LeaderId` INTEGER NULL,
 
     INDEX `Project_Id_idx`(`Id`),
@@ -308,7 +308,7 @@ ALTER TABLE `Message` ADD CONSTRAINT `Message_ContactId_fkey` FOREIGN KEY (`Cont
 ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_AssignmentId_fkey` FOREIGN KEY (`AssignmentId`) REFERENCES `Assignment`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -320,7 +320,7 @@ ALTER TABLE `Permission` ADD CONSTRAINT `Permission_PageId_fkey` FOREIGN KEY (`P
 ALTER TABLE `Permission` ADD CONSTRAINT `Permission_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Project` ADD CONSTRAINT `Project_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Project` ADD CONSTRAINT `Project_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Project` ADD CONSTRAINT `Project_LeaderId_fkey` FOREIGN KEY (`LeaderId`) REFERENCES `User`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -332,8 +332,7 @@ ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_ProjectId_fkey` FORE
 ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-       
+ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;      
 
 
 

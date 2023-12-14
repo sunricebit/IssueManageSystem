@@ -16,11 +16,11 @@ namespace IMS.Models
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int? ProjectId { get; set; }
-        public int? ClassId { get; set; }
+        public int ClassId { get; set; }
         public int? AssignmentId { get; set; }
 
         public virtual Assignment? Assignment { get; set; }
-        public virtual Class? Class { get; set; }
+        public virtual Class Class { get; set; } = null!;
         public virtual Project? Project { get; set; }
         public virtual ICollection<Issue> Issues { get; set; }
     }
