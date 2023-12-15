@@ -222,7 +222,7 @@ namespace IMS.Controllers
                 message.Success = "Add Issue Setting success";
             }
             message.Error = checkDup;
-            return RedirectToAction("IssueSetting", new { projectId = p.Id });
+            return RedirectToAction("IssueSetting", new { id = p.Id });
         }
 
         [Route("IssueSetting")]
@@ -259,7 +259,7 @@ namespace IMS.Controllers
 
             _isDAO.UpdateIssueSetting(issueSetting);
 
-            return RedirectToAction("IssueSetting", new { projectId = projectId });
+            return RedirectToAction("IssueSetting", new { id = projectId });
         }
 
         [HttpGet("Milestones/{id}")]
@@ -304,6 +304,7 @@ namespace IMS.Controllers
                 ClassId = project.ClassId,
                 ProjectId = model.ProjectId,
             };
+            milestone.Status = false;
             _milestoneService.AddMilestone(milestone);
             return RedirectToAction("ProjectMilestone");
         }
