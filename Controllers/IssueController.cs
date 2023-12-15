@@ -416,11 +416,12 @@ namespace IMS.Controllers
 
                 if (project == null) return RedirectToAction("NotFound", "Error");
 
+                var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
+                milestones.Insert(0, new { Id = -1, Title = "Not yet" });
                 var authors = project.Students.ToList();
                 var assignees = authors.Select(user => user).ToList();
                 assignees.Insert(0, new { Id = -1, Name = "Not yet" });
 
-                var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
                 ViewBag.Milestones = milestones;
                 ViewBag.Authors = authors;
                 ViewBag.Assignees = assignees;
@@ -454,7 +455,6 @@ namespace IMS.Controllers
                 ViewBag.Authors = authors;
                 ViewBag.Assignees = assignees;
             }
-
 
 
             //-----------MAIN----------
