@@ -109,12 +109,6 @@
                 @Html.DropDownListFor(model => model.ParentIssueId, new SelectList(ViewBag.ParentIssues, "Id", "Title"), "Select a parent", new { @class = "form-select", onchange = "updateDropdown('ParentIssueId', 'UpdateParentIssue', 'updateParentIssueResult')" })
             </div>
 
-            <h5 class="mb-3">Related Issues</h5>
-            <ul class="list-group">
-                <li class="list-group-item"><a href="#">Related Issue 1</a></li>
-                <li class="list-group-item"><a href="#">Related Issue 2</a></li>
-                <li class="list-group-item"><a href="#">Related Issue 3</a></li>
-            </ul>
         </div>
     </div>
 

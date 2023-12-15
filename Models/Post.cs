@@ -15,7 +15,7 @@ namespace IMS.Models
         public string? Description { get; set; }
         public string? Excerpt { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public bool IsPublic { get; set; }
         public string? ImageUrl { get; set; }
         public int AuthorId { get; set; }

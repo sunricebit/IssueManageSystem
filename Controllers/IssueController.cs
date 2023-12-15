@@ -1,12 +1,16 @@
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 public class IssueViewModel
 {
-    public string Tab { get; set; } = "all";
+    public string Tab { get; set; } = "A";
     public string? Search { get; set; } = "";
 
     [Display(Name = "Project")]
     public int? ProjectId { get; set; }
+    [Display(Name = "Status")]
+    public int? StatusId { get; set; }
     [Display(Name = "Milestone")]
     public int? MilestoneId { get; set; }
     [Display(Name = "Author")]
@@ -63,6 +67,7 @@ namespace IMS.Controllers
         {
             context = _context;
         }
+
 
         [HttpPost]
         public async Task<IActionResult> UpdateStatus(int issueId, string type, int selectedValue)
@@ -289,6 +294,88 @@ namespace IMS.Controllers
             }
         }
 
+        public IActionResult GetDataByProjectId(int? projectId)
+        {
+            if (projectId.HasValue)
+            {
+                var project = context.Projects
+                    .Where(p => p.Id == projectId)
+                    .Select(p => new
+                    {
+                        Students = p.Students.Select(s => new { s.Id, s.Name }),
+                        Issues = p.Issues.Select(i => new { i.Id, i.Title }),
+                        Milestones = p.Milestones.Select(m => new { m.Id, m.Title }),
+                        Class = new { Milestones = p.Class.Milestones.Select(cm => new { cm.Id, cm.Title }) }
+                    })
+                    .SingleOrDefault();
+
+                if (project == null) return RedirectToAction("NotFound", "Error");
+
+                var authors = project.Students.ToList();
+                var assignees = authors.Select(user => user).ToList();
+                assignees.Insert(0, new { Id = -1, Name = "Not yet" });
+
+                var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
+
+                string authorsJson = JsonConvert.SerializeObject(authors, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                string assigneesJson = JsonConvert.SerializeObject(assignees, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                string milestonesJson = JsonConvert.SerializeObject(milestones, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                return Json(new { authorsJson, assigneesJson, milestonesJson });
+            }
+            else
+            {
+                var userId = HttpContext.Session.GetUser()!.Id;
+                User? user = context.Users.SingleOrDefault(user => user.Id == userId);
+                if (user == null) return RedirectToAction("SignIn", "Auth");
+
+                var userData = context.Users
+                    .Where(user => user.Id == userId)
+                    .Select(user => new
+                    {
+                        ProjectsNavigation = user.ProjectsNavigation.Select(project => new
+                        {
+                            project.Id,
+                            project.Name,
+                            Class = new { Milestones = project.Class.Milestones.Select(clsMilestone => new { clsMilestone.Id, clsMilestone.Title }) },
+                            Students = project.Students.Select(student => new { student.Id, student.Name }),
+                            Milestones = project.Milestones.Select(projectMilestone => new { projectMilestone.Id, projectMilestone.Title })
+                        })
+                    })
+                    .AsSplitQuery()
+                    .SingleOrDefault()!;
+
+                var milestones = userData.ProjectsNavigation.SelectMany(project => project.Class.Milestones).Union(userData.ProjectsNavigation.SelectMany(project => project.Milestones)).DistinctBy(milestone => milestone.Id).ToList();
+                milestones.Insert(0, new { Id = -1, Title = "Not yet" });
+                var authors = userData.ProjectsNavigation.SelectMany(project => project.Students).DistinctBy(students => students.Id).ToList();
+                var assignees = authors.Select(user => user).ToList();
+                assignees.Insert(0, new { Id = -1, Name = "Not yet" });
+
+                string authorsJson = JsonConvert.SerializeObject(authors, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                string assigneesJson = JsonConvert.SerializeObject(assignees, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                string milestonesJson = JsonConvert.SerializeObject(milestones, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                return Json(new { authorsJson, assigneesJson, milestonesJson });
+            }
+        }
+
+
 
         [Route("issues")]
         [CustomAuthorize]
@@ -303,6 +390,7 @@ namespace IMS.Controllers
             ViewBag.Milestones = new List<Milestone>();
             ViewBag.Authors = new List<User>();
             ViewBag.Assignees = new List<User>();
+            ViewBag.Statuses = context.IssueSettings.Where(setting => setting.Type == "STATUS").ToList();
 
             var userData = context.Users
                  .Include(user => user.ProjectsNavigation).ThenInclude(project => project.Class).ThenInclude(cls => cls.Milestones)
@@ -312,18 +400,65 @@ namespace IMS.Controllers
                  .SingleOrDefault(user => user.Id == userId)!;
 
             var projects = userData.ProjectsNavigation.ToList();
-            var milestones = userData.ProjectsNavigation.SelectMany(project => project.Class.Milestones).Union(userData.ProjectsNavigation.SelectMany(project => project.Milestones)).DistinctBy(milestone => milestone.Id).ToList();
-            milestones.Insert(0, new Milestone() { Id = -1, Title = "Not yet" });
-            var authors = userData.ProjectsNavigation.SelectMany(project => project.Students).DistinctBy(students => students.Id).ToList();
-            var assignees = new List<User>(authors);
-            assignees.Insert(0, new User() { Id = -1, Name = "Not yet" });
-
             ViewBag.Projects = projects;
-            ViewBag.Milestones = milestones;
-            ViewBag.Authors = authors;
-            ViewBag.Assignees = assignees;
-
             if (projects.Count == 0) return View(vm);
+
+
+            if (vm.ProjectId.HasValue)
+            {
+                var project = context.Projects
+                     .Where(p => p.Id == vm.ProjectId)
+                     .Select(p => new
+                     {
+                         Students = p.Students.Select(s => new { s.Id, s.Name }),
+                         Issues = p.Issues.Select(i => new { i.Id, i.Title }),
+                         Milestones = p.Milestones.Select(m => new { m.Id, m.Title }),
+                         Class = new { Milestones = p.Class.Milestones.Select(cm => new { cm.Id, cm.Title }) }
+                     })
+                     .SingleOrDefault();
+
+                if (project == null) return RedirectToAction("NotFound", "Error");
+
+                var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
+                milestones.Insert(0, new { Id = -1, Title = "Not yet" });
+                var authors = project.Students.ToList();
+                var assignees = authors.Select(user => user).ToList();
+                assignees.Insert(0, new { Id = -1, Name = "Not yet" });
+
+                ViewBag.Milestones = milestones;
+                ViewBag.Authors = authors;
+                ViewBag.Assignees = assignees;
+
+            }
+            else
+            {
+                var userdData2 = context.Users
+                    .Where(user => user.Id == userId)
+                    .Select(user => new
+                    {
+                        ProjectsNavigation = user.ProjectsNavigation.Select(project => new
+                        {
+                            project.Id,
+                            project.Name,
+                            Class = new { Milestones = project.Class.Milestones.Select(clsMilestone => new { clsMilestone.Id, clsMilestone.Title }) },
+                            Students = project.Students.Select(student => new { student.Id, student.Name }),
+                            Milestones = project.Milestones.Select(projectMilestone => new { projectMilestone.Id, projectMilestone.Title })
+                        })
+                    })
+                    .AsSplitQuery()
+                    .SingleOrDefault()!;
+
+                var milestones = userdData2.ProjectsNavigation.SelectMany(project => project.Class.Milestones).Union(userdData2.ProjectsNavigation.SelectMany(project => project.Milestones)).DistinctBy(milestone => milestone.Id).ToList();
+                milestones.Insert(0, new { Id = -1, Title = "Not yet" });
+                var authors = userdData2.ProjectsNavigation.SelectMany(project => project.Students).DistinctBy(students => students.Id).ToList();
+                var assignees = authors.Select(user => user).ToList();
+                assignees.Insert(0, new { Id = -1, Name = "Not yet" });
+
+                ViewBag.Milestones = milestones;
+                ViewBag.Authors = authors;
+                ViewBag.Assignees = assignees;
+            }
+
 
             //-----------MAIN----------
             IQueryable<Issue> issues = context.Issues.AsQueryable().Where(issue => projects.Contains(issue.Project));
@@ -353,6 +488,11 @@ namespace IMS.Controllers
                 }
             }
 
+            if (vm.StatusId != null)
+            {
+                issues = issues.Where(issue => issue.StatusId == vm.StatusId);
+            }
+
             //Author
             if (vm.AuthorId != null)
             {
@@ -372,26 +512,18 @@ namespace IMS.Controllers
                 }
             }
 
-            switch (vm.Tab)
+            if (vm.Tab != "A")
             {
-                case "requirement":
-                    issues = issues.Where(issue => issue.Type.Value == "Requirement");
-                    break;
-                case "task":
-                    issues = issues.Where(issue => issue.Type.Value == "Task");
-                    break;
-                case "question":
-                    issues = issues.Where(issue => issue.Type.Value == "Q&A");
-                    break;
-                case "defect":
-                    issues = issues.Where(issue => issue.Type.Value == "Defect");
-                    break;
+                issues = issues.Where(issue => issue.Type.Value == vm.Tab);
             }
+
+            var types = context.IssueSettings.Where(setting => setting.Type == "TYPE").ToList();
+            types.Insert(0, new IssueSetting() { Value = "A", Name = "All" });
+            ViewBag.Types = types;
 
             issues = issues
                 .Include(issue => issue.Type)
                 .Include(issue => issue.Status)
-                .Include(issue => issue.Process)
                 .Include(issue => issue.Process)
                 .Include(issue => issue.Milestone)
                 .Include(issue => issue.Author)

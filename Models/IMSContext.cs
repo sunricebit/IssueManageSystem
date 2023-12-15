@@ -36,7 +36,7 @@ namespace IMS.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseMySQL("server=localhost;uid=root;pwd=123456;database=IMS");
+                optionsBuilder.UseMySQL("server=localhost;uid=root;pwd=123456789;database=IMS");
             }
         }
 
@@ -247,9 +247,7 @@ namespace IMS.Models
 
                 entity.Property(e => e.Description).HasMaxLength(200);
 
-                entity.Property(e => e.Color)
-                    .HasMaxLength(10)
-                    .HasDefaultValueSql("'#009966'");
+                entity.Property(e => e.Name).HasMaxLength(50);
 
                 entity.Property(e => e.Status)
                     .IsRequired()
@@ -312,7 +310,6 @@ namespace IMS.Models
                 entity.Property(e => e.StartDate).HasColumnType("datetime(3)");
 
                 entity.Property(e => e.Title).HasColumnType("text");
-                entity.Property(e => e.Status).HasDefaultValueSql("'1'");
 
                 entity.HasOne(d => d.Assignment)
                     .WithMany(p => p.Milestones)
@@ -377,7 +374,9 @@ namespace IMS.Models
 
                 entity.Property(e => e.Title).HasColumnType("text");
 
-                entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
 
                 entity.HasOne(d => d.Author)
                     .WithMany(p => p.Posts)
