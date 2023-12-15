@@ -247,7 +247,7 @@ namespace IMS.Controllers
             ViewBag.Teacher = teacher;
             ViewBag.Student = students;
             ViewBag.Action = "People";
-            if (!string.IsNullOrEmpty(searchString) && filterbyStatus != "ALL")
+            if (!string.IsNullOrEmpty(filterbyStatus) && filterbyStatus != "ALL")
             {
                 if (filterbyStatus == "true")
                 {
@@ -260,9 +260,10 @@ namespace IMS.Controllers
             }
             if (!string.IsNullOrEmpty(searchString))
             {
-                students = students.Where(item => item.Name.ToLower().Contains(searchString.ToLower()) || 
-                                          item.Email.ToLower().Contains(searchString.ToLower()) ||
-                                          item.Phone.ToLower().Contains(searchString.ToLower())).ToList();
+
+
+                students = students.Where(item => item.Name.ToLower().Contains(searchString.ToLower())
+                || item.Email.ToLower().Contains(searchString.ToLower())).ToList();
             }
             
             ViewBag.Student = students;
@@ -348,6 +349,7 @@ namespace IMS.Controllers
                 EndDate = model.EndDate,
                 ClassId = model.ClassId
             };
+            milestone.Status = false;
             _milestoneService.AddMilestone(milestone);
 
             
@@ -358,7 +360,7 @@ namespace IMS.Controllers
         {
            if (_classService.AddStudentToClass(ClassId, Name) == false)
             {
-                ViewBag.ErrorMessage = "Class is already exist.";
+                ViewBag.ErrorMessage = "Student is already exist.";
             };
             return RedirectToAction("Index");
         }
@@ -413,7 +415,7 @@ namespace IMS.Controllers
             return RedirectToAction("IssueSetting", issueSettingViewModel.Id);
         }
         [HttpPost("ToggleIssueSettingStatus")]
-        public IActionResult ToggleIssueSettingStatus(int id)
+        public IActionResult ToggleIssueSettingStatus(int id,int classid)
         {
             var issueSetting = _isDAO.GetIssueSettingById(id);
 
@@ -426,23 +428,10 @@ namespace IMS.Controllers
 
             _isDAO.UpdateIssueSetting(issueSetting);
 
-            return RedirectToAction("IssueSetting",  issueSetting.ClassId );
+            return RedirectToAction("IssueSetting",  new { id = classid} );
         }
 
-        public void Pagination(int page, int pageSize, IEnumerable<User> UserList, string searchTerm)
-        {
-
-            
-            var totalItems = UserList.Count();
-            var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
-            var itemsOnPage = UserList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-            ViewBag.TotalPages = totalPages;
-            ViewBag.CurrentPage = page;
-            ViewBag.PageSize = pageSize;
-            ViewBag.Search = searchTerm;
-            ViewBag.PostList = itemsOnPage;
-        }
+       
         [HttpPost("ClosedMilestone")]
         public IActionResult CloseMilestone(int id,int classid)
         {
