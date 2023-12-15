@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 public class IssueViewModel
 {
-    public string Tab { get; set; } = "all";
+    public string Tab { get; set; } = "A";
     public string? Search { get; set; } = "";
 
     [Display(Name = "Project")]
@@ -372,26 +372,18 @@ namespace IMS.Controllers
                 }
             }
 
-            switch (vm.Tab)
+            if (vm.Tab != "A")
             {
-                case "requirement":
-                    issues = issues.Where(issue => issue.Type.Value == "Requirement");
-                    break;
-                case "task":
-                    issues = issues.Where(issue => issue.Type.Value == "Task");
-                    break;
-                case "question":
-                    issues = issues.Where(issue => issue.Type.Value == "Q&A");
-                    break;
-                case "defect":
-                    issues = issues.Where(issue => issue.Type.Value == "Defect");
-                    break;
+                issues = issues.Where(issue => issue.Type.Value == vm.Tab);
             }
+
+            var types = context.IssueSettings.Where(setting => setting.Type == "TYPE").ToList();
+            types.Insert(0, new IssueSetting() { Value = "A", Name = "All" });
+            ViewBag.Types = types;
 
             issues = issues
                 .Include(issue => issue.Type)
                 .Include(issue => issue.Status)
-                .Include(issue => issue.Process)
                 .Include(issue => issue.Process)
                 .Include(issue => issue.Milestone)
                 .Include(issue => issue.Author)
