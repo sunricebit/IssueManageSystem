@@ -9,6 +9,8 @@ public class IssueViewModel
 
     [Display(Name = "Project")]
     public int? ProjectId { get; set; }
+    [Display(Name = "Status")]
+    public int? StatusId { get; set; }
     [Display(Name = "Milestone")]
     public int? MilestoneId { get; set; }
     [Display(Name = "Author")]
@@ -388,7 +390,7 @@ namespace IMS.Controllers
             ViewBag.Milestones = new List<Milestone>();
             ViewBag.Authors = new List<User>();
             ViewBag.Assignees = new List<User>();
-
+            ViewBag.Statuses = context.IssueSettings.Where(setting => setting.Type == "STATUS").ToList();
 
             var userData = context.Users
                  .Include(user => user.ProjectsNavigation).ThenInclude(project => project.Class).ThenInclude(cls => cls.Milestones)
@@ -400,6 +402,7 @@ namespace IMS.Controllers
             var projects = userData.ProjectsNavigation.ToList();
             ViewBag.Projects = projects;
             if (projects.Count == 0) return View(vm);
+
 
             if (vm.ProjectId.HasValue)
             {
@@ -483,6 +486,11 @@ namespace IMS.Controllers
                 {
                     issues = issues.Where(issue => issue.MilestoneId != null && issue.MilestoneId == vm.MilestoneId);
                 }
+            }
+
+            if (vm.StatusId != null)
+            {
+                issues = issues.Where(issue => issue.StatusId == vm.StatusId);
             }
 
             //Author

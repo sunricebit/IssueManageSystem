@@ -72,7 +72,14 @@
                 </div>
             </div>
 
-            <div class="col-3">
+            <div class="col-2">
+                <div class="form-group mb-3">
+                    @Html.LabelFor(model => model.StatusId, new { @class = "control-label mb-1" })
+                    @Html.DropDownListFor(model => model.StatusId, new SelectList(ViewBag.Statuses, "Id", "Value"), "Select a status", new { @class = "form-control", @id = "milestoneSelect" })
+                </div>
+            </div>
+
+            <div class="col-2">
                 <div class="form-group mb-3">
                     @Html.LabelFor(model => model.AuthorId, new { @class = "control-label mb-1" })
                     @Html.DropDownListFor(model => model.AuthorId, new SelectList(ViewBag.Authors, "Id", "Name"), "Select an author", new { @class = "form-control", @id = "authorSelect" })
