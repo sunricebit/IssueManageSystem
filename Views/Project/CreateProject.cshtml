@@ -1,88 +1,68 @@
 ﻿@model IMS.ViewModels.Validation.ProjectViewModel
 @{
-    ViewData["Title"] = "Add Project";
-    string confirmMessage = "Are you want to add this project ?";
 }
-<div class="container mt-5">
-    <h2>Add Project</h2>
-
-    <!-- Form để thêm Project -->
-    <form asp-action="CreateProject" method="post" class="needs-validation"  id="formSubmit">
-        <!-- Validation Summary -->
-        @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
-        @if (!ViewData.ModelState.IsValid)
-        {
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                    {
-                        <li>@error.ErrorMessage</li>
-                    }
-                </ul>
+<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-        }
-        @if (ViewBag.SuccessMessage != null)
-        {
-            <div class="alert alert-success">
-                <ul>
-                    <li>@ViewBag.SuccessMessage</li>
-                </ul>
-            </div>
-        }
-        @if (ViewBag.ErrorMessage != null)
-        {
-            <div class="alert alert-danger">
-                <ul>
-                    <li>@ViewBag.ErrorMessage</li>
-                </ul>
-            </div>
-        }
+            <form asp-action="CreateProject" method="post">
+                <div class="modal-body">
 
-        <!-- Name -->
-        <div class="form-group">
-            <label for="Name">Name*:</label>
-            <input type="text" class="form-control" id="Name" name="Name" asp-for="Name" required>
-            <div class="invalid-feedback">Please enter the Name.</div>
+                    <!-- Name -->
+                    <div class="form-group mb-3">
+                        <label for="Name">Name*:</label>
+                        <input type="text" class="form-control" id="Name" name="Name" asp-for="Name" required>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <!-- Group Name -->
+                    <div class="form-group mb-3">
+                        <label for="GroupName">Group Name:</label>
+                        <input type="text" class="form-control" id="GroupName" name="GroupName" asp-for="GroupName" required>
+                        <span asp-validation-for="GroupName" class="text-danger"></span>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group mb-3">
+                        <label for="Description">Description:</label>
+                        <textarea class="form-control" id="Description" name="Description" asp-for="Description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <!-- Class -->
+                    <div class="form-group mb-3">
+                        <label for="Class">Class*:</label>
+                        <select class="form-control" id="ClassId" name="ClassId" asp-for="ClassId" required>
+                            @foreach(Class c in ViewBag.ClassList){
+                                <option value="@c.Id">@c.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Status -->
+                    <label for="Status">Status*:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="status" value="true" style="display: inline-block; margin-right: 10px;">
+                        <label class="form-check-label" asp-for="Status">
+                            Active
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="status" value="false" style="display: inline-block;" checked>
+                        <label class="form-check-label" asp-for="Status">
+                            Inactive
+                        </label>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
         </div>
-
-        <!-- Class -->
-        <div class="form-group">
-            <label for="ClassId">Class*:</label>
-            <select class="form-control" id="ClassId" name="ClassId" asp-for="ClassId" required>
-                @foreach (Class c in ViewBag.ClassList)
-                {
-                    <option value="@c.Id">@c.Name</option>
-                }
-            </select>
-            <div class="invalid-feedback">Please select a Class.</div>
-        </div>
-
-        <!-- Description -->
-        <div class="form-group">
-            <label for="Description">Description:</label>
-            <textarea class="form-control" id="Description" name="Description" asp-for="Description"></textarea>
-        </div>
-
-        <!-- Status -->
-        <div class="form-group">
-            <label for="statusToggle">Status</label>
-            <div class="form-check form-switch">
-                <input type="hidden" name="Status" value="false" id="StatusId"/>
-                <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" onchange="changeStatus()" />
-            </div>
-        </div>
-
-        <br />
-        <!-- Button submit -->
-        <button type="submit" class="btn btn-primary" id="btnSubmit">Add Project</button>
-    </form>
+    </div>
 </div>
-@Html.Partial("_ConfirmPartial", confirmMessage)
-
-<script>
-    function changeStatus() {
-        var statusToggle = document.getElementById('statusToggle');
-        var statusId = document.getElementById('StatusId');
-        statusId.value = statusToggle.checked ? "true" : "false";
-    }
-</script>

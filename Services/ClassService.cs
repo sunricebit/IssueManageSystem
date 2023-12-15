@@ -72,6 +72,15 @@ namespace IMS.Services
             var milestone = _context.Milestones.Where(m => m.ClassId == id).ToList();
             return milestone;
         }
+
+        public List<Milestone> GetMilestoneByProject(int id)
+        {
+            Project p = _context.Projects.FirstOrDefault(p => p.Id == id);
+            List<Milestone> milestone = _context.Milestones.Where(m => m.ProjectId == id).ToList();
+            milestone.AddRange(_context.Milestones.Where(m => m.ClassId == p.ClassId).ToList());
+            return milestone;
+        }
+
         public IEnumerable<Class> GetClasses()
         {
             return _context.Classes.Include(c => c.Students).Include(c => c.Teacher).Include(c => c.Subject).ToList();
@@ -159,6 +168,11 @@ namespace IMS.Services
         public IEnumerable<Class> GetClassesByStudent(int studentId)
         {
             return _context.Users.Include(u => u.ClassesNavigation).FirstOrDefault(u => u.Id == studentId).ClassesNavigation;
+        }
+
+        public IEnumerable<Class> GetClassesByTeacher(int teacherId)
+        {
+            return _context.Users.Include(u => u.Classes).ThenInclude(c => c.Students).FirstOrDefault(u => u.Id == teacherId).Classes;
         }
     }
 }

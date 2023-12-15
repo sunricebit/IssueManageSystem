@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Project List";
     Pagination pagination = ViewBag.Pagination;
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
 }
 
 <div class="container-fluid px-4">
@@ -10,14 +11,17 @@
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
-            <i class="fas fa-table me-1"></i>
+                <i class="fas fa-table me-1"></i>
                 Your Project
             </div>
-            <div class="col-md-auto">
-                <a class="btn btn-primary" asp-controller="Project" asp-action="CreateProject">
-                    <i class="fas fa-plus"></i> New Project
-                </a>
-            </div>
+            @if (pageAcess.CanAdd)
+            {
+                <div class="col-md-auto">
+                    <a class="btn btn-primary" id="newProject">
+                        <i class="fas fa-plus"></i> New Project
+                    </a>
+                </div>
+            }
         </div>
         <div class="card-body">
             <form asp-controller="Project" asp-action="Index" method="get" id="FilterAndSearchForm">
@@ -25,7 +29,7 @@
                 <input type="hidden" id="pageNumber" name="pageNumber" />
                 <div class="row">
                     <div class="col-md-3">
-                        <label for="Type" class="form-label">Filter by Status:</label>
+                        <label for="Status" class="form-label">Filter by Status:</label>
                         <select class="form-control" id="Status" name="filterByStatus">
                             <option value="" selected>Select Status</option>
                             <option value="">All</option>
@@ -33,7 +37,18 @@
                             <option value="false">Inactive</option>
                         </select>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-3">
+                        <label for="Class" class="form-label">Filter by Class:</label>
+                        <select class="form-control" id="Class" name="filterByClass">
+                            <option value="" selected>Select Class</option>
+                            <option value="">All</option>
+                            @foreach (Class c in ViewBag.ClassList)
+                            {
+                                <option value="@c.Id">@c.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
                         <label for="keyword" class="form-label">Search:</label>
                         <input type="text" id="keyword" name="searchByName" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
                     </div>
@@ -50,8 +65,9 @@
                         <thead>
                             <tr>
                                 <th onclick="sortTable(0)" class="sortable">Name</th>
-                                <th onclick="sortTable(1)" class="sortable">Class</th>
-                                <th onclick="sortTable(2)" class="sortable">Leader</th>
+                                <th onclick="sortTable(1)" class="sortable">Group Name</th>
+                                <th onclick="sortTable(2)" class="sortable">Class</th>
+                                <th onclick="sortTable(3)" class="sortable">Leader</th>
                                 <th class="sortable">Status</th>
                                 <th class="sortable">Action</th>
                             </tr>
@@ -61,13 +77,14 @@
                             {
                                 <tr>
                                     <td>@project.Name</td>
+                                    <td>@project.GroupName</td>
                                     <td>@project.Class.Name</td>
                                     <td>@project.Leader.Email</td>
                                     @if (project.Status == true)
                                     {
                                         <td>
                                             <form asp-action="ToggleStatus" asp-route-id="@project.Id" method="post">
-                                                <button type="submit" class="btn btn-success btn-sm" @(project.Leader.Email == ViewBag.User ? "" : "disabled")>
+                                                <button type="submit" class="btn btn-success btn-sm" @(pageAcess.CanUpdate ? "" : "disabled")>
                                                     Active
                                                 </button>
                                             </form>
@@ -77,7 +94,7 @@
                                     {
                                         <td>
                                             <form asp-action="ToggleStatus" asp-route-id="@project.Id" method="post">
-                                                <button type="submit" class="btn btn-secondary btn-sm" @(project.Leader.Email == ViewBag.User ? "" : "disabled")>
+                                                <button type="submit" class="btn btn-secondary btn-sm" @(pageAcess.CanUpdate ? "" : "disabled")>
                                                     Deactive
                                                 </button>
                                             </form>
@@ -103,3 +120,14 @@
         </div>
     </div>
 </div>
+
+<div id="modalContainer">
+    @await Html.PartialAsync("CreateProject")
+</div>
+
+<script>
+    document.getElementById("newProject").addEventListener("click", function () {
+        // Hiển thị modal
+        $('#createModal').modal('show');
+    });
+</script>
