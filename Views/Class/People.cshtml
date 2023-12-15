@@ -1,0 +1,187 @@
+﻿@using IMS.ViewModels.Paginate;
+@model IMS.ViewModels.Class.ClassViewModel;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "CLass Member";
+    Pagination pagination = ViewBag.Pagination;
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex">
+        <a asp-action="Details" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">General</a>
+        <a asp-action="People" asp-controller="Class" asp-route-id="@Model.Id" class="btn btn-outline-primary text-decoration-none">People</a>
+        <a asp-action="Milestones" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Milestone</a>
+        <a asp-action="IssueSetting" asp-controller="Class" asp-route-id="@Model.Id" class="btn  btn-outline-primary text-decoration-none">Issue Setting</a>
+        <input type="hidden" id="classid" value="@Model.Id" />
+    </div>
+    <h1>Class @Model.Name</h1>
+    
+    
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fas fa-table me-1"></i>
+            Student Table
+        </div>
+        
+        
+            <div class="col-md-auto">
+                <a class="btn btn-primary" onclick="openPopupAddStudent()">
+                    <i class="fas fa-plus"></i> New
+                </a>
+            </div>
+        
+    </div>
+    <div class="card-body">
+        <div class="mb-3 row">
+
+                <div class="row"> 
+                    <div class="col-md-4 mb-3">
+                        <label for="StatusFilter" class="form-label">Filter by Status:</label>
+                        <select id="StatusFilter" class="form-select" name="filterbyStatus">
+                            <option value=>Select Status</option>
+                            <option value=true>Active</option>
+                            <option value=false>Inactive</option>
+                            <option value="All">All Status</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <form asp-action="People" asp-controller="Class" asp-route-id="@Model.Id" method="get" class="form-inline">
+                        <label for="searchInput" class="form-label">Search:</label>
+
+                            <input type="text" id="searchString" name="searchString" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                        </form>
+                    </div>
+                </div>
+
+
+
+
+
+            <table style="border-width: 1px;  border-color: #e0e0e0" class="table  table-bordered " id="sorttable-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th onclick="sortTable(0)">Name</th>
+                        <th>Avatar</th>
+                        <th onclick="sortTable(1)">Email</th>
+                        <th>Phone</th>
+
+                        <th>Status</th>
+                        <th class="sortable">Action</th>
+
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var student in ViewBag.Student)
+                    {
+                        <tr>
+                            <td>@student.Name</td>
+                            <td>
+                                <img src="@student.Avatar" alt="Avatar" width="50" height="50" />
+                            </td>
+                            <td>@student.Email</td>
+                            <td>@student.Phone</td>
+
+                            @if (@student.Status == true)
+                            {
+                                <td>
+                                    <a>
+                                        <button  class="btn btn-success btn-sm" >
+                                            Active
+                                        </button>
+                                    </a>
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <a >
+                                        <button  class="btn btn-secondary btn-sm" >
+                                            Deactive
+                                        </button>
+                                    </a>
+                                </td>
+                            }
+                            <td>
+                                <div class="btn-group" role="group" aria-label="User Actions">
+                                    
+                                        <form asp-action="RemoveStudent" asp-route-id="@Model.Id" asp-route-email="@student.Email" asp-controller="Class" method="post" onsubmit="">
+                                            <button type="submit" class="btn btn-danger" >
+                                                <i class="fas fa-trash"></i> Remove
+                                            </button>
+                                        </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+<div class="modal" id="exampleModal" tabindex="-1" style="background-color: #2220208c">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Student</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup()"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form for Milestone input -->
+                <form id="milestoneForm" onsubmit="addstudent(event)">
+                    <div class="mb-3">
+                        <label for="Name/Email" class="form-label">Email*</label>
+                        <input type="text" class="form-control" id="Email" required>
+                    </div>
+                    
+
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup()">Close</button>
+
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function openPopupAddStudent() {
+        var popup = document.getElementById("exampleModal");
+        document.getElementById("Email").value = "";
+      
+        popup.style.display = 'block';
+    }
+
+    function closePopup() {
+        var popup = document.getElementById("exampleModal");
+        popup.style.display = 'none';
+    }
+
+    function addstudent(event) {
+        event.preventDefault();
+
+        var formData = {
+            Name: document.getElementById("Email").value,
+            ClassId: document.getElementById("classid").value
+        };
+
+        $.ajax({
+            url: "/Class/AddStudent",
+            method: "POST",
+            data: formData,
+            success: function (response) {
+                closePopup();
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    }
+</script>

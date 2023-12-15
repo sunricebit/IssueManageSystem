@@ -72,7 +72,7 @@ namespace IMS.Controllers
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                //mailService.SendPassword(email, password);
+                mailService.SendPassword(email, password);
             }
 
             HttpContext.Session.SetUser(user);
@@ -98,7 +98,7 @@ namespace IMS.Controllers
             if (!ModelState.IsValid) return View();
 
             var user = _context.Users.FirstOrDefault(user => user.Email == vm.Email);
-            if(user!=null && user.Status == false)
+            if (user != null && user.Status == false)
             {
                 ViewBag.Success = "This account has been blocked, please choose another account";
                 return View();
@@ -110,7 +110,7 @@ namespace IMS.Controllers
                 return View();
             }
 
-            if(user != null && user.Status == null)
+            if (user != null && user.Status == null)
             {
                 user.ConfirmToken = hashService.RandomHash();
                 await _context.SaveChangesAsync();
@@ -139,9 +139,27 @@ namespace IMS.Controllers
             await _context.SaveChangesAsync();
             mailService.SendMailConfirm(userCreate.Email, userCreate.ConfirmToken!);
             ViewBag.Success = "Success! Your registration is complete. Check your email for confirmation";
+            HttpContext.Session.SetString("emailRegistor", userCreate.Email);
             ModelState.Clear();
             return View(new SignUpViewModel());
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ResendEmail([FromServices] IMailService mailService, [FromServices] IHashService hashService)
+        {
+            var emailRegistor = HttpContext.Session.GetString("emailRegistor");
+            if (emailRegistor == null) return RedirectToAction("SignUp");
+            var user = _context.Users.SingleOrDefault(user => user.Email == emailRegistor);
+            if (user == null) return RedirectToAction("SignUp");
+
+            user.ConfirmToken = hashService.RandomHash();
+            await _context.SaveChangesAsync();
+            ViewBag.Success = "An email has been sent again, please check your mailbox";
+            mailService.SendMailConfirm(user.Email, user.ConfirmToken!);
+            return View("SignUp", new SignUpViewModel());
+        }
+
+
 
 
         [Route("confirm/{token}")]
@@ -181,7 +199,7 @@ namespace IMS.Controllers
 
         [Route("sign-in")]
         [HttpPost]
-        public IActionResult SignIn(SignInViewModel vm, [FromServices] IHashService hashService, 
+        public IActionResult SignIn(SignInViewModel vm, [FromServices] IHashService hashService,
             [FromServices] IPermissionService permissionService)
         {
             if (!ModelState.IsValid) return View();
@@ -211,7 +229,7 @@ namespace IMS.Controllers
             PermissionViewModel permissionVM = permissionService.GetPermissionViewModel(user.RoleId);
             string permissionString = JsonSerializer.Serialize(permissionVM);
             HttpContext.Session.SetString("Permission", permissionString);
-
+            HttpContext.Session.Remove("emailRegistor");
             ModelState.Clear();
             return Redirect("/BlankDashboard");
         }

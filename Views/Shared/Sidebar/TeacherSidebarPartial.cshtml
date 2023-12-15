@@ -4,7 +4,7 @@
     <div class="sb-sidenav-menu">
         <div class="nav">
             <div class="sb-sidenav-menu-heading">Home</div>
-            <a class="nav-link" asp-controller="Home" asp-action="Blank">
+            <a class="nav-link" asp-controller="Home" asp-action="UserDashboard">
                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                 Dashboard
             </a>
@@ -26,9 +26,13 @@
                 Subject
             </a>
             <div class="sb-sidenav-menu-heading">Class</div>
-            <a class="nav-link" href="#">
+            <a class="nav-link" asp-action="Index" asp-controller="Class">
                 <div class="sb-nav-link-icon"><i class="fa-solid fa-users-rectangle"></i></div>
                 Class Manage
+            </a>
+            <a class="nav-link" asp-controller="Project" asp-action="Index">
+                <div class="sb-nav-link-icon"><i class="fa-solid fa-file-contract"></i></div>
+                Project
             </a>
 
         </div>

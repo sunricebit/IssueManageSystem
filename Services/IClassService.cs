@@ -14,6 +14,14 @@ namespace IMS.Services
         public int GetTeacherIdByNameAndEmail(string name);
         public IEnumerable<User> GetAllTeachers();
         public IEnumerable<Class> GetClassesByStudent(int studentId);
+        public IEnumerable<Class> GetClassesByTeacher(int teacherId);
         public bool ClassExist(string className);
+        public IEnumerable<User> GetStudent(int classId);
+        public List<Milestone> GetMilestone(int id);
+        public List<Milestone> GetMilestoneByProject(int id);
+        public int GetSubjectId(string name);
+        public bool AddStudentToClass(int classId, string email);
+        public bool RemoveStudentFromClass(int classId, string email);
+        public IEnumerable<Assignment> GetAssignments(int subjectid);
     }
 }

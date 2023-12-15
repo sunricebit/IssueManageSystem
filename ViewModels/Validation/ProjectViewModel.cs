@@ -5,6 +5,8 @@
         public int? Id { get; set; }
         [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }
+        [Required(ErrorMessage = "Group name is required")]
+        public string GroupName { get; set; }
         [Required(ErrorMessage = "Status is required")]
         public bool? Status { get; set; }
         public string? Description { get; set; }

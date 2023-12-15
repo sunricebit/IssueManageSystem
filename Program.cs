@@ -1,7 +1,5 @@
 ﻿var builder = WebApplication.CreateBuilder(args);
 
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NHaF1cWWhIYVJ2WmFZfVpgcF9FYFZTQ2YuP1ZhSXxQd0diWH9ac3RXTmJVV0c=");
-
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<IMSContext>(options => new IMSContext());
 builder.Services.AddSingleton<IHashService, HashService>();
@@ -12,8 +10,11 @@ builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IClassService,ClassService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IChkPgAcessService, ChkPgAcessService>();
+builder.Services.AddScoped<ICommonService, CommonService>();
 builder.Services.AddScoped<SettingDAO>();
 builder.Services.AddScoped<PermissionDAO>();
+builder.Services.AddScoped<IMilestoneService, MilestoneService>();
+builder.Services.AddScoped<IssueSettingDAO>();
 builder.Services.AddSingleton<ErrorHelper>();
 builder.Services.AddHttpContextAccessor();
 

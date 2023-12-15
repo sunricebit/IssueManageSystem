@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "CLass List";
     Pagination pagination = ViewBag.Pagination;
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
+}
 }
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center">
@@ -28,36 +30,46 @@
 
                 <form asp-controller="Class" asp-action="Index" method="get" id="FilterAndSearchForm">
                     <div class="row">
-                        <input type="hidden" id="pageNumber" name="pageNumber" />
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="roleFilter" class="form-label">Filter by Teacher:</label>
                             <select id="roleFilter" class="form-select" name="filterByTeacher">
                                 <option value="">Select Teacher</option>
-
                                 @foreach (var teacher in ViewBag.TeacherValue)
                                 {
                                     <option value="@teacher.Name">@teacher.Name</option>
                                 }
                                 <option value="ALL">All Teacher</option>
-
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
+
+                        <div class="col-md-3 mb-3">
+                            <label for="SubjectFilter" class="form-label">Filter by Subject:</label>
+                            <select id="SubjectFilter" class="form-select" name="filterBySubject">
+                                <option value="">Select Subject</option>
+                                @foreach (var subject in ViewBag.SubjectValue)
+                                {
+                                    <option value="@subject.Name">@subject.Name</option>
+                                }
+                                <option value="ALL">All Subject</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
                             <label for="StatusFilter" class="form-label">Filter by Status:</label>
                             <select id="StatusFilter" class="form-select" name="filterbyStatus">
-                                <option value=>Select Status</option>
-                                <option value=true>Active</option>
-                                <option value=false>Inactive</option>
-                                <option value=>All Status</option>
+                                <option value="">Select Status</option>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                                <option value="">All Status</option>
                             </select>
                         </div>
 
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="searchInput" class="form-label">Search:</label>
-
-                            <input type="text" id="keyword" name="searchByValue" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
-                            <button type="submit" class="btn btn-primary">Search</button>
-
+                            <div class="input-group">
+                                <input type="text" id="keyword" name="searchByValue" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -67,7 +79,7 @@
                 <thead class="thead-dark">
                     <tr>
                         <th onclick="sortTable(0)">Name</th>
-                        <th>Description</th>
+                       
                         <th onclick="sortTable(1)">Teacher</th>
                         <th>Subject</th>
                         <th>Number of student</th>
@@ -82,7 +94,7 @@
                     {
                         <tr>
                             <td>@classItem.Name</td>
-                            <td>@classItem.Description</td>
+                           
                             <td>@(classItem.Teacher != null ? classItem.Teacher.Name : "Dont have teacher")</td>
                             <td>@(classItem.Subject != null ? classItem.Subject.Name : "Dont have subject")</td>
                             <td>@(classItem.Students != null ? classItem.Students.Count : 0)</td>
@@ -112,6 +124,22 @@
                                     <a asp-action="Details" asp-route-id="@classItem.Id" asp-controller="Class" class="btn btn-info btn-sm">
                                         <i class="fas fa-eye"></i> Details
                                     </a>
+                                    @if (@classItem.IsActive == true)
+                                    {
+                                        <form asp-action="ToggleStatus" asp-route-id="@classItem.Id" asp-controller="Class" method="post" onsubmit="">
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="fas fa-trash"></i> Deactivate
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="ToggleStatus" asp-route-id="@classItem.Id" asp-controller="Class" method="post" onsubmit="">
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-trash"></i> Activate
+                                            </button>
+                                        </form>
+                                    }
                                 </div>
                             </td>
                         </tr>

@@ -19,7 +19,7 @@ namespace IMS.Services
         {
             return _context.Users.Where(u => u.RoleId == 5).ToList();
         }
-        public User GetUserByEmail(string email)
+        public User GetUserByEmail(string email)    
         {
             return _context.Users.FirstOrDefault(u => u.Email == email);
         }
@@ -78,7 +78,11 @@ namespace IMS.Services
                     || u.Email.Contains(searchTerm) || u.Phone.Contains(searchTerm));
         }
 
-       
+       public IEnumerable<Post> GetPost(int id) 
+        {
+
+            return _context.Posts.Where( p => p.AuthorId == id).ToList();
+        }
       
     }
 }

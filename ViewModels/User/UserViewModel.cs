@@ -16,7 +16,7 @@
 
         [Required(ErrorMessage = "Name is required")]
         public string Name { get; set; }
-
+        public string? Description { get; set; }
         public string? Avatar { get; set; }
         public bool? Gender { get; set; }
         public string? Phone { get; set; }

@@ -1,0 +1,172 @@
+﻿@model IMS.ViewModels.Validation.ProjectViewModel;
+@{
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
+}
+
+<div class="container-fluid px-4">
+    <ul class="nav nav-tabs mt-4">
+        <li class="nav-item">
+            <a class="nav-link text-white bg-primary" asp-controller="Project" asp-action="ProjectDetail" asp-route-id="@Model.Id">General</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-primary" asp-controller="Project" asp-action="Member" asp-route-id="@Model.Id">Member</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-primary" asp-controller="Project" asp-action="ProjectMilestone" asp-route-id="@Model.Id">Milestone</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-primary" asp-controller="Project" asp-action="IssueSetting" asp-route-id="@Model.Id">Issue Setting</a>
+        </li>
+    </ul>
+
+
+    <h1> Project @Model.Name</h1>
+    <!-- Header Section -->
+    <div class="container-fluid container-limited project-highlight-puc">
+        <main class="content" id="content-body" itemscope itemtype="http://schema.org/SoftwareSourceCode">
+            <!-- Header Section -->
+
+            <div class="row">
+                <div class="col-md-6">
+                    <form asp-action="ProjectMilestone" asp-controller="Project" asp-route-id="@Model.Id" method="get" class="form-inline">
+                        <input type="search" id="searchString" name="searchString" placeholder="Filter by milestone name" class="form-control mr-2" spellcheck="false" />
+                        <button type="submit" class="btn btn-primary">Search Page</button>
+                    </form>
+                </div>
+                <div class="col-md-2 text-right">
+                    <a class="btn btn-success ml-3" title="New milestone" onclick="openPopupAddMilestone()">
+                        New milestone
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+    <div class="row">
+        @foreach (var milestone in ViewBag.MilestoneList)
+        {
+            <div class="col-md-6 mb-3">
+                <strong data-qa-milestone-title="123" data-testid="milestone-link">
+                    <a>@milestone.Title</a>
+                </strong>
+                <div class="text-tertiary mb-2">
+                    @(milestone.StartDate != DateTime.MinValue ? milestone.StartDate.ToString("MMM d, yyyy") + "–" + (milestone.EndDate != DateTime.MinValue ? milestone.EndDate.ToString("MMM d, yyyy") : "") : "")
+                </div>
+                <div>
+
+                    <span class="badge badge-pill badge-muted mb-2">@milestone.Project?.Name</span>
+                </div>
+
+                <div class="mt-2">
+                    @if (milestone.Status == false)
+                    {
+                        <span class="btn btn-danger">Closed</span>
+                    }
+                    else
+                    {
+                        <span class="btn btn-success">Open</span>
+                    }
+
+
+                </div>
+
+            </div>
+            <div class="col-md-4 milestone-progress">
+            </div>
+            <div class="col-md-2">
+                <form asp-action="CloseMilestone" asp-route-id="@milestone.Id" asp-route-id="@Model.Id" asp-controller="Project" method="post">
+                    <div class="milestone-actions d-flex justify-content-sm-start justify-content-md-end">
+                        @if (milestone.Status == true)
+                        {
+                            <button type="submit" class="btn btn-sm btn-secondary ml-3" @(milestone.AssignmentId == null ? "" : "disabled")>
+                                <span class="gl-button-text">Close Milestone</span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-sm btn-success ml-3" @(milestone.AssignmentId == null ? "" : "disabled")>
+                                <span class="gl-button-text">Reopen Milestone</span>
+                            </button>
+                        }
+                    </div>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+<div class="modal" id="exampleModal" tabindex="-1" style="background-color: #2220208c">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Milestone</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closePopup()"></button>
+            </div>
+            <div class="modal-body">
+
+                <form id="milestoneForm" onsubmit="saveMilestone(event)">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+                    <input type="hidden" class="form-control" id="projectId" value="@Model.Id">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup()">Close</button>
+
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openPopupAddMilestone() {
+        var popup = document.getElementById("exampleModal");
+        document.getElementById("title").value = "";
+        document.getElementById("description").value = "";
+        document.getElementById("startDate").value = "";
+        document.getElementById("endDate").value = "";
+        popup.style.display = 'block';
+    }
+
+    function closePopup() {
+        var popup = document.getElementById("exampleModal");
+        popup.style.display = 'none';
+    }
+
+    function saveMilestone(event) {
+        event.preventDefault();
+
+        var formData = {
+            Title: document.getElementById("title").value,
+            Description: document.getElementById("description").value,
+            StartDate: document.getElementById("startDate").value,
+            EndDate: document.getElementById("endDate").value,
+            ProjectId: document.getElementById("projectId").value,
+        };
+
+        $.ajax({
+            url: "/Project/CreateMilestone",
+            method: "POST",
+            data: formData,
+            success: function (response) {
+                closePopup();
+            },
+            error: function (error) {
+                console.error(error);
+            }
+        });
+    }
+</script>

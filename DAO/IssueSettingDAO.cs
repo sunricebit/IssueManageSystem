@@ -13,11 +13,23 @@ namespace IMS.DAO
 
         public List<IssueSetting> GetIssueSettingByProject(int projectId)
         {
+            //var common = _context.IssueSettings;
             Project project = _context.Projects.Include(p => p.IssueSettings).FirstOrDefault(p => p.Id == projectId);
             List<IssueSetting> issueSettingList = new List<IssueSetting>();
             issueSettingList.AddRange(project.IssueSettings);
             Class c = _context.Classes.Include(c => c.IssueSettings).FirstOrDefault(c => c.Id == project.ClassId);
             issueSettingList.AddRange(c.IssueSettings.Where(i => i.ProjectId == null));
+            issueSettingList.AddRange(_context.IssueSettings.Where(item => item.ClassId == null));
+            //common = common.Where(item => item.ClassId == null);
+            return issueSettingList.OrderBy(p => p.Id).ToList();
+        }
+
+        public List<IssueSetting> GetIssueSettingClass(int classId)
+        {
+            List<IssueSetting> issueSettingList = new List<IssueSetting>();
+            Class c = _context.Classes.Include(c => c.IssueSettings).FirstOrDefault(c => c.Id == classId);
+            issueSettingList.AddRange(c.IssueSettings.Where(i => i.ProjectId == null));
+            issueSettingList.AddRange(_context.IssueSettings.Where(i => i.ClassId == null));
             return issueSettingList.OrderBy(p => p.Id).ToList();
         }
 
@@ -35,6 +47,13 @@ namespace IMS.DAO
 
         public string CheckDuplicate(IssueSetting issueSetting)
         {
+            IssueSetting? issueSettingCommon = _context.IssueSettings.FirstOrDefault(i => i.Type == issueSetting.Type &&
+                    i.Value == issueSetting.Value);
+            if (issueSettingCommon != null)
+            {
+                return "Already have this Issue Setting in Common";
+            }
+
             if (issueSetting.ProjectId == null)
             {
                 // issueSetting trên class so sánh trên class
@@ -73,6 +92,11 @@ namespace IMS.DAO
                 }
                 return "Can Add";
             }
+        }
+
+        public IssueSetting GetIssueSettingById(int id)
+        {
+            return _context.IssueSettings.FirstOrDefault(i => i.Id == id);
         }
     }
 }

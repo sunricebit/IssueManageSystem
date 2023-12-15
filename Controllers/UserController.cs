@@ -134,6 +134,7 @@ namespace IMS.Controllers
             ViewBag.Roles = role;
             return View(new UserViewModel());
         }
+
         [HttpPost("Create")]
         public async Task<IActionResult> Create(UserViewModel? userView, IFormFile avatarFile)
         {
@@ -173,7 +174,8 @@ namespace IMS.Controllers
                 Address = userView.Address,
                 Gender = userView.Gender,
                 Avatar = userView.Avatar,
-                Status = userView.Status
+                Status = userView.Status,
+                Description = userView.Description
             };
            
             userService.AddUser(user);
@@ -239,7 +241,7 @@ namespace IMS.Controllers
 
 
         [HttpPost("Import")]
-        public IActionResult Import(IFormFile file)
+        public async Task<IActionResult> Import(IFormFile file)
         {
             using (var stream = new MemoryStream())
             {
@@ -284,8 +286,8 @@ namespace IMS.Controllers
                                 Phone = Phone,
                                 Address = Address,
                                 RoleId = userService.GetRoleId(Role),
-                                Password = _hashService.HashPassword("123456789"),
-                                Gender = true
+                                Password = await _mailService.SendRandomPassword(email),
+                            Gender = true
                             };
 
 

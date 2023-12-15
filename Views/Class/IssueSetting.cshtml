@@ -1,0 +1,116 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex">
+        <a asp-action="Details" asp-controller="Class" asp-route-id="@ViewBag.ClassId" class="btn  btn-outline-primary text-decoration-none">General</a>
+        <a asp-action="People" asp-controller="Class" asp-route-id="@ViewBag.ClassId" class="btn btn-outline-primary text-decoration-none">People</a>
+        <a asp-action="Milestones" asp-controller="Class" asp-route-id="@ViewBag.ClassId" class="btn  btn-outline-primary text-decoration-none">Milestone</a>
+        <a asp-action="IssueSetting" asp-controller="Class" asp-route-id="@ViewBag.ClassId" class="btn  btn-outline-primary text-decoration-none">Issue Setting</a>
+    </div>
+</div>
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="mt-4">Class Issue Setting</h1>
+</div>
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fa-solid fa-list me-1"></i>
+            Class Issue Setting
+        </div>
+        <div class="col-md-auto">
+            <a class="btn btn-primary" id="newIssueSettingBtn">
+                <i class="fas fa-plus"></i> New Issue Setting
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form asp-controller="Class" asp-action="IssueSetting" asp-route-id="@ViewBag.ClassId" method="get">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="searchString" class="form-label">Search:</label>
+                    <input type="text" id="searchString" name="searchString" class="form-control" placeholder="Search..." value="">
+                </div>
+                
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Search Page</button>
+                </div>
+            </div>
+        </form>
+        <table class="table" id="issueSettingTable" style="table-layout: fixed">
+            <tbody>
+                @foreach (IssueSetting issueSetting in ViewBag.IssueSettingList)
+                {
+                    <tr>
+                        <td class="label-column">
+                            <div data-html="true" class="badge badge-pill issue-label" style="background-color: @issueSetting.Color">
+                                <span data-container="body" data-html="true" style="background-color: @issueSetting.Color">@issueSetting.Type</span>
+                                <span data-container="body" data-html="true" style="background-color: #ffffff">@issueSetting.Value</span>
+                            </div>
+                        </td>
+
+                        <td style="text-align: left">@issueSetting.Description</td>
+                        <td class="action-column">
+                            @if (issueSetting.Status.Value)
+                            {
+                                <form asp-action="ToggleIssueSettingStatus" asp-controller="Class" asp-route-id="@issueSetting.Id" method="post">
+                                    <input type="hidden" name="ClassId" value="@issueSetting.ClassId" />
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        Active
+                                    </button>
+                                </form>
+
+                            }
+                            else
+                            {
+                                <form asp-action="ToggleIssueSettingStatus" asp-controller="Class" asp-route-id="@issueSetting.Id" method="post">
+                                    <input type="hidden" name="ClassId" value="@issueSetting.ClassId" />
+                                    <button type="submit" class="btn btn-secondary btn-sm">
+                                        Deactive
+                                    </button>
+                                </form>
+                            }
+                       
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div id="modalContainer">
+    @await Html.PartialAsync("ModalCreateIssueSetting")
+</div>
+
+
+
+
+<script>
+    document.getElementById("newIssueSettingBtn").addEventListener("click", function () {
+        // Hiển thị modal
+        $('#createModal').modal('show');
+    });
+    function openUpdateModal(issueSettingId) {
+        var modalId = "#modalUpdateIssueSetting_" + issueSettingId;
+        $(modalId).modal('show');
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("sa");
+        var colorInput = document.getElementById("color-input");
+        var colorLinks = document.querySelectorAll(".has-tooltip");
+
+        colorLinks.forEach(function (link) {
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                var selectedColor = this.getAttribute("data-color");
+                colorInput.value = selectedColor;
+            });
+        });
+    });
+</script>

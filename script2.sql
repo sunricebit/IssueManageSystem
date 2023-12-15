@@ -176,7 +176,7 @@ CREATE TABLE `Milestone` (
     `ProjectId` INTEGER NULL,
     `ClassId` INTEGER NOT NULL,
     `AssignmentId` INTEGER NULL,
-
+    `Status` BOOLEAN NULL,
     INDEX `Milestone_Id_idx`(`Id`),
     PRIMARY KEY (`Id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -489,6 +489,7 @@ INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`Is
 INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (4,'IS1237',NULL,4,4,0);
 INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (5,'IS1238',NULL,4,5,0);
 
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '1');
 INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('6', '1');
 INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('7', '1');
 INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('8', '1');
@@ -517,7 +518,8 @@ INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('30', '1');
 INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('31', '1');
 
 INSERT INTO `ims`.`project` (`Name`,`GroupName`,`Status`, `ClassId`, `LeaderId`) VALUES
-('HumanResourceManagement','G1', '1', '1', '6'),
+('HumanResourceManagement','G1', '1', '1', '5'),
+('HumanResourceManagement111','G2', '1', '1', '5'),
 ('FinancialProject', 'G2', '1', '1', '12'),
 ('CustomerManagementSystem', 'G2', '1', '1', '18'),
 ('LogisticsProject', 'G2', '1', '1', '24'),
@@ -526,9 +528,10 @@ INSERT INTO `ims`.`project` (`Name`,`GroupName`,`Status`, `ClassId`, `LeaderId`)
 INSERT INTO `Milestone` (`Title`, `Description`, `StartDate`, `EndDate`, `ProjectId`, `ClassId`, `AssignmentId`) VALUES
 ('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 1, 1, NULL),
 ('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 1, 1, NULL),
-('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 1, 1, NULL),
+('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 1, 1, NULL);
 
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('5', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('6', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('7', '1');
 INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('8', '1');
