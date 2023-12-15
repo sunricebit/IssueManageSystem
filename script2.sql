@@ -41,7 +41,7 @@ CREATE TABLE `Post` (
     `Description` LONGTEXT NULL,
     `Excerpt` TEXT NULL,
     `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `UpdatedAt` DATETIME(3) NULL,
+    `UpdatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `IsPublic` BOOLEAN NOT NULL DEFAULT false,
     `ImageUrl` VARCHAR(300) NULL,
     `AuthorId` INTEGER NOT NULL,
