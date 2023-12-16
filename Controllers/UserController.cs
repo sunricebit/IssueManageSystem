@@ -370,7 +370,10 @@ namespace IMS.Controllers
                 {
                     await DeleteFromFirebase(userView.Avatar);
                 }
-                
+               
+                // Delete in server
+                fileStream2.Close();
+                System.IO.File.Delete(filePath);
                 userView.Avatar = downloadLink;
             }
            

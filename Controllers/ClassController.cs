@@ -371,7 +371,7 @@ namespace IMS.Controllers
             _milestoneService.AddMilestone(milestone);
 
             
-            return RedirectToAction("Milestones",new { milestone.ClassId});
+            return RedirectToAction("Milestones",new {id= milestone.ClassId});
         }
         [HttpPost("AddStudent")]
         public IActionResult AddStudent(int ClassId, string Name)
