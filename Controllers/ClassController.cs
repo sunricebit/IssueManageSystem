@@ -335,6 +335,7 @@ namespace IMS.Controllers
             }
             ViewBag.IssueSettingList = issueSettings;
             ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
+            ViewBag.ClassId = id;
 
             return View("IssueSetting");
         }
@@ -399,6 +400,7 @@ namespace IMS.Controllers
             {
                 Type = issueSettingViewModel.Type,
                 Value = issueSettingViewModel.Value,
+                Name = issueSettingViewModel.Name,
                 Description = issueSettingViewModel.Description,
                 ClassId = issueSettingViewModel.ClassId,
                 Color = issueSettingViewModel.Color,
@@ -412,7 +414,7 @@ namespace IMS.Controllers
                 message.Success = "Add Issue Setting success";
             }
             message.Error = checkDup;
-            return RedirectToAction("IssueSetting", issueSettingViewModel.Id);
+            return RedirectToAction("IssueSetting", new { id = issueSettingViewModel.ClassId });
         }
         [HttpPost("ToggleIssueSettingStatus")]
         public IActionResult ToggleIssueSettingStatus(int id,int classid)

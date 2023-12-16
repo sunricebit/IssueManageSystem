@@ -1,6 +1,7 @@
 ﻿@using IMS.ViewModels.Paginate;
 @{
     ViewData["Title"] = "Project Member";
+    IMS.ViewModels.Permission.PageAccess pageAcess = ViewBag.PageAccess;
 }
 <div class="container-fluid px-4">
     <ul class="nav nav-tabs mt-4">
@@ -26,7 +27,7 @@
             </ul>
         </div>
     }
-   
+
 
     @if (!String.IsNullOrEmpty(ViewBag.ErrorMessage))
     {
@@ -36,7 +37,7 @@
             </ul>
         </div>
     }
-    
+
 
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -45,46 +46,48 @@
                 Members Table
             </div>
 
-
-            <div class="col-md-auto">
-                <a class="btn btn-primary" onclick="openPopupAddStudent()">
-                    <i class="fas fa-plus"></i> New
-                </a>
-            </div>
+            @if (pageAcess.CanAdd)
+            {
+                <div class="col-md-auto">
+                    <a class="btn btn-primary" onclick="openPopupAddStudent()">
+                        <i class="fas fa-plus"></i> New
+                    </a>
+                </div>
+            }
 
         </div>
         <div class="card-body">
             <div class="mb-3 row">
 
-                    <div class="row">
-                        
+                <div class="row">
 
-                        
-                        <form asp-action="Member" asp-controller="Project" method="get" class="form-inline">
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label for="StatusFilter" class="form-label">Filter by Status:</label>
-                                    <select id="StatusFilter" class="form-select" name="filterbyStatus">
-                                        <option value="">Select Status</option>
-                                        <option value="true">Active</option>
-                                        <option value="false">Inactive</option>
-                                        <option value="">All Status</option>
-                                    </select>
-                                </div>
 
-                                <div class="col-md-6 mb-3">
-                                    <label for="searchInput" class="form-label">Search:</label>
-                                    <input type="hidden" id="id" name="id" value="@ViewBag.ProjectId">
-                                    <input type="text" id="searchString" name="searchString" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
-                                </div>
 
-                                <div class="col-md-4 mb-3">
-                                    <button type="submit" class="btn btn-primary">Search</button>
-                                </div>
+                    <form asp-action="Member" asp-controller="Project" method="get" class="form-inline">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="StatusFilter" class="form-label">Filter by Status:</label>
+                                <select id="StatusFilter" class="form-select" name="filterbyStatus">
+                                    <option value="">Select Status</option>
+                                    <option value="true">Active</option>
+                                    <option value="false">Inactive</option>
+                                    <option value="">All Status</option>
+                                </select>
                             </div>
-                        </form>
-                    </div>
-               
+
+                            <div class="col-md-6 mb-3">
+                                <label for="searchInput" class="form-label">Search:</label>
+                                <input type="hidden" id="id" name="id" value="@ViewBag.ProjectId">
+                                <input type="text" id="searchString" name="searchString" class="form-control" placeholder="Search..." value="@ViewBag.SearchValue">
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
 
                 <table style="border-width: 1px;  border-color: #e0e0e0" class="table  table-bordered " id="sorttable-table">
                     <thead class="thead-dark">
@@ -95,7 +98,10 @@
                             <th>Phone</th>
 
                             <th>Status</th>
-                            <th class="sortable">Action</th>
+                            @if (pageAcess.CanDelete)
+                            {
+                                <th class="sortable">Action</th>
+                            }
 
 
                         </tr>
@@ -116,7 +122,7 @@
                                 {
                                     <td>
                                         <a>
-                                            <button class="btn btn-success btn-sm">
+                                            <button class="btn btn-success btn-sm" @(pageAcess.CanUpdate ? "" : "disabled")>
                                                 Active
                                             </button>
                                         </a>
@@ -126,22 +132,25 @@
                                 {
                                     <td>
                                         <a>
-                                            <button class="btn btn-secondary btn-sm">
+                                            <button class="btn btn-secondary btn-sm" @(pageAcess.CanUpdate ? "" : "disabled")>
                                                 Deactive
                                             </button>
                                         </a>
                                     </td>
                                 }
-                                <td>
-                                    <div class="btn-group" role="group" aria-label="User Actions">
+                                @if (pageAcess.CanDelete)
+                                {
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="User Actions">
 
-                                        <form id="removeStudentForm" asp-action="RemoveStudent" asp-route-id="@ViewBag.ProjectId" asp-route-email="@student.Email" asp-controller="Project" method="post" onsubmit="">
-                                            <button type="submit" class="btn btn-danger">
-                                                <i class="fas fa-trash"></i> Remove
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
+                                            <form id="removeStudentForm" asp-action="RemoveStudent" asp-route-id="@ViewBag.ProjectId" asp-route-email="@student.Email" asp-controller="Project" method="post" onsubmit="">
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-trash"></i> Remove
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                }
                             </tr>
                         }
                     </tbody>
@@ -180,11 +189,14 @@
                 <!-- Form for Milestone input -->
                 <form id="milestoneForm" onsubmit="addstudent(event)">
                     <div class="mb-3">
-                        <label for="Name/Email" class="form-label">Email*</label>
-                        <input type="text" class="form-control" id="Email" required>
+                        <label for="Email" class="form-label">Name*</label>
+                        <select class="form-control" id="Email" name="Email" required>
+                            @foreach (User u in ViewBag.StudentInClass)
+                            {
+                                <option value="@u.Email">@u.Name</option>
+                            }
+                        </select>
                     </div>
-
-
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup()">Close</button>
 
                     <button type="submit" class="btn btn-primary">Save</button>

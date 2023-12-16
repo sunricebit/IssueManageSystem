@@ -210,6 +210,7 @@ namespace IMS.Controllers
             {
                 Type = issueSettingViewModel.Type,
                 Value = issueSettingViewModel.Value,
+                Name = issueSettingViewModel.Name,
                 Description = issueSettingViewModel.Description,
                 ProjectId = issueSettingViewModel.ProjectId,
                 ClassId = p.ClassId,
@@ -224,19 +225,23 @@ namespace IMS.Controllers
                 message.Success = "Add Issue Setting success";
             }
             message.Error = checkDup;
-            return RedirectToAction("IssueSetting", new { projectId = p.Id });
+
+            return RedirectToAction("IssueSetting", new { id = p.Id });
         }
+
         [Route("Member")]
         [CustomAuthorize]
-        public IActionResult Member(string? searchString, int id,string filterbyStatus)
+        public IActionResult Member(string? searchString, int id,string filterbyStatus, [FromServices] IChkPgAcessService chkPgAcessService)
         {
             ViewBag.ProjectId = id;
             ViewBag.ErrorMessage = TempData["ErrorMessage"] as string;
             ViewBag.SuccessMessage = TempData["SuccessMessage"] as string; 
-           
+
             User u = HttpContext.Session.GetUser();
             Project p = _projectService.GetProject(id);
+            ViewBag.StudentInClass = _classService.GetStudentInClass(p.ClassId);
             var members = _projectService.GetStudentInProject(id);
+
             if (!string.IsNullOrEmpty(filterbyStatus) && filterbyStatus != "ALL")
             {
                 if (filterbyStatus == "true")
@@ -254,16 +259,18 @@ namespace IMS.Controllers
                 members = members.Where(item => item.Name.ToLower().Contains(searchString.ToLower())
                 || item.Email.ToLower().Contains(searchString.ToLower())).ToList();
             }
+            ViewBag.PageAccess = chkPgAcessService.GetPageAccess(HttpContext);
             ViewBag.Student = members;
             return View();
         }
+
         [HttpPost("AddStudent")]
         public IActionResult AddStudent(int projectid, string Name)
         {
             if (_projectService.AddStudentToProject(projectid, Name) == false)
             {
                 TempData["ErrorMessage"] = "Student is already exist.";
-                return RedirectToAction("Member", new { id=projectid });
+                return RedirectToAction("Member", new { id = projectid });
             }
             else
             {
@@ -271,6 +278,7 @@ namespace IMS.Controllers
                 return RedirectToAction("Member", new { id = projectid });
             }
         }
+
         [HttpPost("RemoveStudent")]
         public IActionResult RemoveStudent(int id, string email)
         {
@@ -314,7 +322,7 @@ namespace IMS.Controllers
 
             _isDAO.UpdateIssueSetting(issueSetting);
 
-            return RedirectToAction("IssueSetting", new { projectId = projectId });
+            return RedirectToAction("IssueSetting", new { id = projectId });
         }
 
         [HttpGet("Milestones/{id}")]
@@ -360,8 +368,9 @@ namespace IMS.Controllers
                 ClassId = project.ClassId,
                 ProjectId = model.ProjectId,
             };
+            milestone.Status = false;
             _milestoneService.AddMilestone(milestone);
-            return RedirectToAction("ProjectMilestone");
+            return RedirectToAction("ProjectMilestone", new { id = model.ProjectId  });
         }
 
         [HttpPost("ClosedMilestone")]
@@ -383,7 +392,7 @@ namespace IMS.Controllers
             };
             IEnumerable<Milestone> Milestone = _classService.GetMilestoneByProject(id);
             ViewBag.MilestoneList = Milestone;
-            return View("ProjectMilestone", projectViewModel);
+            return View("ProjectMilestone", new { id = project.Id });
         }
     }
 }

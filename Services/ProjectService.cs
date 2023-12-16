@@ -85,19 +85,16 @@
             }
             return resultList;
         }
+
         public bool RemoveStudentFromProject(int projectid, string email)
         {
-            var @project = _context.Projects.Include(p => p.Students).FirstOrDefault(c => c.Id == projectid);
+            var project = _context.Projects.Include(p => p.Students).FirstOrDefault(c => c.Id == projectid);
             var student = _context.Users.FirstOrDefault(u => u.Email == email);
-
-           
-
-            @project.Students.Remove(student);
-
+            project.Students.Remove(student);
             _context.SaveChanges();
-
             return true;
         }
+
         public bool AddStudentToProject(int projectid, string email)
         {
             Project project = _context.Projects.Include(c => c.Students).FirstOrDefault(c => c.Id == projectid);
@@ -114,9 +111,7 @@
             }
 
             project.Students.Add(student);
-
             _context.SaveChanges();
-
             return true;
         }
     }
