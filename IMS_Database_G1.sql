@@ -126,6 +126,7 @@ CREATE TABLE `Issue` (
     `Title` TEXT NOT NULL,
     `Description` LONGTEXT NULL,
     `DocumentUrl` LONGTEXT NULL,
+    `FileNameUrl` VARCHAR(100) NULL,
     `FileName` VARCHAR(100) NULL,
     `MilestoneId` INTEGER NULL,
     `ProjectId` INTEGER NOT NULL,

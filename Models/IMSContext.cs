@@ -178,6 +178,8 @@ namespace IMS.Models
 
                 entity.Property(e => e.FileName).HasMaxLength(100);
 
+                entity.Property(e => e.FileNameUrl).HasMaxLength(100);
+
                 entity.Property(e => e.Title).HasColumnType("text");
 
                 entity.Property(e => e.UpdatedAt)

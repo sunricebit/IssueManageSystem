@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Net;
 using Firebase.Auth;
 using Firebase.Storage;
 using Microsoft.AspNetCore.Mvc;
@@ -318,7 +319,8 @@ namespace IMS.Controllers
                     AssigneeId = vm.AssigneeId,
                     ParentIssueId = vm.ParentIssueId,
                     DocumentUrl = documentUrl,
-                    FileName = filename
+                    FileNameUrl = filename,
+                    FileName = vm.File?.FileName
                 };
 
                 context.Issues.Add(issue);
@@ -382,6 +384,22 @@ namespace IMS.Controllers
             var downloadUrl = await firebaseStorage.Child(path).GetDownloadUrlAsync();
             await auth.SignInWithOAuthAsync(FirebaseAuthType.EmailAndPassword, accessToken);
             return downloadUrl;
+        }
+
+        [HttpGet]
+        public IActionResult Download(string fileUrl)
+        {
+            var fileName = Path.GetFileName(fileUrl);
+
+            var memory = new MemoryStream();
+            using (var client = new WebClient())
+            {
+                var fileBytes = client.DownloadData(fileUrl);
+                memory.Write(fileBytes, 0, fileBytes.Length);
+            }
+            memory.Position = 0;
+            var file = File(memory, "application/octet-stream", fileName);
+            return file;
         }
 
 

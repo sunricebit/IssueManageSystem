@@ -14,6 +14,7 @@ namespace IMS.Models
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
         public string? DocumentUrl { get; set; }
+        public string? FileNameUrl { get; set; }
         public string? FileName { get; set; }
         public int? MilestoneId { get; set; }
         public int ProjectId { get; set; }
