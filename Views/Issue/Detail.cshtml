@@ -86,7 +86,7 @@
 
             <div class="mb-3">
                 @Html.LabelFor(model => model.TypeId, "Type")
-                @Html.DropDownListFor(model => model.TypeId, new SelectList(ViewBag.Types, "Id", "Value"), new { @class = "form-select", onchange = "updateDropdown('TypeId', 'UpdateType', 'updateTypeResult')" })
+                @Html.DropDownListFor(model => model.TypeId, new SelectList(ViewBag.Types, "Id", "Name"), new { @class = "form-select", onchange = "updateDropdown('TypeId', 'UpdateType', 'updateTypeResult')" })
             </div>
 
             <div class="mb-3">
