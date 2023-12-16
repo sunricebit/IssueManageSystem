@@ -203,19 +203,19 @@ namespace IMS.Controllers
         }
 
         [HttpPost("CreateIssueSetting")]
-        public IActionResult CreateIssueSetting(IssueSettingViewModel issueSettingViewModel, [FromServices] ErrorHelper message)
+        public IActionResult CreateIssueSetting(IssueSettingViewModel IssueSettingViewModel, [FromServices] ErrorHelper message)
         {
-            Project p = _projectService.GetProject((int)issueSettingViewModel.ProjectId);
+            Project p = _projectService.GetProject((int)IssueSettingViewModel.ProjectId);
             IssueSetting iS = new IssueSetting()
             {
-                Type = issueSettingViewModel.Type,
-                Value = issueSettingViewModel.Value,
-                Name = issueSettingViewModel.Name,
-                Description = issueSettingViewModel.Description,
-                ProjectId = issueSettingViewModel.ProjectId,
+                Type = IssueSettingViewModel.Type,
+                Value = IssueSettingViewModel.Value,
+                Name = IssueSettingViewModel.Name,
+                Description = IssueSettingViewModel.Description,
+                ProjectId = IssueSettingViewModel.ProjectId,
                 ClassId = p.ClassId,
-                Color = issueSettingViewModel.Color,
-                Status = issueSettingViewModel.Status,
+                Color = IssueSettingViewModel.Color,
+                Status = IssueSettingViewModel.Status,
             };
 
             string checkDup = _isDAO.CheckDuplicate(iS);
@@ -298,29 +298,29 @@ namespace IMS.Controllers
 
             ViewBag.ProjectId = id;
 
-            List<IssueSetting> issueSettings = _isDAO.GetIssueSettingByProject(id);
+            List<IssueSetting> IssueSettings = _isDAO.GetIssueSettingByProject(id);
             if (!string.IsNullOrEmpty(searchString))
             {
-                issueSettings = issueSettings.Where(item => item.Type.ToLower().Contains(searchString.ToLower())
+                IssueSettings = IssueSettings.Where(item => item.Type.ToLower().Contains(searchString.ToLower())
                 || item.Value.ToLower().Contains(searchString.ToLower())).ToList();
             }
-            ViewBag.IssueSettingList = issueSettings;
+            ViewBag.IssueSettingList = IssueSettings;
             return View();
         }
 
         [HttpPost("ToggleIssueSettingStatus")]
         public IActionResult ToggleIssueSettingStatus(int id, int projectId)
         {
-            var issueSetting = _isDAO.GetIssueSettingById(id);
+            var IssueSetting = _isDAO.GetIssueSettingById(id);
 
-            if (issueSetting == null)
+            if (IssueSetting == null)
             {
                 return NotFound();
             }
 
-            issueSetting.Status = !issueSetting.Status;
+            IssueSetting.Status = !IssueSetting.Status;
 
-            _isDAO.UpdateIssueSetting(issueSetting);
+            _isDAO.UpdateIssueSetting(IssueSetting);
 
             return RedirectToAction("IssueSetting", new { id = projectId });
         }
