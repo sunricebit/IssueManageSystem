@@ -110,13 +110,13 @@
                 {
                     <div class="d-flex align-items-center justify-content-between py-2">
                         <div class="d-flex flex-column" style="gap: 4px">
-                            <h5 class="mb-1" onclick="window.location.href = '/@item.Project.Id/issues/@item.Id'">@item.Title</h5>
+                            <h5 class="mb-1" style="cursor: pointer" onclick="window.location.href = '/@item.Project.Id/issues/@item.Id'">@item.Title</h5>
                             <span class="fw-bold"><span class="text-secondary fw-normal">Created at</span> @GetTimeAgoString(item.CreatedAt) <span class="text-secondary fw-normal">by</span> <span>@item.Author.Name</span> <span class="text-secondary fw-normal">-</span> @(item.Project.Name) @(item.Milestone != null ? " - " + item.Milestone.Title:"" )<span></span></span>
 
                             <div class="d-flex" style="gap: 6px">
-                                <span class="badge rounded-pill bg-primary">@item.Type.Value</span>
-                                <span class="badge rounded-pill bg-secondary">@item.Status.Value</span>
-                                <span class="badge rounded-pill bg-success">@item.Process.Value</span>
+                                <span class="badge rounded-pill bg-primary">@item.Type.Name</span>
+                                <span class="badge rounded-pill bg-secondary">@item.Status.Name</span>
+                                <span class="badge rounded-pill bg-success">@item.Process.Name</span>
                             </div>
                         </div>
                         <div>
