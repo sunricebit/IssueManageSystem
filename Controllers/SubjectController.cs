@@ -54,7 +54,7 @@ public class AssignmentViewModel2
     public string? Description { get; set; }
 
     [Required(ErrorMessage = "Please enter weight assignment")]
-    [Range(1, 100, ErrorMessage = "The value must be greater than 0.")]
+    [Range(1, 100, ErrorMessage = "The value must be greater than 0 and less than or equal to 100")]
     public int Weight { get; set; }
 }
 
@@ -120,12 +120,14 @@ namespace IMS.Controllers
                     break;
             }
 
+            subjects = subjects.OrderByDescending(subject => subject.CreatedAt);
+
             int pageIndex = vm.PageIndex == 0 ? 1 : vm.PageIndex;
             int pageSize = 10;
             int itemCount = subjects.Count();
             int totalPages = (int)Math.Ceiling((double)itemCount / pageSize);
 
-            subjects = subjects.Skip((pageIndex - 1) * pageSize).Take(pageSize).OrderByDescending(subject => subject.CreatedAt);
+            subjects = subjects.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
             vm.PageIndex = pageIndex;
             vm.PageSize = pageSize;
@@ -154,7 +156,7 @@ namespace IMS.Controllers
             {
                 _context.Subjects.Add(new()
                 {
-                    Code = vm.Code.Trim(),
+                    Code = vm.Code.Trim().ToUpper(),
                     Name = vm.Name.Trim(),
                     IsActive = vm.IsActive,
                     SubjectManagerId = vm.SubjectManagerId

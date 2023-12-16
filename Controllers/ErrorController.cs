@@ -5,7 +5,7 @@ namespace IMS.Controllers
     [Route("Error")]
     public class ErrorController : Controller
     {
-        [Route  ("NotAccess")]
+        [Route("NotAccess")]
         public IActionResult NotAccess()
         {
             return View();
@@ -14,6 +14,13 @@ namespace IMS.Controllers
         [Route("404")]
         public IActionResult NotFound()
         {
+            return View();
+        }
+
+        [Route("InternalServerError")]
+        public IActionResult InternalServerError(string message)
+        {
+            ViewBag.ErrorMessage = message;
             return View();
         }
     }

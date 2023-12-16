@@ -48,6 +48,13 @@
                 </div>
             </form>
             <table class="table" id="issueSettingTable" style="table-layout: fixed">
+                <thead>
+                    <tr>
+                        <th class="label-column">Type/Value</th>
+                        <th>Decription</th>
+                        <th class="action-column">Action</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @foreach (IssueSetting issueSetting in ViewBag.IssueSettingList)
                     {
@@ -80,23 +87,6 @@
                                         </button>
                                     </form>
                                 }
-                                @*@if (issueSetting.ProjectId != null)
-                                {
-                                    <div id="modalContainer">
-                                        @await Html.PartialAsync("ModalUpdateIssueSetting", new IMS.ViewModels.Validation.IssueSettingViewModel
-                                        { 
-                                            Id = issueSetting.Id,
-                                            Type = issueSetting.Type,
-                                            Value = issueSetting.Value,
-                                            Color = issueSetting.Color,
-                                            Description = issueSetting.Description, 
-                                            ProjectId = issueSetting.ProjectId
-                                        })
-                                    </div>
-                                    <button onclick="openUpdateModal(@issueSetting.Id)" class="btn btn-primary btn-sm">
-                                        Update
-                                    </button>
-                                }*@
                             </td>
                         </tr>
                     }
