@@ -33,11 +33,16 @@
                         <button type="submit" class="btn btn-primary">Search</button>
                     </form>
                 </div>
-                <div class="col-md-2 text-right">
-                    <a class="btn btn-success ml-3" title="New milestone" onclick="openPopupAddMilestone()">
-                        New milestone
-                    </a>
-                </div>
+                @if (pageAcess.CanAdd)
+                {
+
+
+                    <div class="col-md-2 text-right">
+                        <a class="btn btn-success ml-3" title="New milestone" onclick="openPopupAddMilestone()">
+                            New milestone
+                        </a>
+                    </div>
+                }
             </div>
 
         </main>
@@ -78,13 +83,13 @@
                     <div class="milestone-actions d-flex justify-content-sm-start justify-content-md-end">
                         @if (milestone.Status == true)
                         {
-                            <button type="submit" class="btn btn-sm btn-secondary ml-3" @(milestone.AssignmentId == null ? "" : "disabled")>
+                            <button type="submit" class="btn btn-sm btn-secondary ml-3" @(milestone.AssignmentId == null  || pageAcess.CanUpdate ? "" : "disabled")>
                                 <span class="gl-button-text">Close Milestone</span>
                             </button>
                         }
                         else
                         {
-                            <button type="submit" class="btn btn-sm btn-success ml-3" @(milestone.AssignmentId == null ? "" : "disabled")>
+                            <button type="submit" class="btn btn-sm btn-success ml-3" @(milestone.AssignmentId == null  || pageAcess.CanUpdate ? "" : "disabled")>
                                 <span class="gl-button-text">Reopen Milestone</span>
                             </button>
                         }

@@ -294,7 +294,7 @@ namespace IMS.Controllers
 
         [Route("IssueSetting")]
         [CustomAuthorize]
-        public IActionResult IssueSetting(string? searchString, int id)
+        public IActionResult IssueSetting(string? searchString, int id, [FromServices] IChkPgAcessService chkPgAcess)
         {
             ViewBag.ProjectId = id;
             User u = HttpContext.Session.GetUser();
@@ -308,6 +308,7 @@ namespace IMS.Controllers
                 IssueSettings = IssueSettings.Where(item => item.Type.ToLower().Contains(searchString.ToLower())
                 || item.Value.ToLower().Contains(searchString.ToLower())).ToList();
             }
+            ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
             ViewBag.IssueSettingList = IssueSettings;
             return View();
         }
