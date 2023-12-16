@@ -1,581 +1,639 @@
--- MySQL dump 10.13  Distrib 8.0.33, for Win64 (x86_64)
---
--- Host: localhost    Database: ims
--- ------------------------------------------------------
--- Server version	8.0.33
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
-DROP SCHEMA IF EXISTS IMS;
+﻿DROP SCHEMA IF EXISTS IMS;
 
 CREATE DATABASE IMS;
 
 USE IMS;
 
---
--- Table structure for table `assignment`
---
-
-DROP TABLE IF EXISTS `assignment`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `assignment` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` text COLLATE utf8mb4_unicode_ci,
-  `SubjectId` int NOT NULL,
-  `Weight` int NOT NULL,
-  `IsActive` tinyint(1) NOT NULL DEFAULT '1',
-  `CreatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  PRIMARY KEY (`Id`),
-  KEY `Assignment_Id_idx` (`Id`),
-  KEY `Assignment_SubjectId_fkey` (`SubjectId`),
-  CONSTRAINT `Assignment_SubjectId_fkey` FOREIGN KEY (`SubjectId`) REFERENCES `subject` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `assignment`
---
-
-LOCK TABLES `assignment` WRITE;
-/*!40000 ALTER TABLE `assignment` DISABLE KEYS */;
-INSERT INTO `assignment` VALUES (1,'Assignment 1',NULL,1,10,1,'2023-12-16 10:01:12.183'),(2,'Assignment 2',NULL,1,10,1,'2023-12-16 10:01:12.191'),(3,'Assignment 3',NULL,1,10,1,'2023-12-16 10:01:12.195'),(4,'Assignment 1',NULL,2,10,1,'2023-12-16 10:01:12.201'),(5,'Assignment 2',NULL,2,10,1,'2023-12-16 10:01:12.207'),(6,'Assignment 3',NULL,2,10,1,'2023-12-16 10:01:12.212'),(7,'Assignment 1',NULL,3,10,1,'2023-12-16 10:01:12.220'),(8,'Assignment 2',NULL,3,10,1,'2023-12-16 10:01:12.225'),(9,'Assignment 3',NULL,3,10,1,'2023-12-16 10:01:12.230'),(10,'Assignment 1',NULL,4,10,1,'2023-12-16 10:01:12.236'),(11,'Assignment 2',NULL,4,10,1,'2023-12-16 10:01:12.242'),(12,'Assignment 3',NULL,4,10,1,'2023-12-16 10:01:12.246'),(13,'Assignment 1',NULL,5,10,1,'2023-12-16 10:01:12.252'),(14,'Assignment 2',NULL,5,10,1,'2023-12-16 10:01:12.256'),(15,'Assignment 3',NULL,5,10,1,'2023-12-16 10:01:12.261');
-/*!40000 ALTER TABLE `assignment` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `class`
---
-
-DROP TABLE IF EXISTS `class`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `class` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Name` varchar(15) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` varchar(300) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `TeacherId` int DEFAULT NULL,
-  `SubjectId` int DEFAULT NULL,
-  `IsActive` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`Id`),
-  KEY `Class_Id_idx` (`Id`),
-  KEY `Class_SubjectId_fkey` (`SubjectId`),
-  KEY `Class_TeacherId_fkey` (`TeacherId`),
-  CONSTRAINT `Class_SubjectId_fkey` FOREIGN KEY (`SubjectId`) REFERENCES `subject` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `Class_TeacherId_fkey` FOREIGN KEY (`TeacherId`) REFERENCES `user` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `class`
---
-
-LOCK TABLES `class` WRITE;
-/*!40000 ALTER TABLE `class` DISABLE KEYS */;
-INSERT INTO `class` VALUES (1,'IS1234',NULL,4,1,1),(2,'IS1235',NULL,4,2,1),(3,'IS1236',NULL,4,3,1),(4,'IS1237',NULL,4,4,1),(5,'IS1238',NULL,4,5,1),(6,'PRN211',NULL,25,13,1);
-/*!40000 ALTER TABLE `class` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `classstudent`
---
-
-DROP TABLE IF EXISTS `classstudent`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `classstudent` (
-  `StudentId` int NOT NULL,
-  `ClassId` int NOT NULL,
-  PRIMARY KEY (`ClassId`,`StudentId`),
-  KEY `ClassStudent_ClassId_StudentId_idx` (`ClassId`,`StudentId`),
-  KEY `ClassStudent_StudentId_fkey` (`StudentId`),
-  CONSTRAINT `ClassStudent_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `class` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `ClassStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `user` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `classstudent`
---
-
-LOCK TABLES `classstudent` WRITE;
-/*!40000 ALTER TABLE `classstudent` DISABLE KEYS */;
-INSERT INTO `classstudent` VALUES (5,1),(5,2),(6,1),(7,1),(8,1),(9,1),(10,1),(11,1),(12,1),(13,1),(14,1),(15,1),(16,1),(17,1),(18,1),(19,1),(20,1),(21,1),(22,1),(23,1),(24,1),(25,1),(26,1),(27,1),(28,1),(29,1),(30,1),(31,1);
-/*!40000 ALTER TABLE `classstudent` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `contact`
---
-
-DROP TABLE IF EXISTS `contact`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `contact` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Phone` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `IsValid` tinyint(1) NOT NULL DEFAULT '1',
-  `CreatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  `CarerId` int DEFAULT NULL,
-  `ContactTypeId` int NOT NULL,
-  PRIMARY KEY (`Id`),
-  KEY `Contact_Id_idx` (`Id`),
-  KEY `Contact_ContactTypeId_fkey` (`ContactTypeId`),
-  KEY `Contact_CarerId_fkey` (`CarerId`),
-  CONSTRAINT `Contact_CarerId_fkey` FOREIGN KEY (`CarerId`) REFERENCES `user` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `Contact_ContactTypeId_fkey` FOREIGN KEY (`ContactTypeId`) REFERENCES `setting` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `contact`
---
-
-LOCK TABLES `contact` WRITE;
-/*!40000 ALTER TABLE `contact` DISABLE KEYS */;
-INSERT INTO `contact` VALUES (1,'myellowlee0@rakuten.co.jp','Morley Yellowlee','0579421047',1,'2023-12-16 10:01:11.876',4,14),(2,'ldrewery1@cpanel.net','Lonnie Drewery','0312487974',1,'2023-12-16 10:01:11.886',4,13),(3,'rcaitlin2@springer.com','Rob Caitlin','0411455192',1,'2023-12-16 10:01:11.891',1,16),(4,'gchaff3@dmoz.org','Gilli Chaff','0816481931',1,'2023-12-16 10:01:11.896',1,16),(5,'abailles4@fema.gov','Aime Bailles','0504574491',1,'2023-12-16 10:01:11.910',1,15),(6,'kheakey5@bloglines.com','Katerina Heakey','0395053048',1,'2023-12-16 10:01:11.920',1,15),(7,'lsyder6@usgs.gov','Lyndsay Syder','0661478939',1,'2023-12-16 10:01:11.925',1,13),(8,'lhamsley7@google.fr','Lewes Hamsley','0393419687',1,'2023-12-16 10:01:11.931',1,15),(9,'fweaving8@canalblog.com','Farlee Weaving','0239507840',1,'2023-12-16 10:01:11.935',1,16),(10,'bgores9@apache.org','Brandtr Gores','0749441649',1,'2023-12-16 10:01:11.941',1,15),(11,'cmcginleya@de.vu','Cindra McGinley','0125382173',1,'2023-12-16 10:01:11.945',4,13),(12,'hboylesb@timesonline.co.uk','Hazel Boyles','0070353353',1,'2023-12-16 10:01:11.951',4,14),(13,'mdavenhallc@narod.ru','Marla Davenhall','0745924359',1,'2023-12-16 10:01:11.991',4,15),(14,'epealingd@vistaprint.com','Elie Pealing','0298591661',1,'2023-12-16 10:01:12.000',1,15);
-/*!40000 ALTER TABLE `contact` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `issue`
---
-
-DROP TABLE IF EXISTS `issue`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `issue` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Title` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` longtext COLLATE utf8mb4_unicode_ci,
-  `MilestoneId` int DEFAULT NULL,
-  `ProjectId` int NOT NULL,
-  `AuthorId` int NOT NULL,
-  `AssigneeId` int DEFAULT NULL,
-  `TypeId` int NOT NULL,
-  `StatusId` int NOT NULL,
-  `ProcessId` int NOT NULL,
-  `ParentIssueId` int DEFAULT NULL,
-  `CreatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  `UpdatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  PRIMARY KEY (`Id`),
-  KEY `Issue_Id_idx` (`Id`),
-  KEY `Issue_TypeId_fkey` (`TypeId`),
-  KEY `Issue_StatusId_fkey` (`StatusId`),
-  KEY `Issue_ProcessId_fkey` (`ProcessId`),
-  KEY `Issue_AssigneeId_fkey` (`AssigneeId`),
-  KEY `Issue_AuthorId_fkey` (`AuthorId`),
-  KEY `Issue_MilestoneId_fkey` (`MilestoneId`),
-  KEY `Issue_ProjectId_fkey` (`ProjectId`),
-  KEY `Issue_ParentIssueId_fkey` (`ParentIssueId`),
-  CONSTRAINT `Issue_AssigneeId_fkey` FOREIGN KEY (`AssigneeId`) REFERENCES `user` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `Issue_AuthorId_fkey` FOREIGN KEY (`AuthorId`) REFERENCES `user` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `Issue_MilestoneId_fkey` FOREIGN KEY (`MilestoneId`) REFERENCES `milestone` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `Issue_ParentIssueId_fkey` FOREIGN KEY (`ParentIssueId`) REFERENCES `issue` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `Issue_ProcessId_fkey` FOREIGN KEY (`ProcessId`) REFERENCES `issuesetting` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `Issue_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `project` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `Issue_StatusId_fkey` FOREIGN KEY (`StatusId`) REFERENCES `issuesetting` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `Issue_TypeId_fkey` FOREIGN KEY (`TypeId`) REFERENCES `issuesetting` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `issue`
---
-
-LOCK TABLES `issue` WRITE;
-/*!40000 ALTER TABLE `issue` DISABLE KEYS */;
-/*!40000 ALTER TABLE `issue` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `issuesetting`
---
-
-DROP TABLE IF EXISTS `issuesetting`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `issuesetting` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Value` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Color` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '#009966',
-  `Status` tinyint(1) NOT NULL DEFAULT '1',
-  `ClassId` int DEFAULT NULL,
-  `ProjectId` int DEFAULT NULL,
-  PRIMARY KEY (`Id`),
-  KEY `IssueSetting_Id_idx` (`Id`),
-  KEY `IssueSetting_ClassId_fkey` (`ClassId`),
-  KEY `IssueSetting_ProjectId_fkey` (`ProjectId`),
-  CONSTRAINT `IssueSetting_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `class` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `IssueSetting_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `project` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `issuesetting`
---
-
-LOCK TABLES `issuesetting` WRITE;
-/*!40000 ALTER TABLE `issuesetting` DISABLE KEYS */;
-INSERT INTO `issuesetting` VALUES (1,'TYPE','R','Requirement',NULL,'#009966',1,NULL,NULL),(2,'TYPE','T','Task',NULL,'#009966',1,NULL,NULL),(3,'TYPE','Q','Q&A',NULL,'#009966',1,NULL,NULL),(4,'TYPE','D','Defect',NULL,'#009966',1,NULL,NULL),(5,'STATUS','Todo','To do',NULL,'#009966',1,NULL,NULL),(6,'STATUS','Doing','Doing',NULL,'#009966',1,NULL,NULL),(7,'STATUS','Done','Done',NULL,'#009966',1,NULL,NULL),(8,'PROCESS','Coding','Coding',NULL,'#009966',1,NULL,NULL),(9,'PROCESS','Req','Req',NULL,'#009966',1,NULL,NULL),(10,'PROCESS','Testing','Testing',NULL,'#009966',1,NULL,NULL),(11,'PROCESS','Design','Design',NULL,'#009966',1,NULL,NULL),(12,'Bug','Service','abc',NULL,'#eee600',1,1,8),(13,'Bug','Controller','abc','Bug of Controller','#330066',1,1,8),(14,'Bug','DAO','abc','Bug Of Dao','#6699cc',1,NULL,NULL),(15,'Defect','Req','abc',NULL,'#dc143c',1,NULL,NULL),(16,'Defect','Valid','abc',NULL,'#eee600',1,NULL,NULL),(17,'Defect','Test','abc',NULL,'#808080',1,1,NULL);
-/*!40000 ALTER TABLE `issuesetting` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `message`
---
-
-DROP TABLE IF EXISTS `message`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `message` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Content` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ContactId` int DEFAULT NULL,
-  `CreatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  PRIMARY KEY (`Id`),
-  KEY `Message_Id_idx` (`Id`),
-  KEY `Message_ContactId_fkey` (`ContactId`),
-  CONSTRAINT `Message_ContactId_fkey` FOREIGN KEY (`ContactId`) REFERENCES `contact` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `message`
---
-
-LOCK TABLES `message` WRITE;
-/*!40000 ALTER TABLE `message` DISABLE KEYS */;
-/*!40000 ALTER TABLE `message` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `milestone`
---
-
-DROP TABLE IF EXISTS `milestone`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `milestone` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Title` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` text COLLATE utf8mb4_unicode_ci,
-  `StartDate` datetime(3) DEFAULT NULL,
-  `EndDate` datetime(3) DEFAULT NULL,
-  `ProjectId` int DEFAULT NULL,
-  `ClassId` int NOT NULL,
-  `AssignmentId` int DEFAULT NULL,
-  `Status` tinyint(1) DEFAULT NULL,
-  PRIMARY KEY (`Id`),
-  KEY `Milestone_Id_idx` (`Id`),
-  KEY `Milestone_AssignmentId_fkey` (`AssignmentId`),
-  KEY `Milestone_ClassId_fkey` (`ClassId`),
-  KEY `Milestone_ProjectId_fkey` (`ProjectId`),
-  CONSTRAINT `Milestone_AssignmentId_fkey` FOREIGN KEY (`AssignmentId`) REFERENCES `assignment` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `Milestone_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `class` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `Milestone_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `project` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `milestone`
---
-
-LOCK TABLES `milestone` WRITE;
-/*!40000 ALTER TABLE `milestone` DISABLE KEYS */;
-INSERT INTO `milestone` VALUES (1,'Milestone 1','Description for Milestone 1','2023-01-01 00:00:00.000','2023-02-01 00:00:00.000',1,1,NULL,NULL),(2,'Milestone 2','Description for Milestone 2','2023-03-01 00:00:00.000','2023-04-01 00:00:00.000',1,1,NULL,NULL),(3,'Milestone 3','Description for Milestone 3','2023-05-01 00:00:00.000','2023-06-01 00:00:00.000',1,1,NULL,NULL),(4,'Iter1','Iter1','2023-12-16 00:00:00.000','2023-12-24 00:00:00.000',NULL,2,NULL,1),(5,'Iter2','Iter2','2023-12-16 00:00:00.000','2023-12-23 00:00:00.000',NULL,2,NULL,1),(6,'Iter1',NULL,'2023-12-16 00:00:00.000','2023-12-17 00:00:00.000',7,2,NULL,0),(7,'Iter3','Iter3','2023-12-16 00:00:00.000','2023-12-17 00:00:00.000',7,2,NULL,0),(8,'Iter3','Iter3','2023-12-16 00:00:00.000','2023-12-17 00:00:00.000',7,2,NULL,0),(9,'Iter3','Iter3','2023-12-16 00:00:00.000','2023-12-17 00:00:00.000',7,2,NULL,0),(10,'Iter3','Iter3','2023-12-16 00:00:00.000','2023-12-17 00:00:00.000',7,2,NULL,0),(11,'Iter3','Iter3','2023-12-16 00:00:00.000','2023-12-17 00:00:00.000',7,2,NULL,0),(12,'Iter3','Iter3','2023-12-16 00:00:00.000','2023-12-17 00:00:00.000',7,2,NULL,0),(13,'Iter1',NULL,'2023-12-17 00:00:00.000','2023-12-18 00:00:00.000',NULL,1,NULL,0);
-/*!40000 ALTER TABLE `milestone` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `permission`
---
-
-DROP TABLE IF EXISTS `permission`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `permission` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `RoleId` int NOT NULL,
-  `PageId` int NOT NULL,
-  `CanCreate` tinyint(1) NOT NULL DEFAULT '0',
-  `CanRead` tinyint(1) NOT NULL DEFAULT '0',
-  `CanUpdate` tinyint(1) NOT NULL DEFAULT '0',
-  `CanExport` tinyint(1) NOT NULL DEFAULT '0',
-  `CanDelete` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`Id`),
-  UNIQUE KEY `Permission_RoleId_PageId_key` (`RoleId`,`PageId`),
-  KEY `Permission_RoleId_PageId_idx` (`RoleId`,`PageId`),
-  KEY `Permission_PageId_fkey` (`PageId`),
-  CONSTRAINT `Permission_PageId_fkey` FOREIGN KEY (`PageId`) REFERENCES `setting` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `Permission_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `setting` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `permission`
---
-
-LOCK TABLES `permission` WRITE;
-/*!40000 ALTER TABLE `permission` DISABLE KEYS */;
-INSERT INTO `permission` VALUES (1,1,17,1,1,1,0,0),(2,2,17,0,0,0,0,0),(3,3,17,0,0,0,0,0),(4,4,17,0,0,0,0,0),(5,5,17,0,0,0,0,0),(6,1,18,1,1,1,1,1),(7,2,18,0,1,0,0,0),(8,3,18,0,1,0,0,0),(9,5,18,0,1,0,0,0),(10,4,18,1,1,1,0,0),(11,1,19,1,1,1,0,0),(12,2,19,0,1,0,0,0),(13,3,19,0,1,0,0,0),(14,5,19,0,1,0,0,0),(15,4,19,1,1,1,0,0),(16,1,20,1,1,1,0,0),(17,2,20,0,1,0,0,0),(18,3,20,0,1,0,0,0),(19,5,20,0,1,0,0,0),(20,4,20,0,1,0,0,0),(21,1,21,1,1,1,0,0),(22,2,21,0,1,0,0,0),(23,3,21,0,1,0,0,0),(24,5,21,0,1,0,0,0),(25,4,21,0,1,0,0,0),(26,1,22,1,1,1,0,0),(27,2,22,0,1,0,0,0),(28,3,22,0,1,0,0,0),(29,5,22,0,1,0,0,0),(30,4,22,0,1,0,0,0),(31,1,23,1,1,1,0,0),(32,2,23,0,1,0,0,0),(33,3,23,0,1,0,0,0),(34,5,23,0,1,0,0,0),(35,4,23,0,1,0,0,0),(36,1,26,1,1,1,1,1),(37,2,26,0,1,0,0,0),(38,3,26,0,0,0,0,0),(39,5,26,0,0,0,0,0),(40,4,26,1,1,1,0,0),(41,1,27,1,1,1,1,1),(42,2,27,0,1,0,0,0),(43,3,27,0,0,0,0,0),(44,5,27,0,0,0,0,0),(45,4,27,0,0,0,0,0),(46,1,28,1,1,1,0,0),(47,2,28,0,1,0,0,0),(48,3,28,0,1,0,0,0),(49,5,28,0,1,0,0,0),(50,4,28,0,1,0,0,0),(51,1,29,1,1,1,1,1),(52,2,29,0,1,0,0,0),(53,3,29,0,0,0,0,0),(54,5,29,0,0,0,0,0),(55,4,29,0,0,0,0,0),(56,1,31,1,1,1,0,0),(57,2,31,0,1,0,0,0),(58,3,31,0,1,0,0,0),(59,5,31,0,1,0,0,0),(60,4,31,0,1,0,0,0),(61,1,32,1,1,1,1,1),(62,2,32,1,1,1,1,1),(63,3,32,1,1,1,1,1),(64,5,32,1,1,1,1,1),(65,4,32,1,1,1,1,1),(66,1,33,1,1,1,1,1),(67,2,33,1,1,1,1,1),(68,3,33,0,1,0,0,0),(69,5,33,0,1,0,0,0),(70,4,33,0,1,1,0,0),(71,1,34,1,1,1,1,1),(72,2,34,0,1,0,0,0),(73,3,34,0,1,0,0,0),(74,5,34,0,1,0,0,0),(75,4,34,1,1,1,0,0),(76,1,35,1,1,1,1,1),(77,2,35,0,1,0,0,0),(78,3,35,0,1,0,0,0),(79,5,35,0,1,0,0,0),(80,4,35,1,1,1,0,0),(81,1,36,1,1,1,1,1),(82,2,36,1,1,1,1,1),(83,3,36,0,1,0,0,0),(84,5,36,0,1,0,0,0),(85,4,36,0,1,1,0,0),(86,1,37,1,1,1,1,1),(87,2,37,0,1,0,0,0),(88,3,37,0,1,0,0,0),(89,5,37,0,1,0,0,0),(90,4,37,0,1,0,0,0),(91,1,38,1,1,1,1,1),(92,2,38,0,1,0,0,0),(93,3,38,0,1,0,0,0),(94,5,38,0,1,0,0,0),(95,4,38,0,1,0,0,0),(96,1,39,1,1,1,1,1),(97,2,39,0,1,0,0,0),(98,3,39,0,1,0,0,0),(99,5,39,0,1,0,0,0),(100,4,39,1,1,1,0,0),(101,1,40,1,1,1,1,1),(102,2,40,0,1,0,0,0),(103,3,40,0,1,0,0,0),(104,5,40,0,1,0,0,0),(105,4,40,1,1,1,0,0),(106,1,41,1,1,1,1,1),(107,2,41,0,1,0,0,0),(108,3,41,0,1,0,0,0),(109,5,41,0,1,0,0,0),(110,4,41,1,1,1,0,0),(111,1,42,1,1,1,1,1),(112,2,42,1,1,1,1,1),(113,3,42,1,1,1,1,1),(114,5,42,1,1,1,1,1),(115,4,42,1,1,1,1,1),(116,1,43,1,1,1,1,1),(117,2,43,0,1,0,0,0),(118,3,43,0,1,0,0,0),(119,5,43,1,1,1,0,0),(120,4,43,1,1,1,0,0),(121,1,44,1,1,1,1,1),(122,2,44,0,1,0,0,0),(123,3,44,0,1,0,0,0),(124,5,44,0,1,0,0,0),(125,4,44,0,1,0,0,0);
-/*!40000 ALTER TABLE `permission` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `post`
---
-
-DROP TABLE IF EXISTS `post`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `post` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Title` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` longtext COLLATE utf8mb4_unicode_ci,
-  `Excerpt` text COLLATE utf8mb4_unicode_ci,
-  `CreatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  `UpdatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  `IsPublic` tinyint(1) NOT NULL DEFAULT '0',
-  `ImageUrl` varchar(300) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `AuthorId` int NOT NULL,
-  `CategoryId` int DEFAULT NULL,
-  PRIMARY KEY (`Id`),
-  KEY `Post_Id_idx` (`Id`),
-  KEY `Post_CategoryId_fkey` (`CategoryId`),
-  KEY `Post_AuthorId_fkey` (`AuthorId`),
-  CONSTRAINT `Post_AuthorId_fkey` FOREIGN KEY (`AuthorId`) REFERENCES `user` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `Post_CategoryId_fkey` FOREIGN KEY (`CategoryId`) REFERENCES `setting` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `post`
---
-
-LOCK TABLES `post` WRITE;
-/*!40000 ALTER TABLE `post` DISABLE KEYS */;
-INSERT INTO `post` VALUES (1,'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.','Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.Pellentesque at nulla. Suspendisse potenti. Cras in purus eu magna vulputate luctus.Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus vestibulum sagittis sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.','Phasellus sit amet erat. Nulla tempus','2023-12-16 10:01:12.010','2023-12-16 10:01:12.010',1,NULL,4,7),(2,'Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.Pellentesque at nulla. Suspendisse potenti. Cras in purus eu magna vulputate luctus.','In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet.Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.','Sed sagittis. Nam congue, risus semper porta volutpa','2023-12-16 10:01:12.021','2023-12-16 10:01:12.021',0,'http://dummyimage.com/588x643.png/ff4444/ffffff',4,10),(3,'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.','Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.Sed ante. Vivamus tortor. Duis mattis egestas metus.','Phasellus sit amet erat. Nulla tempus','2023-12-16 10:01:12.026','2023-12-16 10:01:12.026',1,'http://dummyimage.com/533x699.png/dddddd/000000',4,10),(4,'Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.Phasellus in felis. Donec semper sapien a libero. Nam dui.','Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.','Quisque porta volutpat erat.','2023-12-16 10:01:12.031','2023-12-16 10:01:12.031',1,'http://dummyimage.com/448x560.png/5fa2dd/ffffff',4,9),(5,'Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.Duis bibendum. Morbi non quam nec dui luctus rutrum. Nulla tellus.In sagittis dui vel nisl. Duis ac nibh. Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus.','Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.','Donec diam neque, vestibulum eget','2023-12-16 10:01:12.039','2023-12-16 10:01:12.039',1,NULL,4,9),(6,'Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.','Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.','Duis consequat dui nec nisi volutpat eleifend','2023-12-16 10:01:12.045','2023-12-16 10:01:12.045',1,'http://dummyimage.com/550x664.png/cc0000/ffffff',4,9),(7,'Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi.','Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.','Nulla ut erat id mauris vulputate elementum','2023-12-16 10:01:12.052','2023-12-16 10:01:12.052',0,'http://dummyimage.com/423x596.png/ff4444/ffffff',4,7),(8,'Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero.Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.','Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.','Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id','2023-12-16 10:01:12.058','2023-12-16 10:01:12.058',1,NULL,4,10),(9,'Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet.Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.','Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.','Nullam sit amet turpis elementum ligula vehicula consequat','2023-12-16 10:01:12.063','2023-12-16 10:01:12.063',1,'http://dummyimage.com/443x660.png/cc0000/ffffff',4,11),(10,'Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.','Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.','Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi','2023-12-16 10:01:12.069','2023-12-16 10:01:12.069',0,'http://dummyimage.com/492x512.png/ff4444/ffffff',4,9),(11,'Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.','Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.','Maecenas leo odio, condimentum id, luctus nec','2023-12-16 10:01:12.075','2023-12-16 10:01:12.075',0,NULL,4,12),(12,'Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.','Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero.Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.','Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo','2023-12-16 10:01:12.081','2023-12-16 10:01:12.081',0,'http://dummyimage.com/467x648.png/cc0000/ffffff',4,12),(13,'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.','Proin interdum mauris non ligula pellentesque ultrices','2023-12-16 10:01:12.086','2023-12-16 10:01:12.086',0,NULL,4,10),(14,'Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.Phasellus in felis. Donec semper sapien a libero. Nam dui.','Sed ante. Vivamus tortor. Duis mattis egestas metus.Aenean fermentum. Donec ut mauris eget massa tempor convallis. Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.','Quisque porta volutpat erat','2023-12-16 10:01:12.093','2023-12-16 10:01:12.093',1,NULL,4,12);
-/*!40000 ALTER TABLE `post` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `project`
---
-
-DROP TABLE IF EXISTS `project`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `project` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `GroupName` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Status` tinyint(1) DEFAULT '1',
-  `Description` text COLLATE utf8mb4_unicode_ci,
-  `ClassId` int NOT NULL,
-  `LeaderId` int DEFAULT NULL,
-  PRIMARY KEY (`Id`),
-  KEY `Project_Id_idx` (`Id`),
-  KEY `Project_ClassId_fkey` (`ClassId`),
-  KEY `Project_LeaderId_fkey` (`LeaderId`),
-  CONSTRAINT `Project_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `class` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `Project_LeaderId_fkey` FOREIGN KEY (`LeaderId`) REFERENCES `user` (`Id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `project`
---
-
-LOCK TABLES `project` WRITE;
-/*!40000 ALTER TABLE `project` DISABLE KEYS */;
-INSERT INTO `project` VALUES (1,'HumanResourceManagement','G1',1,NULL,1,5),(2,'HumanResourceManagement111','G2',1,NULL,1,5),(3,'FinancialProject','G2',1,NULL,1,12),(4,'CustomerManagementSystem','G2',1,NULL,1,18),(5,'LogisticsProject','G2',1,NULL,1,24),(6,'ECommerceApp','G2',1,NULL,1,30),(7,'XCB01','G1',1,NULL,2,4),(8,'VCM01','g1',1,NULL,1,4);
-/*!40000 ALTER TABLE `project` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `projectstudent`
---
-
-DROP TABLE IF EXISTS `projectstudent`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `projectstudent` (
-  `StudentId` int NOT NULL,
-  `ProjectId` int NOT NULL,
-  PRIMARY KEY (`ProjectId`,`StudentId`),
-  KEY `ProjectStudent_ProjectId_StudentId_idx` (`ProjectId`,`StudentId`),
-  KEY `ProjectStudent_StudentId_fkey` (`StudentId`),
-  CONSTRAINT `ProjectStudent_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `project` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `ProjectStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `user` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `projectstudent`
---
-
-LOCK TABLES `projectstudent` WRITE;
-/*!40000 ALTER TABLE `projectstudent` DISABLE KEYS */;
-INSERT INTO `projectstudent` VALUES (4,1),(4,2),(4,3),(4,4),(4,5),(4,7),(4,8),(5,1),(5,7),(6,1),(6,8),(7,1),(8,1),(8,8),(9,1),(10,1),(11,1),(11,8),(12,2),(13,2),(14,2),(15,2),(16,2),(17,2),(18,3),(19,3),(20,3),(21,3),(22,3),(23,3),(24,4),(25,4),(26,4),(27,4),(28,4),(29,4),(30,5),(31,5);
-/*!40000 ALTER TABLE `projectstudent` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `report`
---
-
-DROP TABLE IF EXISTS `report`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `report` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Content` varchar(300) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `ReporterId` int NOT NULL,
-  `CreatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  `PostId` int NOT NULL,
-  PRIMARY KEY (`Id`),
-  KEY `Report_ReporterId_fkey` (`ReporterId`),
-  KEY `Report_PostId_fkey` (`PostId`),
-  CONSTRAINT `Report_PostId_fkey` FOREIGN KEY (`PostId`) REFERENCES `post` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `Report_ReporterId_fkey` FOREIGN KEY (`ReporterId`) REFERENCES `user` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `report`
---
-
-LOCK TABLES `report` WRITE;
-/*!40000 ALTER TABLE `report` DISABLE KEYS */;
-/*!40000 ALTER TABLE `report` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `setting`
---
-
-DROP TABLE IF EXISTS `setting`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `setting` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Value` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Order` tinyint NOT NULL,
-  `Status` tinyint(1) NOT NULL,
-  `Description` varchar(400) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`Id`),
-  UNIQUE KEY `Setting_Type_Value_key` (`Type`,`Value`),
-  KEY `Setting_Id_idx` (`Id`),
-  KEY `Setting_Type_Value_idx` (`Type`,`Value`)
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `setting`
---
-
-LOCK TABLES `setting` WRITE;
-/*!40000 ALTER TABLE `setting` DISABLE KEYS */;
-INSERT INTO `setting` VALUES (1,'ROLE','Admin',1,1,NULL),(2,'ROLE','Manager',1,1,NULL),(3,'ROLE','Marketer',1,1,NULL),(4,'ROLE','Teacher',1,1,NULL),(5,'ROLE','Student',1,1,NULL),(6,'POST_CATEGORY','Art and Culture',1,1,NULL),(7,'POST_CATEGORY','Travel and Adventure',1,1,NULL),(8,'POST_CATEGORY','Science and Technology',1,1,NULL),(9,'POST_CATEGORY','Health and Lifestyle',1,1,NULL),(10,'POST_CATEGORY','Learning and Personal Development',1,1,NULL),(11,'POST_CATEGORY','Family Life',1,1,NULL),(12,'CONTACT_TYPE','Networking',1,1,NULL),(13,'CONTACT_TYPE','IT Career Development',1,1,NULL),(14,'CONTACT_TYPE','Financial Aid and Scholarships',1,1,NULL),(15,'CONTACT_TYPE','Faculty and Research',1,1,NULL),(16,'CONTACT_TYPE','International Students',1,1,NULL),(17,'PAGE_LINK','/Setting/SettingList',1,1,NULL),(18,'PAGE_LINK','/Project/Index',0,1,NULL),(19,'PAGE_LINK','/Project/ProjectDetail',0,1,NULL),(20,'PAGE_LINK','/Setting/SettingDetail',0,0,NULL),(21,'PAGE_LINK','/Setting/AddSetting',0,0,NULL),(22,'PAGE_LINK','/Permission/PermissionManage',1,1,''),(23,'PAGE_LINK','/Setting/SettingUpdate',0,0,NULL),(24,'POST_CATEGORY','Family Not Life',2,1,''),(25,'CONTACT_TYPE','Family N Life',7,0,''),(26,'PAGE_LINK','/Project/CreateProject',0,0,NULL),(27,'PAGE_LINK','/User/Index',0,0,NULL),(28,'PAGE_LINK','/Permission/UpdatePermission',0,0,NULL),(29,'PAGE_LINK','/User/Details',0,0,NULL),(30,'PAGE_LINK','abc',1,1,NULL),(31,'PAGE_LINK','/Subject/Index',0,0,NULL),(32,'PAGE_LINK','/UserProfile/User',0,0,NULL),(33,'PAGE_LINK','/Class/Index',1,1,NULL),(34,'PAGE_LINK','/Project/Member',1,1,NULL),(35,'PAGE_LINK','/Project/ProjectMilestone',1,1,NULL),(36,'PAGE_LINK','/Class/Details',1,1,NULL),(37,'PAGE_LINK','/Auth/Logout',1,1,NULL),(38,'PAGE_LINK','/Permission/SearchPage',1,1,NULL),(39,'PAGE_LINK','/Class/People',1,1,NULL),(40,'PAGE_LINK','/Class/Milestones',1,1,NULL),(41,'PAGE_LINK','/Class/IssueSetting',1,1,NULL),(42,'PAGE_LINK','/Auth/ChangePassword',1,1,NULL),(43,'PAGE_LINK','/Project/IssueSetting',1,1,NULL),(44,'PAGE_LINK','/Issue/Index',1,1,NULL);
-/*!40000 ALTER TABLE `setting` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `subject`
---
-
-DROP TABLE IF EXISTS `subject`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `subject` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Code` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` text COLLATE utf8mb4_unicode_ci,
-  `IsActive` tinyint(1) NOT NULL DEFAULT '1',
-  `SubjectManagerId` int NOT NULL,
-  `CreatedAt` datetime(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-  PRIMARY KEY (`Id`),
-  KEY `Subject_Id_idx` (`Id`),
-  KEY `Subject_SubjectManagerId_fkey` (`SubjectManagerId`),
-  CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `user` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `subject`
---
-
-LOCK TABLES `subject` WRITE;
-/*!40000 ALTER TABLE `subject` DISABLE KEYS */;
-INSERT INTO `subject` VALUES (1,'MAE101','Mathematics for Engineering',NULL,1,2,'2023-12-16 10:01:12.097'),(2,'CEA201','Computer Organization and Architecture','Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.',1,2,'2023-12-16 10:01:12.102'),(3,'CSI101','Connecting to Computer Science',NULL,1,2,'2023-12-16 10:01:12.109'),(4,'PRF192','Programming Fundamentals','Fusce consequat. Nulla nisl. Nunc nisl.Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.',1,2,'2023-12-16 10:01:12.114'),(5,'SSG101','Working in Group Skills','In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.',0,2,'2023-12-16 10:01:12.120'),(6,'PRJ321','Web-Based Java Applications','In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.',0,2,'2023-12-16 10:01:12.126'),(7,'NWC202','Computer Networking','In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.',0,2,'2023-12-16 10:01:12.131'),(8,'SWE102','Introduction to Software Engineering','In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.',0,2,'2023-12-16 10:01:12.136'),(9,'JPD121','Elementary Japanese 1.2',NULL,1,2,'2023-12-16 10:01:12.142'),(10,'LAB221','Desktop Java Lab',NULL,0,2,'2023-12-16 10:01:12.147'),(11,'JPD131','Elementary Japanese 2.1',NULL,1,2,'2023-12-16 10:01:12.152'),(12,'LAB231','Web Java Lab',NULL,0,2,'2023-12-16 10:01:12.157'),(13,'PRN292','.NET and C#',NULL,1,2,'2023-12-16 10:01:12.161'),(14,'SWR301','Software Requirements',NULL,0,2,'2023-12-16 10:01:12.168'),(15,'SWQ391','Software Quality Assurance and Testing',NULL,1,2,'2023-12-16 10:01:12.174'),(16,'OJS201','On the job training	',NULL,1,2,'2023-12-16 10:01:12.179');
-/*!40000 ALTER TABLE `subject` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `user`
---
-
-DROP TABLE IF EXISTS `user`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `user` (
-  `Id` int NOT NULL AUTO_INCREMENT,
-  `Email` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Password` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `RoleId` int NOT NULL,
-  `Name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Avatar` varchar(300) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Gender` tinyint(1) DEFAULT NULL,
-  `Phone` varchar(15) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Address` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Status` tinyint(1) DEFAULT NULL,
-  `LstAccessTime` datetime(3) DEFAULT NULL,
-  `ConfirmToken` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ResetToken` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`Id`),
-  UNIQUE KEY `User_Email_key` (`Email`),
-  KEY `User_Id_idx` (`Id`),
-  KEY `User_RoleId_fkey` (`RoleId`),
-  CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `setting` (`Id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `user`
---
-
-LOCK TABLES `user` WRITE;
-/*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin@gmail.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',1,'Kincaid Itzakson',NULL,'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1',0,'0950564222',NULL,1,'2023-12-16 11:46:26.012',NULL,NULL),(2,'manager@gmail.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',2,'Queenie Suff',NULL,'https://robohash.org/consectetursuntet.png?size=100x100&set=set1',NULL,'0654960037','36459 Nevada Trail',1,'2023-12-16 11:46:48.535',NULL,NULL),(3,'marketer@gmail.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',3,'Jeremie Bethel',NULL,'https://robohash.org/voluptatibusconsequaturin.png?size=100x100&set=set1',1,'0720320267','09 Hudson Terrace',1,NULL,NULL,NULL),(4,'teacher@gmail.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',4,'Noella Quaintance',NULL,'https://robohash.org/sedquodquis.png?size=100x100&set=set1',0,'0176636839','4522 Sycamore Avenue',1,'2023-12-16 11:46:13.575',NULL,NULL),(5,'student@gmail.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Bucky Ferrettini',NULL,'https://robohash.org/liberoreiciendisvelit.png?size=100x100&set=set1',NULL,'0542942149','16 Warbler Parkway',1,'2023-12-16 11:45:14.367',NULL,NULL),(6,'student@facebook.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Iolanthe Akker',NULL,'https://robohash.org/eosnostrumquo.png?size=100x100&set=set1',0,'0537712440','33107 Barby Alley',1,NULL,NULL,NULL),(7,'imatschuk6@hibu.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Ingra Matschuk',NULL,'https://robohash.org/maioresquinulla.png?size=100x100&set=set1',1,'0241136823',NULL,1,NULL,NULL,NULL),(8,'dorridge7@homestead.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Daron Orridge',NULL,NULL,NULL,'0378177525','62366 Northport Crossing',1,NULL,NULL,NULL),(9,'test@gmail.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Maggi Gegay',NULL,'https://robohash.org/esseofficiasint.png?size=100x100&set=set1',1,'0181626572','22277 Granby Way',1,NULL,NULL,NULL),(10,'khanratty9@eventbrite.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Kahlil Hanratty',NULL,'https://robohash.org/impeditsequiporro.png?size=100x100&set=set1',0,'0415660856',NULL,1,NULL,NULL,NULL),(11,'jkerswella@msn.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Jacklin Kerswell',NULL,'https://robohash.org/ininullam.png?size=100x100&set=set1',1,'0045353089','16 Dayton Trail',1,NULL,NULL,NULL),(12,'dmccurdyb@opera.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Darcie McCurdy',NULL,'https://robohash.org/utetest.png?size=100x100&set=set1',0,'0114430360',NULL,1,NULL,NULL,NULL),(13,'atolumelloc@yale.edu','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Adelice Tolumello',NULL,'https://robohash.org/ipsamnequelaborum.png?size=100x100&set=set1',0,'0155192798','9651 Nova Drive',1,NULL,NULL,NULL),(14,'mdubbled@sogou.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Marcelo Dubble',NULL,'https://robohash.org/iustonullaqui.png?size=100x100&set=set1',0,'0714674650','021 Aberg Lane',1,NULL,NULL,NULL),(15,'rschulze@state.tx.us','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Ruthy Schulz',NULL,NULL,0,'0346589718','9 Marcy Hill',1,NULL,NULL,NULL),(16,'mannottf@trellian.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Marten Annott',NULL,'https://robohash.org/necessitatibusquiculpa.png?size=100x100&set=set1',1,'0948897513','52802 School Parkway',1,NULL,NULL,NULL),(17,'mbridgewaterg@webs.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Marcella Bridgewater',NULL,'https://robohash.org/nesciuntofficiisconsequuntur.png?size=100x100&set=set1',1,'0741841275','06067 Fallview Park',1,NULL,NULL,NULL),(18,'wmandevilleh@latimes.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Westley Mandeville',NULL,'https://robohash.org/nisivelitperspiciatis.png?size=100x100&set=set1',1,'0145591733','05 Northview Junction',1,NULL,NULL,NULL),(19,'awinningi@google.com.au','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Alena Winning',NULL,NULL,0,'0298745665',NULL,1,NULL,NULL,NULL),(20,'ntinghillj@marriott.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Natalya Tinghill',NULL,NULL,0,'0529296287','0379 Scott Lane',1,NULL,NULL,NULL),(21,'dmilingtonk@guardian.co.uk','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Druci Milington',NULL,'https://robohash.org/etquiomnis.png?size=100x100&set=set1',0,'0563458391',NULL,1,NULL,NULL,NULL),(22,'dmacguinessl@geocities.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Debora MacGuiness',NULL,NULL,1,'0158369774',NULL,1,NULL,NULL,NULL),(23,'efleethamm@wsj.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Ethelred Fleetham',NULL,NULL,NULL,'0625333168',NULL,1,NULL,NULL,NULL),(24,'rseabornen@dyndns.org','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Ring Seaborne',NULL,NULL,0,'0264063417',NULL,1,NULL,NULL,NULL),(25,'narthyo@squarespace.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Nicole Arthy',NULL,'https://robohash.org/expeditaperferendisodit.png?size=100x100&set=set1',NULL,'0868364777',NULL,1,NULL,NULL,NULL),(26,'aarnoldip@cisco.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Almeta Arnoldi',NULL,'https://robohash.org/quisquamaliquidet.png?size=100x100&set=set1',0,'0256102363','784 Pond Circle',1,NULL,NULL,NULL),(27,'drydingsq@wikia.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Duncan Rydings',NULL,'https://robohash.org/etuttempora.png?size=100x100&set=set1',1,'0150387157','5 Holmberg Alley',1,NULL,NULL,NULL),(28,'rder@g.co','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Rex De Meyer',NULL,NULL,0,'0478593443',NULL,1,NULL,NULL,NULL),(29,'esimcoxs@opensource.org','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Ellynn Simcox',NULL,'https://robohash.org/consequaturetadipisci.png?size=100x100&set=set1',1,'0266914275','1282 Red Cloud Circle',1,NULL,NULL,NULL),(30,'fmeiningert@irs.gov','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Forester Meininger',NULL,'https://robohash.org/laboreexercitationemratione.png?size=100x100&set=set1',1,'0617649138','62 Lakewood Gardens Junction',1,NULL,NULL,NULL),(31,'dscawnu@economist.com','$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG',5,'Daisy Scawn',NULL,NULL,1,'0972010267','55565 Pine View Court',1,NULL,NULL,NULL);
-/*!40000 ALTER TABLE `user` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2023-12-16 11:54:44
+-- CreateTable
+CREATE TABLE `Setting` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Type` VARCHAR(20) NOT NULL,
+    `Value` VARCHAR(50) NOT NULL,
+    `Order` TINYINT NOT NULL,
+    `Status` BOOLEAN NOT NULL,
+    `Description` VARCHAR(400) NULL,
+
+    INDEX `Setting_Id_idx`(`Id`),
+    INDEX `Setting_Type_Value_idx`(`Type`, `Value`),
+    UNIQUE INDEX `Setting_Type_Value_key`(`Type`, `Value`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Contact` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Email` VARCHAR(100) NOT NULL,
+    `Name` VARCHAR(100) NOT NULL,
+    `Phone` VARCHAR(15) NULL,
+    `IsValid` BOOLEAN NOT NULL DEFAULT true,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `CarerId` INTEGER NULL,
+    `ContactTypeId` INTEGER NOT NULL,
+
+    INDEX `Contact_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Post` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Title` TEXT NOT NULL,
+    `Description` LONGTEXT NULL,
+    `Excerpt` TEXT NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `UpdatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `IsPublic` BOOLEAN NOT NULL DEFAULT false,
+    `ImageUrl` VARCHAR(300) NULL,
+    `AuthorId` INTEGER NOT NULL,
+    `CategoryId` INTEGER NULL,
+
+    INDEX `Post_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Report` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Content` VARCHAR(300) NOT NULL,
+    `ReporterId` INTEGER NOT NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `PostId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `User` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Email` VARCHAR(100) NOT NULL,
+    `Password` VARCHAR(64) NOT NULL,
+    `RoleId` INTEGER NOT NULL,
+    `Name` VARCHAR(50) NOT NULL,
+    `Description` VARCHAR(255) NULL,
+    `Avatar` VARCHAR(300) NULL,
+    `Gender` BOOLEAN NULL,
+    `Phone` VARCHAR(15) NULL,
+    `Address` VARCHAR(191) NULL,
+    `Status` BOOLEAN NULL,
+    `LstAccessTime` DATETIME(3) NULL,
+    `ConfirmToken` VARCHAR(64) NULL,
+    `ResetToken` VARCHAR(64) NULL,
+
+    UNIQUE INDEX `User_Email_key`(`Email`),
+    INDEX `User_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Assignment` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Name` VARCHAR(100) NOT NULL,
+    `Description` TEXT NULL,
+    `SubjectId` INTEGER NOT NULL,
+    `Weight` INTEGER NOT NULL,
+    `IsActive` BOOLEAN NOT NULL DEFAULT true,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    INDEX `Assignment_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Class` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Name` VARCHAR(15) NOT NULL,
+    `Description` VARCHAR(300) NULL,
+    `TeacherId` INTEGER NULL,
+    `SubjectId` INTEGER NULL,
+    `IsActive` BOOLEAN NOT NULL DEFAULT false,
+
+    INDEX `Class_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ClassStudent` (
+    `StudentId` INTEGER NOT NULL,
+    `ClassId` INTEGER NOT NULL,
+
+    INDEX `ClassStudent_ClassId_StudentId_idx`(`ClassId`, `StudentId`),
+    PRIMARY KEY (`ClassId`, `StudentId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Issue` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Title` TEXT NOT NULL,
+    `Description` LONGTEXT NULL,
+    `DocumentUrl` LONGTEXT NULL,
+    `FileName` VARCHAR(100) NULL,
+    `MilestoneId` INTEGER NULL,
+    `ProjectId` INTEGER NOT NULL,
+    `AuthorId` INTEGER NOT NULL,
+    `AssigneeId` INTEGER NULL,
+    `TypeId` INTEGER NOT NULL,
+    `StatusId` INTEGER NOT NULL,
+    `ProcessId` INTEGER NOT NULL,
+    `ParentIssueId` INTEGER NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `UpdatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    INDEX `Issue_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `IssueSetting` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Type` VARCHAR(20) NOT NULL,
+    `Value` VARCHAR(100) NOT NULL,
+    `Name` VARCHAR(50) NOT NULL,
+    `Description` VARCHAR(200) NULL,
+    `Color` VARCHAR(10) NOT NULL DEFAULT '#009966',
+    `Status` BOOLEAN NOT NULL DEFAULT true,
+    `ClassId` INTEGER NULL,
+    `ProjectId` INTEGER NULL,
+
+    INDEX `IssueSetting_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Message` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Content` VARCHAR(100) NOT NULL,
+    `ContactId` INTEGER NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    INDEX `Message_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Milestone` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Title` TEXT NOT NULL,
+    `Description` TEXT NULL,
+    `StartDate` DATETIME(3) NULL,
+    `EndDate` DATETIME(3) NULL,
+    `ProjectId` INTEGER NULL,
+    `ClassId` INTEGER NOT NULL,
+    `AssignmentId` INTEGER NULL,
+    `Status` BOOLEAN NULL,
+    INDEX `Milestone_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Permission` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `RoleId` INTEGER NOT NULL,
+    `PageId` INTEGER NOT NULL,
+    `CanCreate` BOOLEAN NOT NULL DEFAULT false,
+    `CanRead` BOOLEAN NOT NULL DEFAULT false,
+    `CanUpdate` BOOLEAN NOT NULL DEFAULT false,
+    `CanExport` BOOLEAN NOT NULL DEFAULT false,
+    `CanDelete` BOOLEAN NOT NULL DEFAULT false,
+
+    INDEX `Permission_RoleId_PageId_idx`(`RoleId`, `PageId`),
+    UNIQUE INDEX `Permission_RoleId_PageId_key`(`RoleId`, `PageId`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Project` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Name` VARCHAR(100) NOT NULL,
+    `GroupName` VARCHAR(255) NOT NULL,
+    `Status` BOOLEAN NULL DEFAULT true,
+    `Description` TEXT NULL,
+    `ClassId` INTEGER NOT NULL,
+    `LeaderId` INTEGER NULL,
+
+    INDEX `Project_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ProjectStudent` (
+    `StudentId` INTEGER NOT NULL,
+    `ProjectId` INTEGER NOT NULL,
+
+    INDEX `ProjectStudent_ProjectId_StudentId_idx`(`ProjectId`, `StudentId`),
+    PRIMARY KEY (`ProjectId`, `StudentId`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Subject` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Code` VARCHAR(10) NOT NULL,
+    `Name` VARCHAR(100) NOT NULL,
+    `Description` TEXT NULL,
+    `IsActive` BOOLEAN NOT NULL DEFAULT true,
+    `SubjectManagerId` INTEGER NOT NULL,
+    `CreatedAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    INDEX `Subject_Id_idx`(`Id`),
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+
+
+-- AddForeignKey
+ALTER TABLE `Contact` ADD CONSTRAINT `Contact_ContactTypeId_fkey` FOREIGN KEY (`ContactTypeId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Contact` ADD CONSTRAINT `Contact_CarerId_fkey` FOREIGN KEY (`CarerId`) REFERENCES `User`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Post` ADD CONSTRAINT `Post_CategoryId_fkey` FOREIGN KEY (`CategoryId`) REFERENCES `Setting`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Post` ADD CONSTRAINT `Post_AuthorId_fkey` FOREIGN KEY (`AuthorId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Report` ADD CONSTRAINT `Report_ReporterId_fkey` FOREIGN KEY (`ReporterId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Report` ADD CONSTRAINT `Report_PostId_fkey` FOREIGN KEY (`PostId`) REFERENCES `Post`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `User` ADD CONSTRAINT `User_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Assignment` ADD CONSTRAINT `Assignment_SubjectId_fkey` FOREIGN KEY (`SubjectId`) REFERENCES `Subject`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Class` ADD CONSTRAINT `Class_SubjectId_fkey` FOREIGN KEY (`SubjectId`) REFERENCES `Subject`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Class` ADD CONSTRAINT `Class_TeacherId_fkey` FOREIGN KEY (`TeacherId`) REFERENCES `User`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ClassStudent` ADD CONSTRAINT `ClassStudent_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ClassStudent` ADD CONSTRAINT `ClassStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_TypeId_fkey` FOREIGN KEY (`TypeId`) REFERENCES `IssueSetting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_StatusId_fkey` FOREIGN KEY (`StatusId`) REFERENCES `IssueSetting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_ProcessId_fkey` FOREIGN KEY (`ProcessId`) REFERENCES `IssueSetting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_AssigneeId_fkey` FOREIGN KEY (`AssigneeId`) REFERENCES `User`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_AuthorId_fkey` FOREIGN KEY (`AuthorId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_MilestoneId_fkey` FOREIGN KEY (`MilestoneId`) REFERENCES `Milestone`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Issue` ADD CONSTRAINT `Issue_ParentIssueId_fkey` FOREIGN KEY (`ParentIssueId`) REFERENCES `Issue`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `IssueSetting` ADD CONSTRAINT `IssueSetting_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `IssueSetting` ADD CONSTRAINT `IssueSetting_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Message` ADD CONSTRAINT `Message_ContactId_fkey` FOREIGN KEY (`ContactId`) REFERENCES `Contact`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_AssignmentId_fkey` FOREIGN KEY (`AssignmentId`) REFERENCES `Assignment`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Milestone` ADD CONSTRAINT `Milestone_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Permission` ADD CONSTRAINT `Permission_PageId_fkey` FOREIGN KEY (`PageId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Permission` ADD CONSTRAINT `Permission_RoleId_fkey` FOREIGN KEY (`RoleId`) REFERENCES `Setting`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Project` ADD CONSTRAINT `Project_ClassId_fkey` FOREIGN KEY (`ClassId`) REFERENCES `Class`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Project` ADD CONSTRAINT `Project_LeaderId_fkey` FOREIGN KEY (`LeaderId`) REFERENCES `User`(`Id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_ProjectId_fkey` FOREIGN KEY (`ProjectId`) REFERENCES `Project`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ProjectStudent` ADD CONSTRAINT `ProjectStudent_StudentId_fkey` FOREIGN KEY (`StudentId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Subject` ADD CONSTRAINT `Subject_SubjectManagerId_fkey` FOREIGN KEY (`SubjectManagerId`) REFERENCES `User`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (1,'ROLE','Admin',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (2,'ROLE','Manager',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (3,'ROLE','Marketer',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (4,'ROLE','Teacher',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (5,'ROLE','Student',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (6,'POST_CATEGORY','Art and Culture',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (7,'POST_CATEGORY','Travel and Adventure',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (8,'POST_CATEGORY','Science and Technology',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (9,'POST_CATEGORY','Health and Lifestyle',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (10,'POST_CATEGORY','Learning and Personal Development',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (11,'POST_CATEGORY','Family Life',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (12,'CONTACT_TYPE','Networking',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (13,'CONTACT_TYPE','IT Career Development',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (14,'CONTACT_TYPE','Financial Aid and Scholarships',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (15,'CONTACT_TYPE','Faculty and Research',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (16,'CONTACT_TYPE','International Students',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (17,'PAGE_LINK','/Setting/SettingList',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (18,'PAGE_LINK','/Project/Index',0,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (19,'PAGE_LINK','/Project/ProjectDetail',0,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (20,'PAGE_LINK','/Setting/SettingDetail',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (21,'PAGE_LINK','/Setting/AddSetting',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (22,'PAGE_LINK','/Permission/PermissionManage',1,1,'');
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (23,'PAGE_LINK','/Setting/SettingUpdate',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (24,'POST_CATEGORY','Family Not Life',2,1,'');
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (25,'CONTACT_TYPE','Family N Life',7,0,'');
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (26,'PAGE_LINK','/Project/CreateProject',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (27,'PAGE_LINK','/User/Index',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (28,'PAGE_LINK','/Permission/UpdatePermission',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (29,'PAGE_LINK','/User/Details',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (30,'PAGE_LINK','abc',1,1,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (31,'PAGE_LINK','/Subject/Index',0,0,NULL);
+INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (32,'PAGE_LINK','/UserProfile/User',0,0,NULL);
+
+INSERT INTO `IMS`.`IssueSetting` (`Type`, `Value`, `Name`)
+VALUES
+        ('TYPE', 'R', 'Requirement'),
+        ('TYPE', 'T', 'Task'),
+        ('TYPE', 'Q', 'Q&A'),
+        ('TYPE', 'D', 'Defect'),
+        ('STATUS', 'Todo', 'To do'),
+        ('STATUS', 'Doing', 'Doing'),
+        ('STATUS', 'Done', 'Done'),
+        ('PROCESS', 'Coding', 'Coding'),
+        ('PROCESS', 'Req', 'Req'),
+        ('PROCESS', 'Testing', 'Testing'),
+        ('PROCESS', 'Design', 'Design');
+       
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (2, 'manager@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 2, 'Queenie Suff', 'https://robohash.org/consectetursuntet.png?size=100x100&set=set1', null, '0654960037', '36459 Nevada Trail', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (3, 'marketer@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 3, 'Jeremie Bethel', 'https://robohash.org/voluptatibusconsequaturin.png?size=100x100&set=set1', 1, '0720320267', '09 Hudson Terrace', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (4, 'teacher@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 4, 'Noella Quaintance', 'https://robohash.org/sedquodquis.png?size=100x100&set=set1', 0, '0176636839', '4522 Sycamore Avenue', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (5, 'student@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Bucky Ferrettini', 'https://robohash.org/liberoreiciendisvelit.png?size=100x100&set=set1', null, '0542942149', '16 Warbler Parkway', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (6, 'student@facebook.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Iolanthe Akker', 'https://robohash.org/eosnostrumquo.png?size=100x100&set=set1', 0, '0537712440', '33107 Barby Alley', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (7, 'imatschuk6@hibu.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ingra Matschuk', 'https://robohash.org/maioresquinulla.png?size=100x100&set=set1', 1, '0241136823', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (8, 'dorridge7@homestead.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Daron Orridge', null, null, '0378177525', '62366 Northport Crossing', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (9, 'test@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Maggi Gegay', 'https://robohash.org/esseofficiasint.png?size=100x100&set=set1', 1, '0181626572', '22277 Granby Way', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (10, 'khanratty9@eventbrite.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Kahlil Hanratty', 'https://robohash.org/impeditsequiporro.png?size=100x100&set=set1', 0, '0415660856', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (11, 'jkerswella@msn.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Jacklin Kerswell', 'https://robohash.org/ininullam.png?size=100x100&set=set1', 1, '0045353089', '16 Dayton Trail', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (12, 'dmccurdyb@opera.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Darcie McCurdy', 'https://robohash.org/utetest.png?size=100x100&set=set1', 0, '0114430360', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (13, 'atolumelloc@yale.edu', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Adelice Tolumello', 'https://robohash.org/ipsamnequelaborum.png?size=100x100&set=set1', 0, '0155192798', '9651 Nova Drive', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (14, 'mdubbled@sogou.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Marcelo Dubble', 'https://robohash.org/iustonullaqui.png?size=100x100&set=set1', 0, '0714674650', '021 Aberg Lane', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (15, 'rschulze@state.tx.us', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ruthy Schulz', null, 0, '0346589718', '9 Marcy Hill', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (16, 'mannottf@trellian.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Marten Annott', 'https://robohash.org/necessitatibusquiculpa.png?size=100x100&set=set1', 1, '0948897513', '52802 School Parkway', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (17, 'mbridgewaterg@webs.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Marcella Bridgewater', 'https://robohash.org/nesciuntofficiisconsequuntur.png?size=100x100&set=set1', 1, '0741841275', '06067 Fallview Park', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (18, 'wmandevilleh@latimes.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Westley Mandeville', 'https://robohash.org/nisivelitperspiciatis.png?size=100x100&set=set1', 1, '0145591733', '05 Northview Junction', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (19, 'awinningi@google.com.au', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Alena Winning', null, 0, '0298745665', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (20, 'ntinghillj@marriott.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Natalya Tinghill', null, 0, '0529296287', '0379 Scott Lane', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (21, 'dmilingtonk@guardian.co.uk', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Druci Milington', 'https://robohash.org/etquiomnis.png?size=100x100&set=set1', 0, '0563458391', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (22, 'dmacguinessl@geocities.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Debora MacGuiness', null, 1, '0158369774', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (23, 'efleethamm@wsj.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ethelred Fleetham', null, null, '0625333168', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (24, 'rseabornen@dyndns.org', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ring Seaborne', null, 0, '0264063417', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (25, 'narthyo@squarespace.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Nicole Arthy', 'https://robohash.org/expeditaperferendisodit.png?size=100x100&set=set1', null, '0868364777', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (26, 'aarnoldip@cisco.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Almeta Arnoldi', 'https://robohash.org/quisquamaliquidet.png?size=100x100&set=set1', 0, '0256102363', '784 Pond Circle', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (27, 'drydingsq@wikia.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Duncan Rydings', 'https://robohash.org/etuttempora.png?size=100x100&set=set1', 1, '0150387157', '5 Holmberg Alley', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (28, 'rder@g.co', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Rex De Meyer', null, 0, '0478593443', null, 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (29, 'esimcoxs@opensource.org', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Ellynn Simcox', 'https://robohash.org/consequaturetadipisci.png?size=100x100&set=set1', 1, '0266914275', '1282 Red Cloud Circle', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (30, 'fmeiningert@irs.gov', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Forester Meininger', 'https://robohash.org/laboreexercitationemratione.png?size=100x100&set=set1', 1, '0617649138', '62 Lakewood Gardens Junction', 1);
+INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (31, 'dscawnu@economist.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 5, 'Daisy Scawn', null, 1, '0972010267', '55565 Pine View Court', 1);
+
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (1, 'myellowlee0@rakuten.co.jp', 'Morley Yellowlee', '0579421047', 4, 14);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (2, 'ldrewery1@cpanel.net', 'Lonnie Drewery', '0312487974', 4, 13);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (3, 'rcaitlin2@springer.com', 'Rob Caitlin', '0411455192', 1, 16);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (4, 'gchaff3@dmoz.org', 'Gilli Chaff', '0816481931', 1, 16);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (5, 'abailles4@fema.gov', 'Aime Bailles', '0504574491', 1, 15);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (6, 'kheakey5@bloglines.com', 'Katerina Heakey', '0395053048', 1, 15);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (7, 'lsyder6@usgs.gov', 'Lyndsay Syder', '0661478939', 1, 13);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (8, 'lhamsley7@google.fr', 'Lewes Hamsley', '0393419687', 1, 15);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (9, 'fweaving8@canalblog.com', 'Farlee Weaving', '0239507840', 1, 16);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (10, 'bgores9@apache.org', 'Brandtr Gores', '0749441649', 1, 15);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (11, 'cmcginleya@de.vu', 'Cindra McGinley', '0125382173', 4, 13);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (12, 'hboylesb@timesonline.co.uk', 'Hazel Boyles', '0070353353', 4, 14);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (13, 'mdavenhallc@narod.ru', 'Marla Davenhall', '0745924359', 4, 15);
+insert into `IMS`.`Contact` (Id, Email, Name, Phone, CarerId, ContactTypeId) values (14, 'epealingd@vistaprint.com', 'Elie Pealing', '0298591661', 1, 15);
+
+INSERT INTO `ims`.`post` ( `Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES (' Thời sựChính trịThứ sáu, 15/12/2023, 17:57 (GMT+7) Chủ tịch tỉnh Vĩnh Phúc có hơn 53% phiếu tín nhiệm thấp', '<p>Kết quả lấy phiếu t&iacute;n nhiệm của HĐND tỉnh Vĩnh Ph&uacute;c ng&agrave;y 13/12 cho thấy &ocirc;ng L&ecirc; Duy Th&agrave;nh c&oacute; 19 phiếu t&iacute;n nhiệm cao (40,43%); hai phiếu t&iacute;n nhiệm (4,26%); 25 phiếu t&iacute;n nhiệm thấp (53,19%).</p>\r\n\r\n<p>&Ocirc;ng Th&agrave;nh l&agrave; người c&oacute; số phiếu &quot;t&iacute;n nhiệm cao&quot; thấp nhất v&agrave; phiếu &quot;t&iacute;n nhiệm thấp&quot; nhiều nhất. &Ocirc;ng cũng l&agrave; trường hợp duy nhất nhận qu&aacute; nửa số phiếu t&iacute;n nhiệm thấp.</p>\r\n\r\n<p>&Ocirc;ng Th&agrave;nh đ&atilde; c&oacute; hơn hai năm giữ vị tr&iacute; Chủ tịch UBND tỉnh Vĩnh Ph&uacute;c. Th&aacute;ng 10/2020, khi đang l&agrave;m Ph&oacute; b&iacute; thư Tỉnh ủy, Ph&oacute; chủ tịch Thường trực UBND tỉnh Vĩnh Ph&uacute;c, &ocirc;ng được giới thiệu v&agrave; bầu l&agrave;m Chủ tịch UBND tỉnh với 100% (47/47) số phiếu đồng &yacute;.</p>\r\n\r\n<p>Đợt lấy phiếu t&iacute;n nhiệm năm 2018, &ocirc;ng Th&agrave;nh l&uacute;c đ&oacute; l&agrave; Ph&oacute; chủ tịch UBND tỉnh, đứng ở top giữa, với 33 phiếu t&iacute;n nhiệm cao (67,3); 9 t&iacute;n nhiệm (18,3); 6 t&iacute;n nhiệm thấp (12,2%).</p>\r\n\r\n<p><img alt=\"Ông Lê Duy Thành, Chủ tịch UBND tỉnh Vĩnh Phúc tại cuộc họp tháng 11/2023. Ảnh: Cổng thông tin tỉnh Vĩnh Phúc\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/15/23112023-dientapkvptvinhyen-01-9172-8725-1702637283.png?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=u_oQjhO0_dURphcBJEHAlw\" /></p>\r\n\r\n<p>&Ocirc;ng L&ecirc; Duy Th&agrave;nh, Chủ tịch UBND tỉnh Vĩnh Ph&uacute;c tại cuộc họp th&aacute;ng 11/2023. Ảnh:&nbsp;<em>Cổng th&ocirc;ng tin tỉnh Vĩnh Ph&uacute;c</em></p>\r\n\r\n<p>Theo Nghị quyết 96/2023 của Quốc hội hồi th&aacute;ng 6, c&aacute;n bộ c&oacute; qu&aacute; nửa đến dưới 2/3 tổng số đại biểu đ&aacute;nh gi&aacute; &quot;t&iacute;n nhiệm thấp&quot; phải xin từ chức trong kh&ocirc;ng qu&aacute; 10 ng&agrave;y kể từ ng&agrave;y c&ocirc;ng bố kết quả lấy phiếu t&iacute;n nhiệm. Nếu c&aacute;n bộ kh&ocirc;ng xin từ chức th&igrave; thường trực HĐND tr&igrave;nh HĐND tiến h&agrave;nh bỏ phiếu t&iacute;n nhiệm (với hai mức t&iacute;n nhiệm hoặc kh&ocirc;ng t&iacute;n nhiệm).</p>\r\n\r\n<p>Người được bỏ phiếu t&iacute;n nhiệm nhận được hơn 50% đ&aacute;nh gi&aacute; &quot;kh&ocirc;ng t&iacute;n nhiệm&quot; th&igrave; sẽ bị xem x&eacute;t miễn nhiệm.</p>\r\n\r\n<p>&Ocirc;ng L&ecirc; Duy Th&agrave;nh 54 tuổi, qu&ecirc; Vĩnh Ph&uacute;c; tr&igrave;nh độ tiến sĩ kinh tế. Trước khi được bầu l&agrave;m Chủ tịch UBND tỉnh, &ocirc;ng Th&agrave;nh kinh qua nhiều chức vụ tại Vĩnh Ph&uacute;c như Cục ph&oacute; Cục thuế tỉnh; B&iacute; thư Huyện ủy Lập Thạch; Ph&oacute; b&iacute; thư Tỉnh ủy; Ph&oacute; chủ tịch UBND tỉnh.</p>\r\n', 'Ông Lê Duy Thành, Chủ tịch UBND tỉnh Vĩnh Phúc nhận 53,19% số phiếu tín nhiệm thấp, nhiều nhất trong số 28 chức danh được lấy phiếu.', '2023-12-15 20:19:52.251', '2023-12-15 20:21:34.067', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2FVNEDog-1702524615-3901-1702524656.jpg?alt=media&token=03b3768b-3ddb-4d5f-bd68-d7c055f67cb1', '1', '24');
+INSERT INTO `ims`.`post` ( `Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `AuthorId`, `CategoryId`) VALUES ( 'Nga phóng tên lửa Kinzhal vào Ukraine khi ông Putin họp báo', '<p>&quot;Một t&ecirc;n lửa si&ecirc;u vượt &acirc;m Kinzhal được ph&oacute;ng về ph&iacute;a th&agrave;nh phố Starokostiantyniv thuộc tỉnh Khmelnitsky. T&ecirc;n lửa lao xuống tỉnh Khmetnitsky chỉ khoảng 10 ph&uacute;t sau khi b&aacute;o động ph&ograve;ng kh&ocirc;ng to&agrave;n quốc được ph&aacute;t ra&quot;, ph&aacute;t ng&ocirc;n vi&ecirc;n kh&ocirc;ng qu&acirc;n Ukraine Yuri Ignat th&ocirc;ng b&aacute;o tr&ecirc;n truyền h&igrave;nh h&ocirc;m 14/12.</p>\r\n\r\n<p><img alt=\"Tiêm kích MiG-31K Nga phóng tên lửa Kinzhal trong thử nghiệm năm 2018. Ảnh: BQP Nga\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/15/kinzhal-3-1403-1702581863.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=1mzycwk6Vr4ZKfg7B0xdgw\" /></p>\r\n\r\n<p>Ti&ecirc;m k&iacute;ch MiG-31K Nga ph&oacute;ng t&ecirc;n lửa Kinzhal trong thử nghiệm năm 2018. Ảnh:&nbsp;<em>BQP Nga</em></p>\r\n\r\n<p>&Ocirc;ng Ignat n&oacute;i rằng khu vực Starokostiantyniv c&oacute; nhiều cơ sở qu&acirc;n sự, khiến đ&acirc;y l&agrave; mục ti&ecirc;u tấn c&ocirc;ng ưu ti&ecirc;n của qu&acirc;n đội Nga. &quot;Ch&uacute;ng t&ocirc;i sẽ kh&ocirc;ng tiết lộ hậu quả của đ&ograve;n đ&aacute;nh. H&atilde;y để đối phương tự r&uacute;t ra kết luận về mục ti&ecirc;u v&agrave; địa điểm tr&uacute;ng t&ecirc;n lửa&quot;, ph&aacute;t ng&ocirc;n vi&ecirc;n kh&ocirc;ng qu&acirc;n Ukraine n&oacute;i.</p>\r\n\r\n<p>Đ&acirc;y l&agrave; lần đầu ti&ecirc;n Nga sử dụng t&ecirc;n lửa si&ecirc;u vượt &acirc;m Kinzhal để tập k&iacute;ch Ukraine sau nhiều th&aacute;ng chỉ khai hỏa t&ecirc;n lửa h&agrave;nh tr&igrave;nh v&agrave; m&aacute;y bay kh&ocirc;ng người l&aacute;i (UAV) tự s&aacute;t. Cuộc tập k&iacute;ch diễn ra c&ugrave;ng thời điểm Tổng thống Vladimir Putin tổ chức cuộc họp b&aacute;o cuối năm d&agrave;i 4 tiếng.</p>\r\n\r\n<p>Trong cuộc họp b&aacute;o, &ocirc;ng Putin tuy&ecirc;n bố mục ti&ecirc;u chiến dịch ở Ukraine kh&ocirc;ng thay đổi, đ&oacute; l&agrave; &quot;phi ph&aacute;t x&iacute;t h&oacute;a, phi qu&acirc;n sự h&oacute;a v&agrave; đảm bảo t&igrave;nh trạng trung lập của Ukraine&quot;. &Ocirc;ng khẳng định h&ograve;a b&igrave;nh ở Ukraine chỉ đến khi Nga đạt được mục ti&ecirc;u của m&igrave;nh.</p>\r\n\r\n<p>Truyền th&ocirc;ng Ukraine sau đ&oacute; th&ocirc;ng b&aacute;o &iacute;t nhất ba tiếng nổ lớn đ&atilde; vang l&ecirc;n gần s&acirc;n bay quốc tế Zhulyany ở thủ đ&ocirc; Kiev, nơi triển khai trận địa t&ecirc;n lửa ph&ograve;ng kh&ocirc;ng Patriot. Cơ quan qu&acirc;n sự thủ đ&ocirc; Kiev cho hay ti&ecirc;m k&iacute;ch MiG-31K Nga đ&atilde; ph&oacute;ng t&ecirc;n lửa Kinzhal về ph&iacute;a th&agrave;nh phố v&agrave; k&ecirc;u gọi người d&acirc;n t&igrave;m nơi tr&uacute; ẩn.</p>\r\n\r\n<p>&quot;C&aacute;c hệ thống ph&ograve;ng kh&ocirc;ng đ&atilde; tham chiến v&agrave; bắn rơi một quả đạn của đối phương&quot;, ph&aacute;t ng&ocirc;n vi&ecirc;n Ignat cho hay khi được đề nghị b&igrave;nh luận về những tiếng nổ tr&ecirc;n v&ugrave;ng trời Kiev.</p>\r\n\r\n<p>Bộ Quốc ph&ograve;ng Nga chưa l&ecirc;n tiếng về th&ocirc;ng tin.</p>\r\n\r\n<p>Nga từng nhiều lần tấn c&ocirc;ng s&acirc;n bay trọng yếu ở Starokostiantyniv, do đ&acirc;y l&agrave; căn cứ chủ chốt của kh&ocirc;ng qu&acirc;n Ukraine v&agrave; l&agrave; điểm đ&oacute;ng qu&acirc;n của phi đội cường k&iacute;ch Su-24M trang bị t&ecirc;n lửa dẫn đường Storm Shadow/SCALP-EG được Anh v&agrave; Ph&aacute;p viện trợ.</p>\r\n\r\n<p>Giới chuy&ecirc;n gia cho rằng c&oacute; nhiều l&yacute; do khiến Nga chưa thể ngăn chặn ho&agrave;n to&agrave;n mối đe dọa từ t&ecirc;n lửa Storm Shadow/SCALP-EG, buộc họ li&ecirc;n tục tập k&iacute;ch căn cứ đ&oacute;ng qu&acirc;n của phi đội Su-24M Ukraine.</p>\r\n', 'Nga phóng tên lửa siêu vượt âm Kinzhal nhằm vào Ukraine, cùng lúc ông Putin họp báo cuối năm và tuyên bố sẽ theo đuổi chiến dịch nhắm vào Kiev.', '2023-12-16 22:41:38.176', '2023-12-16 22:41:38.173', '1', '1', '6');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Chuyến công du kêu gọi viện trợ gây thất vọng của ông Zelensky', '<p>Tổng thống Ukraine Volodymyr Zelensky từng được ch&agrave;o đ&oacute;n như người h&ugrave;ng trong chuyến thăm 10 tiếng tới Washington gần một năm trước. Tuy nhi&ecirc;n, lần n&agrave;y mọi thứ đ&atilde; kh&aacute;c nhiều.</p>\r\n\r\n<p>Chuyến thăm của Tổng thống Zelensky tới Washington h&ocirc;m 12/12 l&agrave; lần thứ hai l&atilde;nh đạo Ukraine tới quốc hội Mỹ trong ba th&aacute;ng qua, nhưng sự tiếp đ&oacute;n d&agrave;nh cho &ocirc;ng từ ph&iacute;a đảng Cộng h&ograve;a tương đối lạnh nhạt, đặc biệt ở Hạ viện.</p>\r\n\r\n<p>Chuyến c&ocirc;ng du của &ocirc;ng, do Nh&agrave; Trắng sắp xếp trong bối cảnh Ukraine tiến gần tới bờ vực cạn nguồn vũ kh&iacute; v&agrave; t&agrave;i ch&iacute;nh, diễn ra đ&uacute;ng l&uacute;c Đồi Capitol đối mặt nhiều bất đồng về viện trợ cho Ukraine. C&aacute;c th&agrave;nh vi&ecirc;n đảng Cộng h&ograve;a đ&atilde; y&ecirc;u cầu ch&iacute;nh quyền Tổng thống Biden siết chặt c&aacute;c biện ph&aacute;p kiểm so&aacute;t nhập cư ở bi&ecirc;n giới ph&iacute;a nam, coi đ&oacute; như điều kiện để th&ocirc;ng qua đề xuất viện trợ mới của &ocirc;ng, điều m&agrave; Nh&agrave; Trắng ki&ecirc;n quyết b&aacute;c bỏ.</p>\r\n\r\n<p><img alt=\"Tổng thống Mỹ Joe Biden (phải) và Tổng thống Ukraine Volodymyr Zelensky tại Nhà Trắng ngày 12/12. Ảnh: Reuters\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/13/2023-12-12t175935z-1154230774-3129-5408-1702462771.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=kr8by1oqsOo3WGKidDPAQg\" /></p>\r\n\r\n<p>Tổng thống Mỹ Joe Biden (phải) v&agrave; Tổng thống Ukraine Volodymyr Zelensky tại Nh&agrave; Trắng ng&agrave;y 12/12. Ảnh:<em>&nbsp;Reuters</em></p>\r\n\r\n<p>Ph&aacute;t biểu trước c&aacute;c nghị sĩ Mỹ ở Đồi Capitol, &ocirc;ng&nbsp;<a href=\"https://vnexpress.net/chu-de/volodymyr-zelensky-4565\">Zelensky</a>&nbsp;khẳng định Ukraine sẽ kh&ocirc;ng từ bỏ trong cuộc chiến chống lại Nga, nhưng cảnh b&aacute;o nếu kh&ocirc;ng c&oacute; hỗ trợ từ phương T&acirc;y, xung đột sẽ trở n&ecirc;n t&agrave;n khốc, khi qu&acirc;n đội của &ocirc;ng kh&ocirc;ng thể bảo vệ l&atilde;nh thổ trước đối thủ được trang bị tốt hơn.</p>\r\n\r\n<p>Ph&aacute;t biểu tại Nh&agrave; Trắng sau đ&oacute;, &ocirc;ng Zelensky m&ocirc; tả cuộc thảo luận ở quốc hội Mỹ &quot;tr&ecirc;n cả t&iacute;ch cực&quot;, song thừa nhận người Ukraine sẽ phải nh&igrave;n v&agrave;o kết quả thực tế hơn lời n&oacute;i su&ocirc;ng.</p>\r\n\r\n<p>&quot;Điều quan trọng l&agrave; tới cuối năm nay, ch&uacute;ng ta c&oacute; thể gửi t&iacute;n hiệu mạnh mẽ về sự đo&agrave;n kết đến đối phương. Đ&oacute; l&agrave; sự đo&agrave;n kết của Ukraine, Mỹ, ch&acirc;u &Acirc;u v&agrave; to&agrave;n thế giới&quot;, &ocirc;ng n&oacute;i.</p>\r\n\r\n<p>Đứng cạnh Tổng thống Zelensky trong cuộc họp b&aacute;o chung tại Nh&agrave; Trắng, &ocirc;ng Biden cảnh b&aacute;o Tổng thống Nga&nbsp;<a href=\"https://vnexpress.net/chu-de/vladimir-putin-1614\">Vladimir Putin</a>&nbsp;đang hy vọng Mỹ sẽ ngừng hỗ trợ cho Ukraine. &quot;Ch&uacute;ng ta phải chứng minh &ocirc;ng ấy đ&atilde; sai&quot;, &ocirc;ng n&oacute;i.</p>\r\n\r\n<p>Tuy nhi&ecirc;n, dường như c&oacute; rất &iacute;t hy vọng cho điều đ&oacute; trong thời gian tới.</p>\r\n\r\n<p>Sau cuộc trao đổi ri&ecirc;ng với &ocirc;ng Zelensky, c&aacute;c thượng nghị sĩ Mỹ cho biết b&agrave;i ph&aacute;t biểu của Tổng thống Ukraine đầy cảm x&uacute;c, nhưng dường như kh&ocirc;ng thể t&aacute;c động đến t&igrave;nh cảnh bế tắc ở quốc hội Mỹ hoặc th&uacute;c đẩy họ ph&ecirc; duyệt viện trợ bổ sung trước khi c&aacute;c nh&agrave; lập ph&aacute;p bước v&agrave;o kỳ nghỉ cuối năm từ tuần tới.</p>\r\n\r\n<p>Quốc hội Mỹ đến nay đ&atilde; ph&ecirc; duyệt hơn 111 tỷ USD hỗ trợ Ukraine. Y&ecirc;u cầu viện trợ bổ sung cho Ukraine của &ocirc;ng Biden l&agrave; một phần trong g&oacute;i ng&acirc;n s&aacute;ch lớn hơn m&agrave; Nh&agrave; Trắng y&ecirc;u cầu, trong đ&oacute; gồm cả viện trợ cho Israel v&agrave; giải quyết những th&aacute;ch thức về d&ograve;ng người nhập cư ở bi&ecirc;n giới Mỹ - Mexico.</p>\r\n', 'Tổng thống Zelensky tới Washington với hy vọng có thể thuyết phục quốc hội Mỹ thông qua gói viện trợ 60 tỷ USD, nhưng trở về với cam kết chỉ 200 triệu USD.', '2023-12-16 22:44:56.239', '2023-12-16 22:44:56.238', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fz4967516570263-7bf622a2d145df8f18d2303f0dfe9aaa-1702379979.jpg?alt=media&token=57a140d0-5360-4062-9b7c-d031fb1ab9cb', '1', '6');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Doanh nghiệp ưu tiên kinh nghiệm, tân cử nhân cần làm gì?', '<p>Tại Ng&agrave;y hội việc l&agrave;m do trường Đại học H&agrave; Nội tổ chức h&ocirc;m 15/12, &ocirc;ng Nguyễn Bảo Long, Trưởng ph&ograve;ng ph&aacute;t triển cộng đồng v&agrave; quan hệ đối t&aacute;c, C&ocirc;ng ty TopCV Việt Nam, cho biết h&agrave;ng năm, c&ocirc;ng ty đều phỏng vấn khoảng 3.000 nh&agrave; tuyển dụng, xem nhu cầu của họ thế n&agrave;o.</p>\r\n\r\n<p>Theo b&aacute;o c&aacute;o thị trường tuyển dụng 2022 v&agrave; nhu cầu năm 2023, điều doanh nghiệp quan t&acirc;m nhất trong CV (hồ sơ xin việc) của ứng vi&ecirc;n l&agrave; kinh nghiệm thực tế, chiếm 69,4%. Kỹ năng mềm l&agrave; yếu tố quan trọng thứ hai với 54,1% nh&agrave; tuyển dụng lựa chọn. Học vấn của ứng vi&ecirc;n đứng thứ ba với 33,3%.</p>\r\n\r\n<p>Cũng theo &ocirc;ng Long, năm 2022 nh&agrave; tuyển dụng d&agrave;nh 20% chỉ ti&ecirc;u cho sinh vi&ecirc;n mới ra trường, nhưng năm nay chỉ c&ograve;n 10%.</p>\r\n\r\n<p>&quot;Doanh nghiệp ng&agrave;y c&agrave;ng ưu ti&ecirc;n tuyển nh&acirc;n sự c&oacute; kinh nghiệm&quot;, &ocirc;ng Long n&oacute;i. &Ocirc;ng l&yacute; giải, kinh tế kh&oacute; khăn, doanh nghiệp phải tối ưu chi ph&iacute;, việc tuyển nh&acirc;n sự c&oacute; kinh nghiệm gi&uacute;p họ đỡ c&ocirc;ng đ&agrave;o tạo.</p>\r\n\r\n<p><img alt=\"Ông Nguyễn Bảo Long trong buổi chia sẻ với sinh viên HANU hôm 15/12. Ảnh: HANU\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/16/tu-van-3260-1702723704.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=Rfbf9cjUbiENfCERxZ39Zw\" /></p>\r\n\r\n<p>&Ocirc;ng Nguyễn Bảo Long chia sẻ với sinh vi&ecirc;n HANU h&ocirc;m 15/12. Ảnh:&nbsp;<em>HANU</em></p>\r\n\r\n<p>Ngo&agrave;i ra, những nh&acirc;n sự c&oacute; kinh nghiệm sẵn s&agrave;ng giảm lương để c&oacute; thể cạnh tranh với sinh vi&ecirc;n mới ra trường, theo &ocirc;ng Long. Do đ&oacute;, sinh vi&ecirc;n buộc phải t&iacute;ch lũy kinh nghiệm v&igrave; đ&oacute; l&agrave; ti&ecirc;u chuẩn nh&agrave; tuyển dụng đặt ra v&agrave; ng&agrave;y c&agrave;ng n&acirc;ng cao.</p>\r\n\r\n<p>&quot;Nếu bồi dưỡng v&agrave; t&iacute;ch lũy được kinh nghiệm l&agrave;m việc th&igrave; đ&oacute; sẽ l&agrave; điểm mạnh của bạn trong CV&quot;, &ocirc;ng Long n&oacute;i.</p>\r\n\r\n<p>&Ocirc;ng khuy&ecirc;n sinh vi&ecirc;n<strong>&nbsp;</strong>tr&acirc;n trọng hơn kỳ thực tập ở trường bởi đ&acirc;y l&agrave; thời gian để t&iacute;ch lũy kinh nghiệm l&agrave;m việc v&agrave; đưa v&agrave;o CV. Ngo&agrave;i ra, sinh vi&ecirc;n cũng n&ecirc;n tự chủ về t&agrave;i ch&iacute;nh bằng c&aacute;ch l&agrave;m th&ecirc;m, chẳng hạn l&agrave;m nh&acirc;n vi&ecirc;n b&aacute;n h&agrave;ng. C&ocirc;ng việc n&agrave;y nghe c&oacute; vẻ kh&ocirc;ng li&ecirc;n quan chuy&ecirc;n m&ocirc;n nhưng l&agrave; cơ hội để sinh vi&ecirc;n quan s&aacute;t c&aacute;ch doanh nghiệp vận h&agrave;nh, kiếm tiền, từ đ&oacute; vận dụng cho c&ocirc;ng việc thực tế sau n&agrave;y.</p>\r\n\r\n<p>Trước c&acirc;u hỏi l&agrave;m c&aacute;ch n&agrave;o để tạo ấn tượng với nh&agrave; tuyển dụng nếu kh&ocirc;ng c&oacute; điểm học tập cao v&agrave; nhiều kinh nghiệm l&agrave;m việc, &ocirc;ng Long n&oacute;i &quot;kh&ocirc;ng c&oacute; đường tắt&quot; n&agrave;o ngo&agrave;i việc phải tự bồi dưỡng năng lực, kiến thức. Sinh vi&ecirc;n c&oacute; thể tham gia một số kh&oacute;a học chuy&ecirc;n m&ocirc;n hay c&aacute;c kh&oacute;a kỹ năng giao tiếp, tin học văn ph&ograve;ng, ngoại ngữ để tăng cơ hội.</p>\r\n', 'Gần 70% trong số 3.000 nhà tuyển dụng ưu tiên kinh nghiệm của ứng viên, các tân cử nhân cần trang bị điều này nếu muốn cạnh tranh với nhân sự cũ.', '2023-12-16 22:47:08.305', '2023-12-16 22:47:08.291', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2FDien-song-2676-1651036599.jpg?alt=media&token=9a9a1cda-2cea-4ecd-9faa-9ae955107a50', '1', '24');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Sinh viên kinh tế tìm cách đầu quân cho công ty công nghệ', '<p>Ng&agrave;y 25/11, B&ugrave;i Thị Thu Trang tham dự FTU Career Fair - ng&agrave;y hội việc l&agrave;m lớn nhất trong năm của trường Đại học Ngoại thương. Nữ sinh năm cuối, chuy&ecirc;n ng&agrave;nh Tiếng Anh thương mại, rảo khắp gian h&agrave;ng của c&aacute;c c&ocirc;ng ty c&ocirc;ng nghệ. Trang cho biết quan t&acirc;m đến vị tr&iacute; nh&acirc;n sự, ph&acirc;n t&iacute;ch kinh doanh ở những c&ocirc;ng ty n&agrave;y.</p>\r\n\r\n<p>Nữ sinh cho rằng Tiếng Anh thương mại l&agrave; chuy&ecirc;n ng&agrave;nh rộng, học phủ khắp c&aacute;c kh&iacute;a cạnh của kinh tế, thương mại, n&ecirc;n nhiều sinh vi&ecirc;n kh&oacute; x&aacute;c định mục ti&ecirc;u việc l&agrave;m sau tốt nghiệp. Trang cũng từng c&oacute; thời gian m&ocirc;ng lung, nhưng sau kỳ thực tập tại vị tr&iacute; TA (Talent Acquisition - thu h&uacute;t nh&acirc;n t&agrave;i) ở một c&ocirc;ng ty c&ocirc;ng nghệ, c&ocirc; thấy đ&acirc;y l&agrave; nh&oacute;m doanh nghiệp tiềm năng. D&ugrave; xuất hiện l&agrave;n s&oacute;ng sa thải từ c&aacute;c c&ocirc;ng ty c&ocirc;ng nghệ, nhưng c&aacute;c vị tr&iacute; li&ecirc;n quan kinh doanh, nh&acirc;n sự vẫn cần thiết, ổn định.</p>\r\n\r\n<p>Tương tự, Nguyễn Năng Ho&agrave;ng, sinh vi&ecirc;n năm thứ nhất, ng&agrave;nh Kế to&aacute;n - Kiểm to&aacute;n, nh&igrave;n nhận đ&acirc;y vẫn l&agrave; lĩnh vực c&oacute; nhiều việc l&agrave;m v&agrave; kiếm việc nhanh. V&igrave; thế, Ho&agrave;ng gần như d&agrave;nh to&agrave;n bộ thời gian ở gian h&agrave;ng của C&ocirc;ng ty C&ocirc;ng nghệ Bravestars v&agrave; một số doanh nghiệp c&ugrave;ng lĩnh vực.</p>\r\n\r\n<p>&quot;C&ograve;n ba năm nữa mới tốt nghiệp, nhưng em vẫn muốn hỏi đại diện doanh nghiệp về những nhu cầu, định hướng của họ, từ đ&oacute; để m&igrave;nh biết n&ecirc;n học th&ecirc;m g&igrave;, cải thiện kỹ năng g&igrave;&quot;, Ho&agrave;ng n&oacute;i.</p>\r\n\r\n<p>Nhiều sinh vi&ecirc;n cũng chung mối quan t&acirc;m như Trang v&agrave; Ho&agrave;ng. Ng&agrave;y hội việc l&agrave;m c&oacute; hơn 40 doanh nghiệp tham dự, thu h&uacute;t khoảng 4.000 sinh vi&ecirc;n. C&aacute;c ng&acirc;n h&agrave;ng lớn vẫn thu h&uacute;t nhưng gian h&agrave;ng của c&aacute;c c&ocirc;ng ty c&ocirc;ng nghệ cũng chật k&iacute;n sinh vi&ecirc;n xếp h&agrave;ng, đặt c&acirc;u hỏi.</p>\r\n\r\n<p><img alt=\"Bùi Thị Thu Trang, sinh viên năm cuối, chuyên ngành Tiếng Anh Thương mại, trường Đại học Ngoại thương, đang trao đổi với đại diện doanh nghiệp tại FTU Career Fair, sáng 25/11. Ảnh: Thanh Hằng\" src=\"https://i1-vnexpress.vnecdn.net/2023/11/25/MG-7241-JPG-9648-1700910998.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=TwlzWw96eKpQw27TTQ2pxw\" /></p>\r\n\r\n<p>B&ugrave;i Thị Thu Trang, sinh vi&ecirc;n năm cuối, chuy&ecirc;n ng&agrave;nh Tiếng Anh Thương mại, trường Đại học Ngoại thương, đang trao đổi với đại diện doanh nghiệp tại FTU Career Fair, s&aacute;ng 25/11. Ảnh:&nbsp;<em>Thanh Hằng</em></p>\r\n\r\n<p>Đầu th&aacute;ng 11, PGS.TS Phạm Thu Hương, Ph&oacute; hiệu trưởng trường Đại học Ngoại thương, cho biết qua khảo s&aacute;t 54.000 cựu sinh vi&ecirc;n, c&ocirc;ng nghệ th&ocirc;ng tin l&agrave; một trong hai lĩnh vực việc l&agrave;m được lựa chọn h&agrave;ng đầu, c&oacute; xu hướng tăng trong v&agrave;i năm trở lại đ&acirc;y.</p>\r\n\r\n<p>B&agrave; Phạm Thị Thu Huyền, Trưởng ph&ograve;ng Thu h&uacute;t nh&acirc;n t&agrave;i v&agrave; Trải nghiệm nh&acirc;n vi&ecirc;n, Tập đo&agrave;n FPT, cũng nhận thấy số sinh vi&ecirc;n kinh tế đầu qu&acirc;n cho c&ocirc;ng ty c&ocirc;ng nghệ tăng trong khoảng 2-3 năm nay. T&iacute;nh ri&ecirc;ng tại FPT, nh&acirc;n sự tốt nghiệp c&aacute;c trường kinh tế tăng khoảng 20%.</p>\r\n\r\n<p>Tập đo&agrave;n c&ocirc;ng nghệ One Mount cũng ghi nhận số hồ sơ ứng tuyển của sinh vi&ecirc;n kinh tế tăng. B&agrave; Phạm Thị V&acirc;n, chuy&ecirc;n vi&ecirc;n cao cấp Ph&aacute;t triển thương hiệu, cho biết nh&oacute;m n&agrave;y thường l&agrave;m c&aacute;c vị tr&iacute; li&ecirc;n quan đến ph&acirc;n t&iacute;ch chiến lược kinh doanh, kiểm thử, quan hệ kh&aacute;ch h&agrave;ng, marketing.</p>\r\n\r\n<p>B&agrave; V&acirc;n n&oacute;i đ&uacute;ng l&agrave; nhiều c&ocirc;ng ty phải cắt giảm nh&acirc;n sự, nhưng đ&acirc;y hầu hết l&agrave; c&aacute;c vị tr&iacute; chưa mang về lợi &iacute;ch tương xứng với chi ph&iacute; đầu tư, vận h&agrave;nh. Trong khi đ&oacute;, doanh nghiệp n&agrave;o cũng cần t&igrave;m c&aacute;ch ti&ecirc;u thụ sản phẩm, n&ecirc;n nhu cầu tuyển dụng nh&acirc;n sự phụ tr&aacute;ch kinh doanh lại tăng l&ecirc;n.</p>\r\n\r\n<p>Ngo&agrave;i ra, quan niệm về việc l&agrave;m của sinh vi&ecirc;n cũng c&oacute; sự thay đổi. C&ocirc;ng nghệ trở n&ecirc;n gần gũi, kh&ocirc;ng c&ograve;n bị đ&oacute;ng khung rằng chỉ d&agrave;nh cho người tốt nghiệp c&aacute;c ng&agrave;nh kỹ thuật.</p>\r\n', 'Không chỉ săn việc ở các ngân hàng, ngày càng nhiều sinh viên muốn tìm cơ hội ở các công ty công nghệ vì cho rằng lĩnh vực này còn phát triển.', '2023-12-16 22:48:51.795', '2023-12-16 22:48:51.777', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2F233A8690-1702470885.jpg?alt=media&token=03442527-b96b-484a-8e26-f1c3ba51972c', '4', '9');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Chân váy da thành mốt hot năm 2024', '<p>Da được xem l&agrave; chất liệu kinh điển, gi&uacute;p người mặc trở n&ecirc;n sang trọng. Nếu m&ugrave;a lạnh năm nay, &aacute;o kho&aacute;c da được ưa chuộng, sang năm sau, ch&acirc;n v&aacute;y chất liệu n&agrave;y sẽ xuất hiện trong cả m&ugrave;a mốt Xu&acirc;n H&egrave; lẫn Thu Đ&ocirc;ng. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/00031-givenchy-spring-2024-ready-1702457608.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=G0b9_TuFBvGtMZpyCICgaQ\" /></p>\r\n\r\n<p>Trong khi Acne Studios tung ra ch&acirc;n v&aacute;y si&ecirc;u ngắn m&agrave;u n&acirc;u, Givenchy chọn phong c&aacute;ch sang trọng v&agrave; gợi cảm với ch&acirc;n v&aacute;y midi. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/00030-alaia-spring-2024-ready-to-1702457609.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=RpZz7E1U40BCFTR0DPZ9Sg\" /></p>\r\n\r\n<p>Ala&iuml;a đem tới v&aacute;y b&uacute;t ch&igrave; ngắn tới đầu gối, phối bra top đồng điệu. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/00008-ami-spring-2024-menswear-c-1702457610.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=V9k1D2VatmxWNF6xllQstQ\" /></p>\r\n\r\n<p>Ami tung ra kiểu v&aacute;y xẻ t&agrave; cao tới h&ocirc;ng, d&agrave;nh cho những c&ocirc; g&aacute;i tự tin về đ&ocirc;i ch&acirc;n. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/vay-da-1702457606.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=oVRuY56fQM4kA4_ZOFFLmA\" /></p>\r\n\r\n<p>Từ đầu m&ugrave;a thu, giới y&ecirc;u thời trang đ&atilde; theo đuổi phong c&aacute;ch n&agrave;y với c&aacute;ch phối đa dạng. Ảnh:&nbsp;<em>TST</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/vay-da-2-1702457607.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=wyg_1Lx59ef9JlF6M3aMFg\" /></p>\r\n\r\n<p>Theo&nbsp;<em>Vogue</em>, ch&acirc;n v&aacute;y da được nhiều người y&ecirc;u th&iacute;ch v&igrave; dễ phối đồ, ph&ugrave; hợp nhiều ho&agrave;n cảnh như đi chơi, đi l&agrave;m v&agrave; dự tiệc. Ảnh:&nbsp;<em>TST</em></p>\r\n', 'Chân váy da được nhiều hãng như Givenchy, Acne Studios, Alaïa lăng xê, trở thành mốt hot năm sau.', '2023-12-16 22:51:19.572', '2023-12-16 22:51:19.571', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fhinh-anh-dep-1.jpg?alt=media&token=7d9f0025-7c50-4c67-a89e-08211ec027ef', '2', '7');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Những truyền thống Giáng sinh ít người biết', '<p>Dưới đ&acirc;y l&agrave; một số phong tục v&agrave; truyền thống Gi&aacute;ng sinh tr&ecirc;n thế giới.</p>\r\n\r\n<p><strong>Động vật biết n&oacute;i trong đ&ecirc;m Gi&aacute;ng sinh ở Ba Lan</strong></p>\r\n\r\n<p>Ở Ba Lan người d&acirc;n tin rằng c&aacute;c con vật được ban tặng khả năng biết n&oacute;i trong đ&ecirc;m Gi&aacute;ng sinh. Ch&uacute;a Jesus gi&aacute;ng sinh b&ecirc;n m&aacute;ng cỏ vốn l&agrave; m&aacute;ng đựng thức ăn của gia s&uacute;c v&agrave; khi người ch&agrave;o đời, c&aacute;c lo&agrave;i vật trong trang trại đ&atilde; c&uacute;i đầu ch&agrave;o đ&oacute;n. Do đ&oacute;, c&aacute;c lo&agrave;i vật được ban tặng m&oacute;n qu&agrave; c&oacute; khả năng n&oacute;i tiếng người trong đ&ecirc;m 24/12. Nhiều trẻ em Ba Lan sẽ thường cố gắng tr&ograve; chuyện với c&aacute;c con ch&oacute;, m&egrave;o l&agrave; th&uacute; cưng của ch&uacute;ng trong đ&ecirc;m Noel.</p>\r\n\r\n<p><strong>Đ&oacute;n Gi&aacute;ng sinh sớm ở H&agrave; Lan</strong></p>\r\n\r\n<p>Tại H&agrave; Lan, người d&acirc;n đ&oacute;n Gi&aacute;ng sinh sớm. Đ&ecirc;m 5/12 được trẻ em mong chờ nhất v&igrave; th&aacute;nh Sinterklaas sẽ đến ph&aacute;t qu&agrave;. Ch&uacute;ng sẽ để một chiếc gi&agrave;y b&ecirc;n l&ograve; sưởi, h&aacute;t những b&agrave;i h&aacute;t Gi&aacute;ng sinh H&agrave; Lan v&agrave; chờ qu&agrave; đến.</p>\r\n\r\n<p><img alt=\"Một người đàn ông trong trang phục thánh Sinterklaas. Ảnh: Nos\" src=\"https://i1-dulich.vnecdn.net/2023/12/13/2048x1152-4228-1702400829.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=8XINP5asrdPGSFMWGZ3wIw\" /></p>\r\n\r\n<p>Một người đ&agrave;n &ocirc;ng trong trang phục th&aacute;nh Sinterklaas. Ảnh:&nbsp;<em>Nos</em></p>\r\n\r\n<p>Đức cũng c&oacute; truyền thống tương tự. Tối ng&agrave;y 5/12, một ng&agrave;y trước ng&agrave;y Th&aacute;nh Nicholas, trẻ em Đức sẽ đ&aacute;nh sạch gi&agrave;y v&agrave; để ch&uacute;ng gần l&ograve; sưởi. S&aacute;ng h&ocirc;m sau, ch&uacute;ng sẽ nhận được những chiếc gi&agrave;y chứa đầy chocolate v&agrave; kẹo ngọt, m&oacute;n qu&agrave; được th&aacute;nh Nicholas ban tặng như một lời khen ngợi v&igrave; đ&atilde; ngoan ngo&atilde;n suốt năm qua.</p>\r\n\r\n<p>Qu&yacute;t v&agrave; c&aacute;c m&oacute;n qu&agrave; nhỏ cũng được đặt trong gi&agrave;y, tương tự như tặng qu&agrave; Gi&aacute;ng sinh trong tất ở những quốc gia kh&aacute;c. Với những đứa trẻ chưa ngoan, khoai t&acirc;y thối l&agrave; &quot;phần thường&quot; thay thế kẹo đựng trong gi&agrave;y.</p>\r\n\r\n<p><strong>Trượt patin trong đ&ecirc;m Gi&aacute;ng sinh ở Venezuela</strong></p>\r\n\r\n<p>Nhiều người sẽ d&agrave;nh thời gian đ&ecirc;m Gi&aacute;ng sinh với bạn b&egrave; tại qu&aacute;n rượu địa phương, số kh&aacute;c uống chocolate v&agrave; xem một bộ phim tại nh&agrave;. Với người d&acirc;n Venezuela, đ&acirc;y l&agrave; một đ&ecirc;m trượt patin th&uacute; vị.</p>\r\n\r\n<p>V&agrave;o đ&ecirc;m Gi&aacute;ng sinh, người d&acirc;n thủ đ&ocirc; Caracas sẽ di chuyển đến c&aacute;c địa điểm linh thi&ecirc;ng dự th&aacute;nh lễ tr&ecirc;n gi&agrave;y trượt.</p>\r\n\r\n<p>Trượt băng dịp n&agrave;y l&agrave; truyền thống phổ biến đến mức nhiều con phố cấm &ocirc;t&ocirc; để người d&acirc;n trượt patin an to&agrave;n v&agrave; tận hưởng kh&ocirc;ng kh&iacute; lễ hội vui vẻ.</p>\r\n\r\n<p><strong>Mổ lợn dịp Gi&aacute;ng sinh ở Romania</strong></p>\r\n\r\n<p>C&aacute;c gia đ&igrave;nh ở v&ugrave;ng n&ocirc;ng th&ocirc;n sẽ tập trung lại v&agrave; hiến tế một con lợn được nu&ocirc;i trong nh&agrave;. Sau đ&oacute; họ d&ugrave;ng thịt của con lợn n&agrave;y để nấu đồ ăn cho dịp Gi&aacute;ng sinh. Sự kiện n&agrave;y thường diễn ra v&agrave;o ng&agrave;y 20/12 v&agrave; được gọi l&agrave; Ziua de Ignat. Ng&agrave;y nay, nhiều người d&acirc;n cho rằng đ&acirc;y l&agrave; một truyền thống t&agrave;n &aacute;c với động vật n&ecirc;n kh&ocirc;ng c&ograve;n phổ biến như trước.</p>\r\n\r\n<p><strong>&Ocirc;ng gi&agrave; Noel lướt s&oacute;ng tại Mỹ v&agrave; Australia</strong></p>\r\n\r\n<p>Gi&aacute;ng sinh ở Australia l&agrave; m&ugrave;a h&egrave;, thời tiết n&oacute;ng nực. Do đ&oacute; người d&acirc;n v&agrave; du kh&aacute;ch đ&atilde; quen thuộc với h&igrave;nh ảnh c&aacute;c &ocirc;ng gi&agrave; Noel mặc bộ đồ Gi&aacute;ng sinh đỏ rực, ch&acirc;n đi ủng v&agrave; lướt s&oacute;ng tr&ecirc;n mặt biển.</p>\r\n\r\n<p>Truyền thống lan rộng sang Mỹ, đặc biệt v&agrave;o s&aacute;ng ng&agrave;y 24/12, mọi người từ khắp đất nước tụ tập để xem h&agrave;ng trăm người lướt s&oacute;ng trong trang phục &ocirc;ng gi&agrave; Noel tr&ecirc;n b&atilde;i biển Cocoa ở bang Florida.</p>\r\n\r\n<p><strong>Mua xổ số dịp Gi&aacute;ng sinh ở T&acirc;y Ban Nha</strong></p>\r\n\r\n<p>Xổ số Gi&aacute;ng sinh ở T&acirc;y Ban Nha hay El Gordo l&agrave; một trong những giải xổ số lớn nhất thế giới v&igrave; tiền thưởng l&ecirc;n đến 2 tỷ euro. Hầu hết người d&acirc;n đều mua. Truyền thống n&agrave;y bắt đầu từ năm 1812 v&agrave; đến nay n&oacute; vẫn l&agrave; một truyền thống th&uacute; vị, được người d&acirc;n T&acirc;y Ban Nha y&ecirc;u th&iacute;ch.</p>\r\n', 'Người Ba Lan tin rằng động vật sẽ biết nói vào đêm Giáng sinh còn người dân Tây Ban Nha đổ xô đi mua sổ xố.', '2023-12-16 22:53:17.022', '2023-12-16 22:53:17.021', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2FVNE-Probe-6416-1702438337.jpg?alt=media&token=12b094b3-a21b-4d62-bec4-8e2ec6b9ad07', '1', '8');
+INSERT INTO `ims`.`post` ( `Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES (' Thời sựChính trịThứ sáu, 15/12/2023, 17:57 (GMT+7) Chủ tịch tỉnh Vĩnh Phúc có hơn 53% phiếu tín nhiệm thấp', '<p>Kết quả lấy phiếu t&iacute;n nhiệm của HĐND tỉnh Vĩnh Ph&uacute;c ng&agrave;y 13/12 cho thấy &ocirc;ng L&ecirc; Duy Th&agrave;nh c&oacute; 19 phiếu t&iacute;n nhiệm cao (40,43%); hai phiếu t&iacute;n nhiệm (4,26%); 25 phiếu t&iacute;n nhiệm thấp (53,19%).</p>\r\n\r\n<p>&Ocirc;ng Th&agrave;nh l&agrave; người c&oacute; số phiếu &quot;t&iacute;n nhiệm cao&quot; thấp nhất v&agrave; phiếu &quot;t&iacute;n nhiệm thấp&quot; nhiều nhất. &Ocirc;ng cũng l&agrave; trường hợp duy nhất nhận qu&aacute; nửa số phiếu t&iacute;n nhiệm thấp.</p>\r\n\r\n<p>&Ocirc;ng Th&agrave;nh đ&atilde; c&oacute; hơn hai năm giữ vị tr&iacute; Chủ tịch UBND tỉnh Vĩnh Ph&uacute;c. Th&aacute;ng 10/2020, khi đang l&agrave;m Ph&oacute; b&iacute; thư Tỉnh ủy, Ph&oacute; chủ tịch Thường trực UBND tỉnh Vĩnh Ph&uacute;c, &ocirc;ng được giới thiệu v&agrave; bầu l&agrave;m Chủ tịch UBND tỉnh với 100% (47/47) số phiếu đồng &yacute;.</p>\r\n\r\n<p>Đợt lấy phiếu t&iacute;n nhiệm năm 2018, &ocirc;ng Th&agrave;nh l&uacute;c đ&oacute; l&agrave; Ph&oacute; chủ tịch UBND tỉnh, đứng ở top giữa, với 33 phiếu t&iacute;n nhiệm cao (67,3); 9 t&iacute;n nhiệm (18,3); 6 t&iacute;n nhiệm thấp (12,2%).</p>\r\n\r\n<p><img alt=\"Ông Lê Duy Thành, Chủ tịch UBND tỉnh Vĩnh Phúc tại cuộc họp tháng 11/2023. Ảnh: Cổng thông tin tỉnh Vĩnh Phúc\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/15/23112023-dientapkvptvinhyen-01-9172-8725-1702637283.png?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=u_oQjhO0_dURphcBJEHAlw\" /></p>\r\n\r\n<p>&Ocirc;ng L&ecirc; Duy Th&agrave;nh, Chủ tịch UBND tỉnh Vĩnh Ph&uacute;c tại cuộc họp th&aacute;ng 11/2023. Ảnh:&nbsp;<em>Cổng th&ocirc;ng tin tỉnh Vĩnh Ph&uacute;c</em></p>\r\n\r\n<p>Theo Nghị quyết 96/2023 của Quốc hội hồi th&aacute;ng 6, c&aacute;n bộ c&oacute; qu&aacute; nửa đến dưới 2/3 tổng số đại biểu đ&aacute;nh gi&aacute; &quot;t&iacute;n nhiệm thấp&quot; phải xin từ chức trong kh&ocirc;ng qu&aacute; 10 ng&agrave;y kể từ ng&agrave;y c&ocirc;ng bố kết quả lấy phiếu t&iacute;n nhiệm. Nếu c&aacute;n bộ kh&ocirc;ng xin từ chức th&igrave; thường trực HĐND tr&igrave;nh HĐND tiến h&agrave;nh bỏ phiếu t&iacute;n nhiệm (với hai mức t&iacute;n nhiệm hoặc kh&ocirc;ng t&iacute;n nhiệm).</p>\r\n\r\n<p>Người được bỏ phiếu t&iacute;n nhiệm nhận được hơn 50% đ&aacute;nh gi&aacute; &quot;kh&ocirc;ng t&iacute;n nhiệm&quot; th&igrave; sẽ bị xem x&eacute;t miễn nhiệm.</p>\r\n\r\n<p>&Ocirc;ng L&ecirc; Duy Th&agrave;nh 54 tuổi, qu&ecirc; Vĩnh Ph&uacute;c; tr&igrave;nh độ tiến sĩ kinh tế. Trước khi được bầu l&agrave;m Chủ tịch UBND tỉnh, &ocirc;ng Th&agrave;nh kinh qua nhiều chức vụ tại Vĩnh Ph&uacute;c như Cục ph&oacute; Cục thuế tỉnh; B&iacute; thư Huyện ủy Lập Thạch; Ph&oacute; b&iacute; thư Tỉnh ủy; Ph&oacute; chủ tịch UBND tỉnh.</p>\r\n', 'Ông Lê Duy Thành, Chủ tịch UBND tỉnh Vĩnh Phúc nhận 53,19% số phiếu tín nhiệm thấp, nhiều nhất trong số 28 chức danh được lấy phiếu.', '2023-12-15 20:19:52.251', '2023-12-15 20:21:34.067', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2FVNEDog-1702524615-3901-1702524656.jpg?alt=media&token=03b3768b-3ddb-4d5f-bd68-d7c055f67cb1', '2', '10');
+INSERT INTO `ims`.`post` ( `Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `AuthorId`, `CategoryId`) VALUES ( 'Nga phóng tên lửa Kinzhal vào Ukraine khi ông Putin họp báo', '<p>&quot;Một t&ecirc;n lửa si&ecirc;u vượt &acirc;m Kinzhal được ph&oacute;ng về ph&iacute;a th&agrave;nh phố Starokostiantyniv thuộc tỉnh Khmelnitsky. T&ecirc;n lửa lao xuống tỉnh Khmetnitsky chỉ khoảng 10 ph&uacute;t sau khi b&aacute;o động ph&ograve;ng kh&ocirc;ng to&agrave;n quốc được ph&aacute;t ra&quot;, ph&aacute;t ng&ocirc;n vi&ecirc;n kh&ocirc;ng qu&acirc;n Ukraine Yuri Ignat th&ocirc;ng b&aacute;o tr&ecirc;n truyền h&igrave;nh h&ocirc;m 14/12.</p>\r\n\r\n<p><img alt=\"Tiêm kích MiG-31K Nga phóng tên lửa Kinzhal trong thử nghiệm năm 2018. Ảnh: BQP Nga\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/15/kinzhal-3-1403-1702581863.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=1mzycwk6Vr4ZKfg7B0xdgw\" /></p>\r\n\r\n<p>Ti&ecirc;m k&iacute;ch MiG-31K Nga ph&oacute;ng t&ecirc;n lửa Kinzhal trong thử nghiệm năm 2018. Ảnh:&nbsp;<em>BQP Nga</em></p>\r\n\r\n<p>&Ocirc;ng Ignat n&oacute;i rằng khu vực Starokostiantyniv c&oacute; nhiều cơ sở qu&acirc;n sự, khiến đ&acirc;y l&agrave; mục ti&ecirc;u tấn c&ocirc;ng ưu ti&ecirc;n của qu&acirc;n đội Nga. &quot;Ch&uacute;ng t&ocirc;i sẽ kh&ocirc;ng tiết lộ hậu quả của đ&ograve;n đ&aacute;nh. H&atilde;y để đối phương tự r&uacute;t ra kết luận về mục ti&ecirc;u v&agrave; địa điểm tr&uacute;ng t&ecirc;n lửa&quot;, ph&aacute;t ng&ocirc;n vi&ecirc;n kh&ocirc;ng qu&acirc;n Ukraine n&oacute;i.</p>\r\n\r\n<p>Đ&acirc;y l&agrave; lần đầu ti&ecirc;n Nga sử dụng t&ecirc;n lửa si&ecirc;u vượt &acirc;m Kinzhal để tập k&iacute;ch Ukraine sau nhiều th&aacute;ng chỉ khai hỏa t&ecirc;n lửa h&agrave;nh tr&igrave;nh v&agrave; m&aacute;y bay kh&ocirc;ng người l&aacute;i (UAV) tự s&aacute;t. Cuộc tập k&iacute;ch diễn ra c&ugrave;ng thời điểm Tổng thống Vladimir Putin tổ chức cuộc họp b&aacute;o cuối năm d&agrave;i 4 tiếng.</p>\r\n\r\n<p>Trong cuộc họp b&aacute;o, &ocirc;ng Putin tuy&ecirc;n bố mục ti&ecirc;u chiến dịch ở Ukraine kh&ocirc;ng thay đổi, đ&oacute; l&agrave; &quot;phi ph&aacute;t x&iacute;t h&oacute;a, phi qu&acirc;n sự h&oacute;a v&agrave; đảm bảo t&igrave;nh trạng trung lập của Ukraine&quot;. &Ocirc;ng khẳng định h&ograve;a b&igrave;nh ở Ukraine chỉ đến khi Nga đạt được mục ti&ecirc;u của m&igrave;nh.</p>\r\n\r\n<p>Truyền th&ocirc;ng Ukraine sau đ&oacute; th&ocirc;ng b&aacute;o &iacute;t nhất ba tiếng nổ lớn đ&atilde; vang l&ecirc;n gần s&acirc;n bay quốc tế Zhulyany ở thủ đ&ocirc; Kiev, nơi triển khai trận địa t&ecirc;n lửa ph&ograve;ng kh&ocirc;ng Patriot. Cơ quan qu&acirc;n sự thủ đ&ocirc; Kiev cho hay ti&ecirc;m k&iacute;ch MiG-31K Nga đ&atilde; ph&oacute;ng t&ecirc;n lửa Kinzhal về ph&iacute;a th&agrave;nh phố v&agrave; k&ecirc;u gọi người d&acirc;n t&igrave;m nơi tr&uacute; ẩn.</p>\r\n\r\n<p>&quot;C&aacute;c hệ thống ph&ograve;ng kh&ocirc;ng đ&atilde; tham chiến v&agrave; bắn rơi một quả đạn của đối phương&quot;, ph&aacute;t ng&ocirc;n vi&ecirc;n Ignat cho hay khi được đề nghị b&igrave;nh luận về những tiếng nổ tr&ecirc;n v&ugrave;ng trời Kiev.</p>\r\n\r\n<p>Bộ Quốc ph&ograve;ng Nga chưa l&ecirc;n tiếng về th&ocirc;ng tin.</p>\r\n\r\n<p>Nga từng nhiều lần tấn c&ocirc;ng s&acirc;n bay trọng yếu ở Starokostiantyniv, do đ&acirc;y l&agrave; căn cứ chủ chốt của kh&ocirc;ng qu&acirc;n Ukraine v&agrave; l&agrave; điểm đ&oacute;ng qu&acirc;n của phi đội cường k&iacute;ch Su-24M trang bị t&ecirc;n lửa dẫn đường Storm Shadow/SCALP-EG được Anh v&agrave; Ph&aacute;p viện trợ.</p>\r\n\r\n<p>Giới chuy&ecirc;n gia cho rằng c&oacute; nhiều l&yacute; do khiến Nga chưa thể ngăn chặn ho&agrave;n to&agrave;n mối đe dọa từ t&ecirc;n lửa Storm Shadow/SCALP-EG, buộc họ li&ecirc;n tục tập k&iacute;ch căn cứ đ&oacute;ng qu&acirc;n của phi đội Su-24M Ukraine.</p>\r\n', 'Nga phóng tên lửa siêu vượt âm Kinzhal nhằm vào Ukraine, cùng lúc ông Putin họp báo cuối năm và tuyên bố sẽ theo đuổi chiến dịch nhắm vào Kiev.', '2023-12-16 22:41:38.176', '2023-12-16 22:41:38.173', '1', '1', '24');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Chuyến công du kêu gọi viện trợ gây thất vọng của ông Zelensky', '<p>Tổng thống Ukraine Volodymyr Zelensky từng được ch&agrave;o đ&oacute;n như người h&ugrave;ng trong chuyến thăm 10 tiếng tới Washington gần một năm trước. Tuy nhi&ecirc;n, lần n&agrave;y mọi thứ đ&atilde; kh&aacute;c nhiều.</p>\r\n\r\n<p>Chuyến thăm của Tổng thống Zelensky tới Washington h&ocirc;m 12/12 l&agrave; lần thứ hai l&atilde;nh đạo Ukraine tới quốc hội Mỹ trong ba th&aacute;ng qua, nhưng sự tiếp đ&oacute;n d&agrave;nh cho &ocirc;ng từ ph&iacute;a đảng Cộng h&ograve;a tương đối lạnh nhạt, đặc biệt ở Hạ viện.</p>\r\n\r\n<p>Chuyến c&ocirc;ng du của &ocirc;ng, do Nh&agrave; Trắng sắp xếp trong bối cảnh Ukraine tiến gần tới bờ vực cạn nguồn vũ kh&iacute; v&agrave; t&agrave;i ch&iacute;nh, diễn ra đ&uacute;ng l&uacute;c Đồi Capitol đối mặt nhiều bất đồng về viện trợ cho Ukraine. C&aacute;c th&agrave;nh vi&ecirc;n đảng Cộng h&ograve;a đ&atilde; y&ecirc;u cầu ch&iacute;nh quyền Tổng thống Biden siết chặt c&aacute;c biện ph&aacute;p kiểm so&aacute;t nhập cư ở bi&ecirc;n giới ph&iacute;a nam, coi đ&oacute; như điều kiện để th&ocirc;ng qua đề xuất viện trợ mới của &ocirc;ng, điều m&agrave; Nh&agrave; Trắng ki&ecirc;n quyết b&aacute;c bỏ.</p>\r\n\r\n<p><img alt=\"Tổng thống Mỹ Joe Biden (phải) và Tổng thống Ukraine Volodymyr Zelensky tại Nhà Trắng ngày 12/12. Ảnh: Reuters\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/13/2023-12-12t175935z-1154230774-3129-5408-1702462771.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=kr8by1oqsOo3WGKidDPAQg\" /></p>\r\n\r\n<p>Tổng thống Mỹ Joe Biden (phải) v&agrave; Tổng thống Ukraine Volodymyr Zelensky tại Nh&agrave; Trắng ng&agrave;y 12/12. Ảnh:<em>&nbsp;Reuters</em></p>\r\n\r\n<p>Ph&aacute;t biểu trước c&aacute;c nghị sĩ Mỹ ở Đồi Capitol, &ocirc;ng&nbsp;<a href=\"https://vnexpress.net/chu-de/volodymyr-zelensky-4565\">Zelensky</a>&nbsp;khẳng định Ukraine sẽ kh&ocirc;ng từ bỏ trong cuộc chiến chống lại Nga, nhưng cảnh b&aacute;o nếu kh&ocirc;ng c&oacute; hỗ trợ từ phương T&acirc;y, xung đột sẽ trở n&ecirc;n t&agrave;n khốc, khi qu&acirc;n đội của &ocirc;ng kh&ocirc;ng thể bảo vệ l&atilde;nh thổ trước đối thủ được trang bị tốt hơn.</p>\r\n\r\n<p>Ph&aacute;t biểu tại Nh&agrave; Trắng sau đ&oacute;, &ocirc;ng Zelensky m&ocirc; tả cuộc thảo luận ở quốc hội Mỹ &quot;tr&ecirc;n cả t&iacute;ch cực&quot;, song thừa nhận người Ukraine sẽ phải nh&igrave;n v&agrave;o kết quả thực tế hơn lời n&oacute;i su&ocirc;ng.</p>\r\n\r\n<p>&quot;Điều quan trọng l&agrave; tới cuối năm nay, ch&uacute;ng ta c&oacute; thể gửi t&iacute;n hiệu mạnh mẽ về sự đo&agrave;n kết đến đối phương. Đ&oacute; l&agrave; sự đo&agrave;n kết của Ukraine, Mỹ, ch&acirc;u &Acirc;u v&agrave; to&agrave;n thế giới&quot;, &ocirc;ng n&oacute;i.</p>\r\n\r\n<p>Đứng cạnh Tổng thống Zelensky trong cuộc họp b&aacute;o chung tại Nh&agrave; Trắng, &ocirc;ng Biden cảnh b&aacute;o Tổng thống Nga&nbsp;<a href=\"https://vnexpress.net/chu-de/vladimir-putin-1614\">Vladimir Putin</a>&nbsp;đang hy vọng Mỹ sẽ ngừng hỗ trợ cho Ukraine. &quot;Ch&uacute;ng ta phải chứng minh &ocirc;ng ấy đ&atilde; sai&quot;, &ocirc;ng n&oacute;i.</p>\r\n\r\n<p>Tuy nhi&ecirc;n, dường như c&oacute; rất &iacute;t hy vọng cho điều đ&oacute; trong thời gian tới.</p>\r\n\r\n<p>Sau cuộc trao đổi ri&ecirc;ng với &ocirc;ng Zelensky, c&aacute;c thượng nghị sĩ Mỹ cho biết b&agrave;i ph&aacute;t biểu của Tổng thống Ukraine đầy cảm x&uacute;c, nhưng dường như kh&ocirc;ng thể t&aacute;c động đến t&igrave;nh cảnh bế tắc ở quốc hội Mỹ hoặc th&uacute;c đẩy họ ph&ecirc; duyệt viện trợ bổ sung trước khi c&aacute;c nh&agrave; lập ph&aacute;p bước v&agrave;o kỳ nghỉ cuối năm từ tuần tới.</p>\r\n\r\n<p>Quốc hội Mỹ đến nay đ&atilde; ph&ecirc; duyệt hơn 111 tỷ USD hỗ trợ Ukraine. Y&ecirc;u cầu viện trợ bổ sung cho Ukraine của &ocirc;ng Biden l&agrave; một phần trong g&oacute;i ng&acirc;n s&aacute;ch lớn hơn m&agrave; Nh&agrave; Trắng y&ecirc;u cầu, trong đ&oacute; gồm cả viện trợ cho Israel v&agrave; giải quyết những th&aacute;ch thức về d&ograve;ng người nhập cư ở bi&ecirc;n giới Mỹ - Mexico.</p>\r\n', 'Tổng thống Zelensky tới Washington với hy vọng có thể thuyết phục quốc hội Mỹ thông qua gói viện trợ 60 tỷ USD, nhưng trở về với cam kết chỉ 200 triệu USD.', '2023-12-16 22:44:56.239', '2023-12-16 22:44:56.238', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fz4967516570263-7bf622a2d145df8f18d2303f0dfe9aaa-1702379979.jpg?alt=media&token=57a140d0-5360-4062-9b7c-d031fb1ab9cb', '2', '11');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Doanh nghiệp ưu tiên kinh nghiệm, tân cử nhân cần làm gì?', '<p>Tại Ng&agrave;y hội việc l&agrave;m do trường Đại học H&agrave; Nội tổ chức h&ocirc;m 15/12, &ocirc;ng Nguyễn Bảo Long, Trưởng ph&ograve;ng ph&aacute;t triển cộng đồng v&agrave; quan hệ đối t&aacute;c, C&ocirc;ng ty TopCV Việt Nam, cho biết h&agrave;ng năm, c&ocirc;ng ty đều phỏng vấn khoảng 3.000 nh&agrave; tuyển dụng, xem nhu cầu của họ thế n&agrave;o.</p>\r\n\r\n<p>Theo b&aacute;o c&aacute;o thị trường tuyển dụng 2022 v&agrave; nhu cầu năm 2023, điều doanh nghiệp quan t&acirc;m nhất trong CV (hồ sơ xin việc) của ứng vi&ecirc;n l&agrave; kinh nghiệm thực tế, chiếm 69,4%. Kỹ năng mềm l&agrave; yếu tố quan trọng thứ hai với 54,1% nh&agrave; tuyển dụng lựa chọn. Học vấn của ứng vi&ecirc;n đứng thứ ba với 33,3%.</p>\r\n\r\n<p>Cũng theo &ocirc;ng Long, năm 2022 nh&agrave; tuyển dụng d&agrave;nh 20% chỉ ti&ecirc;u cho sinh vi&ecirc;n mới ra trường, nhưng năm nay chỉ c&ograve;n 10%.</p>\r\n\r\n<p>&quot;Doanh nghiệp ng&agrave;y c&agrave;ng ưu ti&ecirc;n tuyển nh&acirc;n sự c&oacute; kinh nghiệm&quot;, &ocirc;ng Long n&oacute;i. &Ocirc;ng l&yacute; giải, kinh tế kh&oacute; khăn, doanh nghiệp phải tối ưu chi ph&iacute;, việc tuyển nh&acirc;n sự c&oacute; kinh nghiệm gi&uacute;p họ đỡ c&ocirc;ng đ&agrave;o tạo.</p>\r\n\r\n<p><img alt=\"Ông Nguyễn Bảo Long trong buổi chia sẻ với sinh viên HANU hôm 15/12. Ảnh: HANU\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/16/tu-van-3260-1702723704.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=Rfbf9cjUbiENfCERxZ39Zw\" /></p>\r\n\r\n<p>&Ocirc;ng Nguyễn Bảo Long chia sẻ với sinh vi&ecirc;n HANU h&ocirc;m 15/12. Ảnh:&nbsp;<em>HANU</em></p>\r\n\r\n<p>Ngo&agrave;i ra, những nh&acirc;n sự c&oacute; kinh nghiệm sẵn s&agrave;ng giảm lương để c&oacute; thể cạnh tranh với sinh vi&ecirc;n mới ra trường, theo &ocirc;ng Long. Do đ&oacute;, sinh vi&ecirc;n buộc phải t&iacute;ch lũy kinh nghiệm v&igrave; đ&oacute; l&agrave; ti&ecirc;u chuẩn nh&agrave; tuyển dụng đặt ra v&agrave; ng&agrave;y c&agrave;ng n&acirc;ng cao.</p>\r\n\r\n<p>&quot;Nếu bồi dưỡng v&agrave; t&iacute;ch lũy được kinh nghiệm l&agrave;m việc th&igrave; đ&oacute; sẽ l&agrave; điểm mạnh của bạn trong CV&quot;, &ocirc;ng Long n&oacute;i.</p>\r\n\r\n<p>&Ocirc;ng khuy&ecirc;n sinh vi&ecirc;n<strong>&nbsp;</strong>tr&acirc;n trọng hơn kỳ thực tập ở trường bởi đ&acirc;y l&agrave; thời gian để t&iacute;ch lũy kinh nghiệm l&agrave;m việc v&agrave; đưa v&agrave;o CV. Ngo&agrave;i ra, sinh vi&ecirc;n cũng n&ecirc;n tự chủ về t&agrave;i ch&iacute;nh bằng c&aacute;ch l&agrave;m th&ecirc;m, chẳng hạn l&agrave;m nh&acirc;n vi&ecirc;n b&aacute;n h&agrave;ng. C&ocirc;ng việc n&agrave;y nghe c&oacute; vẻ kh&ocirc;ng li&ecirc;n quan chuy&ecirc;n m&ocirc;n nhưng l&agrave; cơ hội để sinh vi&ecirc;n quan s&aacute;t c&aacute;ch doanh nghiệp vận h&agrave;nh, kiếm tiền, từ đ&oacute; vận dụng cho c&ocirc;ng việc thực tế sau n&agrave;y.</p>\r\n\r\n<p>Trước c&acirc;u hỏi l&agrave;m c&aacute;ch n&agrave;o để tạo ấn tượng với nh&agrave; tuyển dụng nếu kh&ocirc;ng c&oacute; điểm học tập cao v&agrave; nhiều kinh nghiệm l&agrave;m việc, &ocirc;ng Long n&oacute;i &quot;kh&ocirc;ng c&oacute; đường tắt&quot; n&agrave;o ngo&agrave;i việc phải tự bồi dưỡng năng lực, kiến thức. Sinh vi&ecirc;n c&oacute; thể tham gia một số kh&oacute;a học chuy&ecirc;n m&ocirc;n hay c&aacute;c kh&oacute;a kỹ năng giao tiếp, tin học văn ph&ograve;ng, ngoại ngữ để tăng cơ hội.</p>\r\n', 'Gần 70% trong số 3.000 nhà tuyển dụng ưu tiên kinh nghiệm của ứng viên, các tân cử nhân cần trang bị điều này nếu muốn cạnh tranh với nhân sự cũ.', '2023-12-16 22:47:08.305', '2023-12-16 22:47:08.291', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2FDien-song-2676-1651036599.jpg?alt=media&token=9a9a1cda-2cea-4ecd-9faa-9ae955107a50', '3', '11');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Sinh viên kinh tế tìm cách đầu quân cho công ty công nghệ', '<p>Ng&agrave;y 25/11, B&ugrave;i Thị Thu Trang tham dự FTU Career Fair - ng&agrave;y hội việc l&agrave;m lớn nhất trong năm của trường Đại học Ngoại thương. Nữ sinh năm cuối, chuy&ecirc;n ng&agrave;nh Tiếng Anh thương mại, rảo khắp gian h&agrave;ng của c&aacute;c c&ocirc;ng ty c&ocirc;ng nghệ. Trang cho biết quan t&acirc;m đến vị tr&iacute; nh&acirc;n sự, ph&acirc;n t&iacute;ch kinh doanh ở những c&ocirc;ng ty n&agrave;y.</p>\r\n\r\n<p>Nữ sinh cho rằng Tiếng Anh thương mại l&agrave; chuy&ecirc;n ng&agrave;nh rộng, học phủ khắp c&aacute;c kh&iacute;a cạnh của kinh tế, thương mại, n&ecirc;n nhiều sinh vi&ecirc;n kh&oacute; x&aacute;c định mục ti&ecirc;u việc l&agrave;m sau tốt nghiệp. Trang cũng từng c&oacute; thời gian m&ocirc;ng lung, nhưng sau kỳ thực tập tại vị tr&iacute; TA (Talent Acquisition - thu h&uacute;t nh&acirc;n t&agrave;i) ở một c&ocirc;ng ty c&ocirc;ng nghệ, c&ocirc; thấy đ&acirc;y l&agrave; nh&oacute;m doanh nghiệp tiềm năng. D&ugrave; xuất hiện l&agrave;n s&oacute;ng sa thải từ c&aacute;c c&ocirc;ng ty c&ocirc;ng nghệ, nhưng c&aacute;c vị tr&iacute; li&ecirc;n quan kinh doanh, nh&acirc;n sự vẫn cần thiết, ổn định.</p>\r\n\r\n<p>Tương tự, Nguyễn Năng Ho&agrave;ng, sinh vi&ecirc;n năm thứ nhất, ng&agrave;nh Kế to&aacute;n - Kiểm to&aacute;n, nh&igrave;n nhận đ&acirc;y vẫn l&agrave; lĩnh vực c&oacute; nhiều việc l&agrave;m v&agrave; kiếm việc nhanh. V&igrave; thế, Ho&agrave;ng gần như d&agrave;nh to&agrave;n bộ thời gian ở gian h&agrave;ng của C&ocirc;ng ty C&ocirc;ng nghệ Bravestars v&agrave; một số doanh nghiệp c&ugrave;ng lĩnh vực.</p>\r\n\r\n<p>&quot;C&ograve;n ba năm nữa mới tốt nghiệp, nhưng em vẫn muốn hỏi đại diện doanh nghiệp về những nhu cầu, định hướng của họ, từ đ&oacute; để m&igrave;nh biết n&ecirc;n học th&ecirc;m g&igrave;, cải thiện kỹ năng g&igrave;&quot;, Ho&agrave;ng n&oacute;i.</p>\r\n\r\n<p>Nhiều sinh vi&ecirc;n cũng chung mối quan t&acirc;m như Trang v&agrave; Ho&agrave;ng. Ng&agrave;y hội việc l&agrave;m c&oacute; hơn 40 doanh nghiệp tham dự, thu h&uacute;t khoảng 4.000 sinh vi&ecirc;n. C&aacute;c ng&acirc;n h&agrave;ng lớn vẫn thu h&uacute;t nhưng gian h&agrave;ng của c&aacute;c c&ocirc;ng ty c&ocirc;ng nghệ cũng chật k&iacute;n sinh vi&ecirc;n xếp h&agrave;ng, đặt c&acirc;u hỏi.</p>\r\n\r\n<p><img alt=\"Bùi Thị Thu Trang, sinh viên năm cuối, chuyên ngành Tiếng Anh Thương mại, trường Đại học Ngoại thương, đang trao đổi với đại diện doanh nghiệp tại FTU Career Fair, sáng 25/11. Ảnh: Thanh Hằng\" src=\"https://i1-vnexpress.vnecdn.net/2023/11/25/MG-7241-JPG-9648-1700910998.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=TwlzWw96eKpQw27TTQ2pxw\" /></p>\r\n\r\n<p>B&ugrave;i Thị Thu Trang, sinh vi&ecirc;n năm cuối, chuy&ecirc;n ng&agrave;nh Tiếng Anh Thương mại, trường Đại học Ngoại thương, đang trao đổi với đại diện doanh nghiệp tại FTU Career Fair, s&aacute;ng 25/11. Ảnh:&nbsp;<em>Thanh Hằng</em></p>\r\n\r\n<p>Đầu th&aacute;ng 11, PGS.TS Phạm Thu Hương, Ph&oacute; hiệu trưởng trường Đại học Ngoại thương, cho biết qua khảo s&aacute;t 54.000 cựu sinh vi&ecirc;n, c&ocirc;ng nghệ th&ocirc;ng tin l&agrave; một trong hai lĩnh vực việc l&agrave;m được lựa chọn h&agrave;ng đầu, c&oacute; xu hướng tăng trong v&agrave;i năm trở lại đ&acirc;y.</p>\r\n\r\n<p>B&agrave; Phạm Thị Thu Huyền, Trưởng ph&ograve;ng Thu h&uacute;t nh&acirc;n t&agrave;i v&agrave; Trải nghiệm nh&acirc;n vi&ecirc;n, Tập đo&agrave;n FPT, cũng nhận thấy số sinh vi&ecirc;n kinh tế đầu qu&acirc;n cho c&ocirc;ng ty c&ocirc;ng nghệ tăng trong khoảng 2-3 năm nay. T&iacute;nh ri&ecirc;ng tại FPT, nh&acirc;n sự tốt nghiệp c&aacute;c trường kinh tế tăng khoảng 20%.</p>\r\n\r\n<p>Tập đo&agrave;n c&ocirc;ng nghệ One Mount cũng ghi nhận số hồ sơ ứng tuyển của sinh vi&ecirc;n kinh tế tăng. B&agrave; Phạm Thị V&acirc;n, chuy&ecirc;n vi&ecirc;n cao cấp Ph&aacute;t triển thương hiệu, cho biết nh&oacute;m n&agrave;y thường l&agrave;m c&aacute;c vị tr&iacute; li&ecirc;n quan đến ph&acirc;n t&iacute;ch chiến lược kinh doanh, kiểm thử, quan hệ kh&aacute;ch h&agrave;ng, marketing.</p>\r\n\r\n<p>B&agrave; V&acirc;n n&oacute;i đ&uacute;ng l&agrave; nhiều c&ocirc;ng ty phải cắt giảm nh&acirc;n sự, nhưng đ&acirc;y hầu hết l&agrave; c&aacute;c vị tr&iacute; chưa mang về lợi &iacute;ch tương xứng với chi ph&iacute; đầu tư, vận h&agrave;nh. Trong khi đ&oacute;, doanh nghiệp n&agrave;o cũng cần t&igrave;m c&aacute;ch ti&ecirc;u thụ sản phẩm, n&ecirc;n nhu cầu tuyển dụng nh&acirc;n sự phụ tr&aacute;ch kinh doanh lại tăng l&ecirc;n.</p>\r\n\r\n<p>Ngo&agrave;i ra, quan niệm về việc l&agrave;m của sinh vi&ecirc;n cũng c&oacute; sự thay đổi. C&ocirc;ng nghệ trở n&ecirc;n gần gũi, kh&ocirc;ng c&ograve;n bị đ&oacute;ng khung rằng chỉ d&agrave;nh cho người tốt nghiệp c&aacute;c ng&agrave;nh kỹ thuật.</p>\r\n', 'Không chỉ săn việc ở các ngân hàng, ngày càng nhiều sinh viên muốn tìm cơ hội ở các công ty công nghệ vì cho rằng lĩnh vực này còn phát triển.', '2023-12-16 22:48:51.795', '2023-12-16 22:48:51.777', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2F233A8690-1702470885.jpg?alt=media&token=03442527-b96b-484a-8e26-f1c3ba51972c', '5', '10');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Chân váy da thành mốt hot năm 2024', '<p>Da được xem l&agrave; chất liệu kinh điển, gi&uacute;p người mặc trở n&ecirc;n sang trọng. Nếu m&ugrave;a lạnh năm nay, &aacute;o kho&aacute;c da được ưa chuộng, sang năm sau, ch&acirc;n v&aacute;y chất liệu n&agrave;y sẽ xuất hiện trong cả m&ugrave;a mốt Xu&acirc;n H&egrave; lẫn Thu Đ&ocirc;ng. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/00031-givenchy-spring-2024-ready-1702457608.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=G0b9_TuFBvGtMZpyCICgaQ\" /></p>\r\n\r\n<p>Trong khi Acne Studios tung ra ch&acirc;n v&aacute;y si&ecirc;u ngắn m&agrave;u n&acirc;u, Givenchy chọn phong c&aacute;ch sang trọng v&agrave; gợi cảm với ch&acirc;n v&aacute;y midi. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/00030-alaia-spring-2024-ready-to-1702457609.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=RpZz7E1U40BCFTR0DPZ9Sg\" /></p>\r\n\r\n<p>Ala&iuml;a đem tới v&aacute;y b&uacute;t ch&igrave; ngắn tới đầu gối, phối bra top đồng điệu. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/00008-ami-spring-2024-menswear-c-1702457610.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=V9k1D2VatmxWNF6xllQstQ\" /></p>\r\n\r\n<p>Ami tung ra kiểu v&aacute;y xẻ t&agrave; cao tới h&ocirc;ng, d&agrave;nh cho những c&ocirc; g&aacute;i tự tin về đ&ocirc;i ch&acirc;n. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/vay-da-1702457606.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=oVRuY56fQM4kA4_ZOFFLmA\" /></p>\r\n\r\n<p>Từ đầu m&ugrave;a thu, giới y&ecirc;u thời trang đ&atilde; theo đuổi phong c&aacute;ch n&agrave;y với c&aacute;ch phối đa dạng. Ảnh:&nbsp;<em>TST</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/vay-da-2-1702457607.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=wyg_1Lx59ef9JlF6M3aMFg\" /></p>\r\n\r\n<p>Theo&nbsp;<em>Vogue</em>, ch&acirc;n v&aacute;y da được nhiều người y&ecirc;u th&iacute;ch v&igrave; dễ phối đồ, ph&ugrave; hợp nhiều ho&agrave;n cảnh như đi chơi, đi l&agrave;m v&agrave; dự tiệc. Ảnh:&nbsp;<em>TST</em></p>\r\n', 'Chân váy da được nhiều hãng như Givenchy, Acne Studios, Alaïa lăng xê, trở thành mốt hot năm sau.', '2023-12-16 22:51:19.572', '2023-12-16 22:51:19.571', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fhinh-anh-dep-1.jpg?alt=media&token=7d9f0025-7c50-4c67-a89e-08211ec027ef', '3', '6');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Những truyền thống Giáng sinh ít người biết', '<p>Dưới đ&acirc;y l&agrave; một số phong tục v&agrave; truyền thống Gi&aacute;ng sinh tr&ecirc;n thế giới.</p>\r\n\r\n<p><strong>Động vật biết n&oacute;i trong đ&ecirc;m Gi&aacute;ng sinh ở Ba Lan</strong></p>\r\n\r\n<p>Ở Ba Lan người d&acirc;n tin rằng c&aacute;c con vật được ban tặng khả năng biết n&oacute;i trong đ&ecirc;m Gi&aacute;ng sinh. Ch&uacute;a Jesus gi&aacute;ng sinh b&ecirc;n m&aacute;ng cỏ vốn l&agrave; m&aacute;ng đựng thức ăn của gia s&uacute;c v&agrave; khi người ch&agrave;o đời, c&aacute;c lo&agrave;i vật trong trang trại đ&atilde; c&uacute;i đầu ch&agrave;o đ&oacute;n. Do đ&oacute;, c&aacute;c lo&agrave;i vật được ban tặng m&oacute;n qu&agrave; c&oacute; khả năng n&oacute;i tiếng người trong đ&ecirc;m 24/12. Nhiều trẻ em Ba Lan sẽ thường cố gắng tr&ograve; chuyện với c&aacute;c con ch&oacute;, m&egrave;o l&agrave; th&uacute; cưng của ch&uacute;ng trong đ&ecirc;m Noel.</p>\r\n\r\n<p><strong>Đ&oacute;n Gi&aacute;ng sinh sớm ở H&agrave; Lan</strong></p>\r\n\r\n<p>Tại H&agrave; Lan, người d&acirc;n đ&oacute;n Gi&aacute;ng sinh sớm. Đ&ecirc;m 5/12 được trẻ em mong chờ nhất v&igrave; th&aacute;nh Sinterklaas sẽ đến ph&aacute;t qu&agrave;. Ch&uacute;ng sẽ để một chiếc gi&agrave;y b&ecirc;n l&ograve; sưởi, h&aacute;t những b&agrave;i h&aacute;t Gi&aacute;ng sinh H&agrave; Lan v&agrave; chờ qu&agrave; đến.</p>\r\n\r\n<p><img alt=\"Một người đàn ông trong trang phục thánh Sinterklaas. Ảnh: Nos\" src=\"https://i1-dulich.vnecdn.net/2023/12/13/2048x1152-4228-1702400829.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=8XINP5asrdPGSFMWGZ3wIw\" /></p>\r\n\r\n<p>Một người đ&agrave;n &ocirc;ng trong trang phục th&aacute;nh Sinterklaas. Ảnh:&nbsp;<em>Nos</em></p>\r\n\r\n<p>Đức cũng c&oacute; truyền thống tương tự. Tối ng&agrave;y 5/12, một ng&agrave;y trước ng&agrave;y Th&aacute;nh Nicholas, trẻ em Đức sẽ đ&aacute;nh sạch gi&agrave;y v&agrave; để ch&uacute;ng gần l&ograve; sưởi. S&aacute;ng h&ocirc;m sau, ch&uacute;ng sẽ nhận được những chiếc gi&agrave;y chứa đầy chocolate v&agrave; kẹo ngọt, m&oacute;n qu&agrave; được th&aacute;nh Nicholas ban tặng như một lời khen ngợi v&igrave; đ&atilde; ngoan ngo&atilde;n suốt năm qua.</p>\r\n\r\n<p>Qu&yacute;t v&agrave; c&aacute;c m&oacute;n qu&agrave; nhỏ cũng được đặt trong gi&agrave;y, tương tự như tặng qu&agrave; Gi&aacute;ng sinh trong tất ở những quốc gia kh&aacute;c. Với những đứa trẻ chưa ngoan, khoai t&acirc;y thối l&agrave; &quot;phần thường&quot; thay thế kẹo đựng trong gi&agrave;y.</p>\r\n\r\n<p><strong>Trượt patin trong đ&ecirc;m Gi&aacute;ng sinh ở Venezuela</strong></p>\r\n\r\n<p>Nhiều người sẽ d&agrave;nh thời gian đ&ecirc;m Gi&aacute;ng sinh với bạn b&egrave; tại qu&aacute;n rượu địa phương, số kh&aacute;c uống chocolate v&agrave; xem một bộ phim tại nh&agrave;. Với người d&acirc;n Venezuela, đ&acirc;y l&agrave; một đ&ecirc;m trượt patin th&uacute; vị.</p>\r\n\r\n<p>V&agrave;o đ&ecirc;m Gi&aacute;ng sinh, người d&acirc;n thủ đ&ocirc; Caracas sẽ di chuyển đến c&aacute;c địa điểm linh thi&ecirc;ng dự th&aacute;nh lễ tr&ecirc;n gi&agrave;y trượt.</p>\r\n\r\n<p>Trượt băng dịp n&agrave;y l&agrave; truyền thống phổ biến đến mức nhiều con phố cấm &ocirc;t&ocirc; để người d&acirc;n trượt patin an to&agrave;n v&agrave; tận hưởng kh&ocirc;ng kh&iacute; lễ hội vui vẻ.</p>\r\n\r\n<p><strong>Mổ lợn dịp Gi&aacute;ng sinh ở Romania</strong></p>\r\n\r\n<p>C&aacute;c gia đ&igrave;nh ở v&ugrave;ng n&ocirc;ng th&ocirc;n sẽ tập trung lại v&agrave; hiến tế một con lợn được nu&ocirc;i trong nh&agrave;. Sau đ&oacute; họ d&ugrave;ng thịt của con lợn n&agrave;y để nấu đồ ăn cho dịp Gi&aacute;ng sinh. Sự kiện n&agrave;y thường diễn ra v&agrave;o ng&agrave;y 20/12 v&agrave; được gọi l&agrave; Ziua de Ignat. Ng&agrave;y nay, nhiều người d&acirc;n cho rằng đ&acirc;y l&agrave; một truyền thống t&agrave;n &aacute;c với động vật n&ecirc;n kh&ocirc;ng c&ograve;n phổ biến như trước.</p>\r\n\r\n<p><strong>&Ocirc;ng gi&agrave; Noel lướt s&oacute;ng tại Mỹ v&agrave; Australia</strong></p>\r\n\r\n<p>Gi&aacute;ng sinh ở Australia l&agrave; m&ugrave;a h&egrave;, thời tiết n&oacute;ng nực. Do đ&oacute; người d&acirc;n v&agrave; du kh&aacute;ch đ&atilde; quen thuộc với h&igrave;nh ảnh c&aacute;c &ocirc;ng gi&agrave; Noel mặc bộ đồ Gi&aacute;ng sinh đỏ rực, ch&acirc;n đi ủng v&agrave; lướt s&oacute;ng tr&ecirc;n mặt biển.</p>\r\n\r\n<p>Truyền thống lan rộng sang Mỹ, đặc biệt v&agrave;o s&aacute;ng ng&agrave;y 24/12, mọi người từ khắp đất nước tụ tập để xem h&agrave;ng trăm người lướt s&oacute;ng trong trang phục &ocirc;ng gi&agrave; Noel tr&ecirc;n b&atilde;i biển Cocoa ở bang Florida.</p>\r\n\r\n<p><strong>Mua xổ số dịp Gi&aacute;ng sinh ở T&acirc;y Ban Nha</strong></p>\r\n\r\n<p>Xổ số Gi&aacute;ng sinh ở T&acirc;y Ban Nha hay El Gordo l&agrave; một trong những giải xổ số lớn nhất thế giới v&igrave; tiền thưởng l&ecirc;n đến 2 tỷ euro. Hầu hết người d&acirc;n đều mua. Truyền thống n&agrave;y bắt đầu từ năm 1812 v&agrave; đến nay n&oacute; vẫn l&agrave; một truyền thống th&uacute; vị, được người d&acirc;n T&acirc;y Ban Nha y&ecirc;u th&iacute;ch.</p>\r\n', 'Người Ba Lan tin rằng động vật sẽ biết nói vào đêm Giáng sinh còn người dân Tây Ban Nha đổ xô đi mua sổ xố.', '2023-12-16 22:53:17.022', '2023-12-16 22:53:17.021', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2FVNE-Probe-6416-1702438337.jpg?alt=media&token=12b094b3-a21b-4d62-bec4-8e2ec6b9ad07', '2', '9');
+INSERT INTO `ims`.`post` ( `Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES (' Thời sựChính trịThứ sáu, 15/12/2023, 17:57 (GMT+7) Chủ tịch tỉnh Vĩnh Phúc có hơn 53% phiếu tín nhiệm thấp', '<p>Kết quả lấy phiếu t&iacute;n nhiệm của HĐND tỉnh Vĩnh Ph&uacute;c ng&agrave;y 13/12 cho thấy &ocirc;ng L&ecirc; Duy Th&agrave;nh c&oacute; 19 phiếu t&iacute;n nhiệm cao (40,43%); hai phiếu t&iacute;n nhiệm (4,26%); 25 phiếu t&iacute;n nhiệm thấp (53,19%).</p>\r\n\r\n<p>&Ocirc;ng Th&agrave;nh l&agrave; người c&oacute; số phiếu &quot;t&iacute;n nhiệm cao&quot; thấp nhất v&agrave; phiếu &quot;t&iacute;n nhiệm thấp&quot; nhiều nhất. &Ocirc;ng cũng l&agrave; trường hợp duy nhất nhận qu&aacute; nửa số phiếu t&iacute;n nhiệm thấp.</p>\r\n\r\n<p>&Ocirc;ng Th&agrave;nh đ&atilde; c&oacute; hơn hai năm giữ vị tr&iacute; Chủ tịch UBND tỉnh Vĩnh Ph&uacute;c. Th&aacute;ng 10/2020, khi đang l&agrave;m Ph&oacute; b&iacute; thư Tỉnh ủy, Ph&oacute; chủ tịch Thường trực UBND tỉnh Vĩnh Ph&uacute;c, &ocirc;ng được giới thiệu v&agrave; bầu l&agrave;m Chủ tịch UBND tỉnh với 100% (47/47) số phiếu đồng &yacute;.</p>\r\n\r\n<p>Đợt lấy phiếu t&iacute;n nhiệm năm 2018, &ocirc;ng Th&agrave;nh l&uacute;c đ&oacute; l&agrave; Ph&oacute; chủ tịch UBND tỉnh, đứng ở top giữa, với 33 phiếu t&iacute;n nhiệm cao (67,3); 9 t&iacute;n nhiệm (18,3); 6 t&iacute;n nhiệm thấp (12,2%).</p>\r\n\r\n<p><img alt=\"Ông Lê Duy Thành, Chủ tịch UBND tỉnh Vĩnh Phúc tại cuộc họp tháng 11/2023. Ảnh: Cổng thông tin tỉnh Vĩnh Phúc\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/15/23112023-dientapkvptvinhyen-01-9172-8725-1702637283.png?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=u_oQjhO0_dURphcBJEHAlw\" /></p>\r\n\r\n<p>&Ocirc;ng L&ecirc; Duy Th&agrave;nh, Chủ tịch UBND tỉnh Vĩnh Ph&uacute;c tại cuộc họp th&aacute;ng 11/2023. Ảnh:&nbsp;<em>Cổng th&ocirc;ng tin tỉnh Vĩnh Ph&uacute;c</em></p>\r\n\r\n<p>Theo Nghị quyết 96/2023 của Quốc hội hồi th&aacute;ng 6, c&aacute;n bộ c&oacute; qu&aacute; nửa đến dưới 2/3 tổng số đại biểu đ&aacute;nh gi&aacute; &quot;t&iacute;n nhiệm thấp&quot; phải xin từ chức trong kh&ocirc;ng qu&aacute; 10 ng&agrave;y kể từ ng&agrave;y c&ocirc;ng bố kết quả lấy phiếu t&iacute;n nhiệm. Nếu c&aacute;n bộ kh&ocirc;ng xin từ chức th&igrave; thường trực HĐND tr&igrave;nh HĐND tiến h&agrave;nh bỏ phiếu t&iacute;n nhiệm (với hai mức t&iacute;n nhiệm hoặc kh&ocirc;ng t&iacute;n nhiệm).</p>\r\n\r\n<p>Người được bỏ phiếu t&iacute;n nhiệm nhận được hơn 50% đ&aacute;nh gi&aacute; &quot;kh&ocirc;ng t&iacute;n nhiệm&quot; th&igrave; sẽ bị xem x&eacute;t miễn nhiệm.</p>\r\n\r\n<p>&Ocirc;ng L&ecirc; Duy Th&agrave;nh 54 tuổi, qu&ecirc; Vĩnh Ph&uacute;c; tr&igrave;nh độ tiến sĩ kinh tế. Trước khi được bầu l&agrave;m Chủ tịch UBND tỉnh, &ocirc;ng Th&agrave;nh kinh qua nhiều chức vụ tại Vĩnh Ph&uacute;c như Cục ph&oacute; Cục thuế tỉnh; B&iacute; thư Huyện ủy Lập Thạch; Ph&oacute; b&iacute; thư Tỉnh ủy; Ph&oacute; chủ tịch UBND tỉnh.</p>\r\n', 'Ông Lê Duy Thành, Chủ tịch UBND tỉnh Vĩnh Phúc nhận 53,19% số phiếu tín nhiệm thấp, nhiều nhất trong số 28 chức danh được lấy phiếu.', '2023-12-15 20:19:52.251', '2023-12-15 20:21:34.067', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2FVNEDog-1702524615-3901-1702524656.jpg?alt=media&token=03b3768b-3ddb-4d5f-bd68-d7c055f67cb1', '1', '9');
+INSERT INTO `ims`.`post` ( `Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `AuthorId`, `CategoryId`) VALUES ( 'Nga phóng tên lửa Kinzhal vào Ukraine khi ông Putin họp báo', '<p>&quot;Một t&ecirc;n lửa si&ecirc;u vượt &acirc;m Kinzhal được ph&oacute;ng về ph&iacute;a th&agrave;nh phố Starokostiantyniv thuộc tỉnh Khmelnitsky. T&ecirc;n lửa lao xuống tỉnh Khmetnitsky chỉ khoảng 10 ph&uacute;t sau khi b&aacute;o động ph&ograve;ng kh&ocirc;ng to&agrave;n quốc được ph&aacute;t ra&quot;, ph&aacute;t ng&ocirc;n vi&ecirc;n kh&ocirc;ng qu&acirc;n Ukraine Yuri Ignat th&ocirc;ng b&aacute;o tr&ecirc;n truyền h&igrave;nh h&ocirc;m 14/12.</p>\r\n\r\n<p><img alt=\"Tiêm kích MiG-31K Nga phóng tên lửa Kinzhal trong thử nghiệm năm 2018. Ảnh: BQP Nga\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/15/kinzhal-3-1403-1702581863.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=1mzycwk6Vr4ZKfg7B0xdgw\" /></p>\r\n\r\n<p>Ti&ecirc;m k&iacute;ch MiG-31K Nga ph&oacute;ng t&ecirc;n lửa Kinzhal trong thử nghiệm năm 2018. Ảnh:&nbsp;<em>BQP Nga</em></p>\r\n\r\n<p>&Ocirc;ng Ignat n&oacute;i rằng khu vực Starokostiantyniv c&oacute; nhiều cơ sở qu&acirc;n sự, khiến đ&acirc;y l&agrave; mục ti&ecirc;u tấn c&ocirc;ng ưu ti&ecirc;n của qu&acirc;n đội Nga. &quot;Ch&uacute;ng t&ocirc;i sẽ kh&ocirc;ng tiết lộ hậu quả của đ&ograve;n đ&aacute;nh. H&atilde;y để đối phương tự r&uacute;t ra kết luận về mục ti&ecirc;u v&agrave; địa điểm tr&uacute;ng t&ecirc;n lửa&quot;, ph&aacute;t ng&ocirc;n vi&ecirc;n kh&ocirc;ng qu&acirc;n Ukraine n&oacute;i.</p>\r\n\r\n<p>Đ&acirc;y l&agrave; lần đầu ti&ecirc;n Nga sử dụng t&ecirc;n lửa si&ecirc;u vượt &acirc;m Kinzhal để tập k&iacute;ch Ukraine sau nhiều th&aacute;ng chỉ khai hỏa t&ecirc;n lửa h&agrave;nh tr&igrave;nh v&agrave; m&aacute;y bay kh&ocirc;ng người l&aacute;i (UAV) tự s&aacute;t. Cuộc tập k&iacute;ch diễn ra c&ugrave;ng thời điểm Tổng thống Vladimir Putin tổ chức cuộc họp b&aacute;o cuối năm d&agrave;i 4 tiếng.</p>\r\n\r\n<p>Trong cuộc họp b&aacute;o, &ocirc;ng Putin tuy&ecirc;n bố mục ti&ecirc;u chiến dịch ở Ukraine kh&ocirc;ng thay đổi, đ&oacute; l&agrave; &quot;phi ph&aacute;t x&iacute;t h&oacute;a, phi qu&acirc;n sự h&oacute;a v&agrave; đảm bảo t&igrave;nh trạng trung lập của Ukraine&quot;. &Ocirc;ng khẳng định h&ograve;a b&igrave;nh ở Ukraine chỉ đến khi Nga đạt được mục ti&ecirc;u của m&igrave;nh.</p>\r\n\r\n<p>Truyền th&ocirc;ng Ukraine sau đ&oacute; th&ocirc;ng b&aacute;o &iacute;t nhất ba tiếng nổ lớn đ&atilde; vang l&ecirc;n gần s&acirc;n bay quốc tế Zhulyany ở thủ đ&ocirc; Kiev, nơi triển khai trận địa t&ecirc;n lửa ph&ograve;ng kh&ocirc;ng Patriot. Cơ quan qu&acirc;n sự thủ đ&ocirc; Kiev cho hay ti&ecirc;m k&iacute;ch MiG-31K Nga đ&atilde; ph&oacute;ng t&ecirc;n lửa Kinzhal về ph&iacute;a th&agrave;nh phố v&agrave; k&ecirc;u gọi người d&acirc;n t&igrave;m nơi tr&uacute; ẩn.</p>\r\n\r\n<p>&quot;C&aacute;c hệ thống ph&ograve;ng kh&ocirc;ng đ&atilde; tham chiến v&agrave; bắn rơi một quả đạn của đối phương&quot;, ph&aacute;t ng&ocirc;n vi&ecirc;n Ignat cho hay khi được đề nghị b&igrave;nh luận về những tiếng nổ tr&ecirc;n v&ugrave;ng trời Kiev.</p>\r\n\r\n<p>Bộ Quốc ph&ograve;ng Nga chưa l&ecirc;n tiếng về th&ocirc;ng tin.</p>\r\n\r\n<p>Nga từng nhiều lần tấn c&ocirc;ng s&acirc;n bay trọng yếu ở Starokostiantyniv, do đ&acirc;y l&agrave; căn cứ chủ chốt của kh&ocirc;ng qu&acirc;n Ukraine v&agrave; l&agrave; điểm đ&oacute;ng qu&acirc;n của phi đội cường k&iacute;ch Su-24M trang bị t&ecirc;n lửa dẫn đường Storm Shadow/SCALP-EG được Anh v&agrave; Ph&aacute;p viện trợ.</p>\r\n\r\n<p>Giới chuy&ecirc;n gia cho rằng c&oacute; nhiều l&yacute; do khiến Nga chưa thể ngăn chặn ho&agrave;n to&agrave;n mối đe dọa từ t&ecirc;n lửa Storm Shadow/SCALP-EG, buộc họ li&ecirc;n tục tập k&iacute;ch căn cứ đ&oacute;ng qu&acirc;n của phi đội Su-24M Ukraine.</p>\r\n', 'Nga phóng tên lửa siêu vượt âm Kinzhal nhằm vào Ukraine, cùng lúc ông Putin họp báo cuối năm và tuyên bố sẽ theo đuổi chiến dịch nhắm vào Kiev.', '2023-12-16 22:41:38.176', '2023-12-16 22:41:38.173', '1', '2', '7');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Chuyến công du kêu gọi viện trợ gây thất vọng của ông Zelensky', '<p>Tổng thống Ukraine Volodymyr Zelensky từng được ch&agrave;o đ&oacute;n như người h&ugrave;ng trong chuyến thăm 10 tiếng tới Washington gần một năm trước. Tuy nhi&ecirc;n, lần n&agrave;y mọi thứ đ&atilde; kh&aacute;c nhiều.</p>\r\n\r\n<p>Chuyến thăm của Tổng thống Zelensky tới Washington h&ocirc;m 12/12 l&agrave; lần thứ hai l&atilde;nh đạo Ukraine tới quốc hội Mỹ trong ba th&aacute;ng qua, nhưng sự tiếp đ&oacute;n d&agrave;nh cho &ocirc;ng từ ph&iacute;a đảng Cộng h&ograve;a tương đối lạnh nhạt, đặc biệt ở Hạ viện.</p>\r\n\r\n<p>Chuyến c&ocirc;ng du của &ocirc;ng, do Nh&agrave; Trắng sắp xếp trong bối cảnh Ukraine tiến gần tới bờ vực cạn nguồn vũ kh&iacute; v&agrave; t&agrave;i ch&iacute;nh, diễn ra đ&uacute;ng l&uacute;c Đồi Capitol đối mặt nhiều bất đồng về viện trợ cho Ukraine. C&aacute;c th&agrave;nh vi&ecirc;n đảng Cộng h&ograve;a đ&atilde; y&ecirc;u cầu ch&iacute;nh quyền Tổng thống Biden siết chặt c&aacute;c biện ph&aacute;p kiểm so&aacute;t nhập cư ở bi&ecirc;n giới ph&iacute;a nam, coi đ&oacute; như điều kiện để th&ocirc;ng qua đề xuất viện trợ mới của &ocirc;ng, điều m&agrave; Nh&agrave; Trắng ki&ecirc;n quyết b&aacute;c bỏ.</p>\r\n\r\n<p><img alt=\"Tổng thống Mỹ Joe Biden (phải) và Tổng thống Ukraine Volodymyr Zelensky tại Nhà Trắng ngày 12/12. Ảnh: Reuters\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/13/2023-12-12t175935z-1154230774-3129-5408-1702462771.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=kr8by1oqsOo3WGKidDPAQg\" /></p>\r\n\r\n<p>Tổng thống Mỹ Joe Biden (phải) v&agrave; Tổng thống Ukraine Volodymyr Zelensky tại Nh&agrave; Trắng ng&agrave;y 12/12. Ảnh:<em>&nbsp;Reuters</em></p>\r\n\r\n<p>Ph&aacute;t biểu trước c&aacute;c nghị sĩ Mỹ ở Đồi Capitol, &ocirc;ng&nbsp;<a href=\"https://vnexpress.net/chu-de/volodymyr-zelensky-4565\">Zelensky</a>&nbsp;khẳng định Ukraine sẽ kh&ocirc;ng từ bỏ trong cuộc chiến chống lại Nga, nhưng cảnh b&aacute;o nếu kh&ocirc;ng c&oacute; hỗ trợ từ phương T&acirc;y, xung đột sẽ trở n&ecirc;n t&agrave;n khốc, khi qu&acirc;n đội của &ocirc;ng kh&ocirc;ng thể bảo vệ l&atilde;nh thổ trước đối thủ được trang bị tốt hơn.</p>\r\n\r\n<p>Ph&aacute;t biểu tại Nh&agrave; Trắng sau đ&oacute;, &ocirc;ng Zelensky m&ocirc; tả cuộc thảo luận ở quốc hội Mỹ &quot;tr&ecirc;n cả t&iacute;ch cực&quot;, song thừa nhận người Ukraine sẽ phải nh&igrave;n v&agrave;o kết quả thực tế hơn lời n&oacute;i su&ocirc;ng.</p>\r\n\r\n<p>&quot;Điều quan trọng l&agrave; tới cuối năm nay, ch&uacute;ng ta c&oacute; thể gửi t&iacute;n hiệu mạnh mẽ về sự đo&agrave;n kết đến đối phương. Đ&oacute; l&agrave; sự đo&agrave;n kết của Ukraine, Mỹ, ch&acirc;u &Acirc;u v&agrave; to&agrave;n thế giới&quot;, &ocirc;ng n&oacute;i.</p>\r\n\r\n<p>Đứng cạnh Tổng thống Zelensky trong cuộc họp b&aacute;o chung tại Nh&agrave; Trắng, &ocirc;ng Biden cảnh b&aacute;o Tổng thống Nga&nbsp;<a href=\"https://vnexpress.net/chu-de/vladimir-putin-1614\">Vladimir Putin</a>&nbsp;đang hy vọng Mỹ sẽ ngừng hỗ trợ cho Ukraine. &quot;Ch&uacute;ng ta phải chứng minh &ocirc;ng ấy đ&atilde; sai&quot;, &ocirc;ng n&oacute;i.</p>\r\n\r\n<p>Tuy nhi&ecirc;n, dường như c&oacute; rất &iacute;t hy vọng cho điều đ&oacute; trong thời gian tới.</p>\r\n\r\n<p>Sau cuộc trao đổi ri&ecirc;ng với &ocirc;ng Zelensky, c&aacute;c thượng nghị sĩ Mỹ cho biết b&agrave;i ph&aacute;t biểu của Tổng thống Ukraine đầy cảm x&uacute;c, nhưng dường như kh&ocirc;ng thể t&aacute;c động đến t&igrave;nh cảnh bế tắc ở quốc hội Mỹ hoặc th&uacute;c đẩy họ ph&ecirc; duyệt viện trợ bổ sung trước khi c&aacute;c nh&agrave; lập ph&aacute;p bước v&agrave;o kỳ nghỉ cuối năm từ tuần tới.</p>\r\n\r\n<p>Quốc hội Mỹ đến nay đ&atilde; ph&ecirc; duyệt hơn 111 tỷ USD hỗ trợ Ukraine. Y&ecirc;u cầu viện trợ bổ sung cho Ukraine của &ocirc;ng Biden l&agrave; một phần trong g&oacute;i ng&acirc;n s&aacute;ch lớn hơn m&agrave; Nh&agrave; Trắng y&ecirc;u cầu, trong đ&oacute; gồm cả viện trợ cho Israel v&agrave; giải quyết những th&aacute;ch thức về d&ograve;ng người nhập cư ở bi&ecirc;n giới Mỹ - Mexico.</p>\r\n', 'Tổng thống Zelensky tới Washington với hy vọng có thể thuyết phục quốc hội Mỹ thông qua gói viện trợ 60 tỷ USD, nhưng trở về với cam kết chỉ 200 triệu USD.', '2023-12-16 22:44:56.239', '2023-12-16 22:44:56.238', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fz4967516570263-7bf622a2d145df8f18d2303f0dfe9aaa-1702379979.jpg?alt=media&token=57a140d0-5360-4062-9b7c-d031fb1ab9cb', '3', '8');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Doanh nghiệp ưu tiên kinh nghiệm, tân cử nhân cần làm gì?', '<p>Tại Ng&agrave;y hội việc l&agrave;m do trường Đại học H&agrave; Nội tổ chức h&ocirc;m 15/12, &ocirc;ng Nguyễn Bảo Long, Trưởng ph&ograve;ng ph&aacute;t triển cộng đồng v&agrave; quan hệ đối t&aacute;c, C&ocirc;ng ty TopCV Việt Nam, cho biết h&agrave;ng năm, c&ocirc;ng ty đều phỏng vấn khoảng 3.000 nh&agrave; tuyển dụng, xem nhu cầu của họ thế n&agrave;o.</p>\r\n\r\n<p>Theo b&aacute;o c&aacute;o thị trường tuyển dụng 2022 v&agrave; nhu cầu năm 2023, điều doanh nghiệp quan t&acirc;m nhất trong CV (hồ sơ xin việc) của ứng vi&ecirc;n l&agrave; kinh nghiệm thực tế, chiếm 69,4%. Kỹ năng mềm l&agrave; yếu tố quan trọng thứ hai với 54,1% nh&agrave; tuyển dụng lựa chọn. Học vấn của ứng vi&ecirc;n đứng thứ ba với 33,3%.</p>\r\n\r\n<p>Cũng theo &ocirc;ng Long, năm 2022 nh&agrave; tuyển dụng d&agrave;nh 20% chỉ ti&ecirc;u cho sinh vi&ecirc;n mới ra trường, nhưng năm nay chỉ c&ograve;n 10%.</p>\r\n\r\n<p>&quot;Doanh nghiệp ng&agrave;y c&agrave;ng ưu ti&ecirc;n tuyển nh&acirc;n sự c&oacute; kinh nghiệm&quot;, &ocirc;ng Long n&oacute;i. &Ocirc;ng l&yacute; giải, kinh tế kh&oacute; khăn, doanh nghiệp phải tối ưu chi ph&iacute;, việc tuyển nh&acirc;n sự c&oacute; kinh nghiệm gi&uacute;p họ đỡ c&ocirc;ng đ&agrave;o tạo.</p>\r\n\r\n<p><img alt=\"Ông Nguyễn Bảo Long trong buổi chia sẻ với sinh viên HANU hôm 15/12. Ảnh: HANU\" src=\"https://i1-vnexpress.vnecdn.net/2023/12/16/tu-van-3260-1702723704.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=Rfbf9cjUbiENfCERxZ39Zw\" /></p>\r\n\r\n<p>&Ocirc;ng Nguyễn Bảo Long chia sẻ với sinh vi&ecirc;n HANU h&ocirc;m 15/12. Ảnh:&nbsp;<em>HANU</em></p>\r\n\r\n<p>Ngo&agrave;i ra, những nh&acirc;n sự c&oacute; kinh nghiệm sẵn s&agrave;ng giảm lương để c&oacute; thể cạnh tranh với sinh vi&ecirc;n mới ra trường, theo &ocirc;ng Long. Do đ&oacute;, sinh vi&ecirc;n buộc phải t&iacute;ch lũy kinh nghiệm v&igrave; đ&oacute; l&agrave; ti&ecirc;u chuẩn nh&agrave; tuyển dụng đặt ra v&agrave; ng&agrave;y c&agrave;ng n&acirc;ng cao.</p>\r\n\r\n<p>&quot;Nếu bồi dưỡng v&agrave; t&iacute;ch lũy được kinh nghiệm l&agrave;m việc th&igrave; đ&oacute; sẽ l&agrave; điểm mạnh của bạn trong CV&quot;, &ocirc;ng Long n&oacute;i.</p>\r\n\r\n<p>&Ocirc;ng khuy&ecirc;n sinh vi&ecirc;n<strong>&nbsp;</strong>tr&acirc;n trọng hơn kỳ thực tập ở trường bởi đ&acirc;y l&agrave; thời gian để t&iacute;ch lũy kinh nghiệm l&agrave;m việc v&agrave; đưa v&agrave;o CV. Ngo&agrave;i ra, sinh vi&ecirc;n cũng n&ecirc;n tự chủ về t&agrave;i ch&iacute;nh bằng c&aacute;ch l&agrave;m th&ecirc;m, chẳng hạn l&agrave;m nh&acirc;n vi&ecirc;n b&aacute;n h&agrave;ng. C&ocirc;ng việc n&agrave;y nghe c&oacute; vẻ kh&ocirc;ng li&ecirc;n quan chuy&ecirc;n m&ocirc;n nhưng l&agrave; cơ hội để sinh vi&ecirc;n quan s&aacute;t c&aacute;ch doanh nghiệp vận h&agrave;nh, kiếm tiền, từ đ&oacute; vận dụng cho c&ocirc;ng việc thực tế sau n&agrave;y.</p>\r\n\r\n<p>Trước c&acirc;u hỏi l&agrave;m c&aacute;ch n&agrave;o để tạo ấn tượng với nh&agrave; tuyển dụng nếu kh&ocirc;ng c&oacute; điểm học tập cao v&agrave; nhiều kinh nghiệm l&agrave;m việc, &ocirc;ng Long n&oacute;i &quot;kh&ocirc;ng c&oacute; đường tắt&quot; n&agrave;o ngo&agrave;i việc phải tự bồi dưỡng năng lực, kiến thức. Sinh vi&ecirc;n c&oacute; thể tham gia một số kh&oacute;a học chuy&ecirc;n m&ocirc;n hay c&aacute;c kh&oacute;a kỹ năng giao tiếp, tin học văn ph&ograve;ng, ngoại ngữ để tăng cơ hội.</p>\r\n', 'Gần 70% trong số 3.000 nhà tuyển dụng ưu tiên kinh nghiệm của ứng viên, các tân cử nhân cần trang bị điều này nếu muốn cạnh tranh với nhân sự cũ.', '2023-12-16 22:47:08.305', '2023-12-16 22:47:08.291', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2FDien-song-2676-1651036599.jpg?alt=media&token=9a9a1cda-2cea-4ecd-9faa-9ae955107a50', '4', '9');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Sinh viên kinh tế tìm cách đầu quân cho công ty công nghệ', '<p>Ng&agrave;y 25/11, B&ugrave;i Thị Thu Trang tham dự FTU Career Fair - ng&agrave;y hội việc l&agrave;m lớn nhất trong năm của trường Đại học Ngoại thương. Nữ sinh năm cuối, chuy&ecirc;n ng&agrave;nh Tiếng Anh thương mại, rảo khắp gian h&agrave;ng của c&aacute;c c&ocirc;ng ty c&ocirc;ng nghệ. Trang cho biết quan t&acirc;m đến vị tr&iacute; nh&acirc;n sự, ph&acirc;n t&iacute;ch kinh doanh ở những c&ocirc;ng ty n&agrave;y.</p>\r\n\r\n<p>Nữ sinh cho rằng Tiếng Anh thương mại l&agrave; chuy&ecirc;n ng&agrave;nh rộng, học phủ khắp c&aacute;c kh&iacute;a cạnh của kinh tế, thương mại, n&ecirc;n nhiều sinh vi&ecirc;n kh&oacute; x&aacute;c định mục ti&ecirc;u việc l&agrave;m sau tốt nghiệp. Trang cũng từng c&oacute; thời gian m&ocirc;ng lung, nhưng sau kỳ thực tập tại vị tr&iacute; TA (Talent Acquisition - thu h&uacute;t nh&acirc;n t&agrave;i) ở một c&ocirc;ng ty c&ocirc;ng nghệ, c&ocirc; thấy đ&acirc;y l&agrave; nh&oacute;m doanh nghiệp tiềm năng. D&ugrave; xuất hiện l&agrave;n s&oacute;ng sa thải từ c&aacute;c c&ocirc;ng ty c&ocirc;ng nghệ, nhưng c&aacute;c vị tr&iacute; li&ecirc;n quan kinh doanh, nh&acirc;n sự vẫn cần thiết, ổn định.</p>\r\n\r\n<p>Tương tự, Nguyễn Năng Ho&agrave;ng, sinh vi&ecirc;n năm thứ nhất, ng&agrave;nh Kế to&aacute;n - Kiểm to&aacute;n, nh&igrave;n nhận đ&acirc;y vẫn l&agrave; lĩnh vực c&oacute; nhiều việc l&agrave;m v&agrave; kiếm việc nhanh. V&igrave; thế, Ho&agrave;ng gần như d&agrave;nh to&agrave;n bộ thời gian ở gian h&agrave;ng của C&ocirc;ng ty C&ocirc;ng nghệ Bravestars v&agrave; một số doanh nghiệp c&ugrave;ng lĩnh vực.</p>\r\n\r\n<p>&quot;C&ograve;n ba năm nữa mới tốt nghiệp, nhưng em vẫn muốn hỏi đại diện doanh nghiệp về những nhu cầu, định hướng của họ, từ đ&oacute; để m&igrave;nh biết n&ecirc;n học th&ecirc;m g&igrave;, cải thiện kỹ năng g&igrave;&quot;, Ho&agrave;ng n&oacute;i.</p>\r\n\r\n<p>Nhiều sinh vi&ecirc;n cũng chung mối quan t&acirc;m như Trang v&agrave; Ho&agrave;ng. Ng&agrave;y hội việc l&agrave;m c&oacute; hơn 40 doanh nghiệp tham dự, thu h&uacute;t khoảng 4.000 sinh vi&ecirc;n. C&aacute;c ng&acirc;n h&agrave;ng lớn vẫn thu h&uacute;t nhưng gian h&agrave;ng của c&aacute;c c&ocirc;ng ty c&ocirc;ng nghệ cũng chật k&iacute;n sinh vi&ecirc;n xếp h&agrave;ng, đặt c&acirc;u hỏi.</p>\r\n\r\n<p><img alt=\"Bùi Thị Thu Trang, sinh viên năm cuối, chuyên ngành Tiếng Anh Thương mại, trường Đại học Ngoại thương, đang trao đổi với đại diện doanh nghiệp tại FTU Career Fair, sáng 25/11. Ảnh: Thanh Hằng\" src=\"https://i1-vnexpress.vnecdn.net/2023/11/25/MG-7241-JPG-9648-1700910998.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=TwlzWw96eKpQw27TTQ2pxw\" /></p>\r\n\r\n<p>B&ugrave;i Thị Thu Trang, sinh vi&ecirc;n năm cuối, chuy&ecirc;n ng&agrave;nh Tiếng Anh Thương mại, trường Đại học Ngoại thương, đang trao đổi với đại diện doanh nghiệp tại FTU Career Fair, s&aacute;ng 25/11. Ảnh:&nbsp;<em>Thanh Hằng</em></p>\r\n\r\n<p>Đầu th&aacute;ng 11, PGS.TS Phạm Thu Hương, Ph&oacute; hiệu trưởng trường Đại học Ngoại thương, cho biết qua khảo s&aacute;t 54.000 cựu sinh vi&ecirc;n, c&ocirc;ng nghệ th&ocirc;ng tin l&agrave; một trong hai lĩnh vực việc l&agrave;m được lựa chọn h&agrave;ng đầu, c&oacute; xu hướng tăng trong v&agrave;i năm trở lại đ&acirc;y.</p>\r\n\r\n<p>B&agrave; Phạm Thị Thu Huyền, Trưởng ph&ograve;ng Thu h&uacute;t nh&acirc;n t&agrave;i v&agrave; Trải nghiệm nh&acirc;n vi&ecirc;n, Tập đo&agrave;n FPT, cũng nhận thấy số sinh vi&ecirc;n kinh tế đầu qu&acirc;n cho c&ocirc;ng ty c&ocirc;ng nghệ tăng trong khoảng 2-3 năm nay. T&iacute;nh ri&ecirc;ng tại FPT, nh&acirc;n sự tốt nghiệp c&aacute;c trường kinh tế tăng khoảng 20%.</p>\r\n\r\n<p>Tập đo&agrave;n c&ocirc;ng nghệ One Mount cũng ghi nhận số hồ sơ ứng tuyển của sinh vi&ecirc;n kinh tế tăng. B&agrave; Phạm Thị V&acirc;n, chuy&ecirc;n vi&ecirc;n cao cấp Ph&aacute;t triển thương hiệu, cho biết nh&oacute;m n&agrave;y thường l&agrave;m c&aacute;c vị tr&iacute; li&ecirc;n quan đến ph&acirc;n t&iacute;ch chiến lược kinh doanh, kiểm thử, quan hệ kh&aacute;ch h&agrave;ng, marketing.</p>\r\n\r\n<p>B&agrave; V&acirc;n n&oacute;i đ&uacute;ng l&agrave; nhiều c&ocirc;ng ty phải cắt giảm nh&acirc;n sự, nhưng đ&acirc;y hầu hết l&agrave; c&aacute;c vị tr&iacute; chưa mang về lợi &iacute;ch tương xứng với chi ph&iacute; đầu tư, vận h&agrave;nh. Trong khi đ&oacute;, doanh nghiệp n&agrave;o cũng cần t&igrave;m c&aacute;ch ti&ecirc;u thụ sản phẩm, n&ecirc;n nhu cầu tuyển dụng nh&acirc;n sự phụ tr&aacute;ch kinh doanh lại tăng l&ecirc;n.</p>\r\n\r\n<p>Ngo&agrave;i ra, quan niệm về việc l&agrave;m của sinh vi&ecirc;n cũng c&oacute; sự thay đổi. C&ocirc;ng nghệ trở n&ecirc;n gần gũi, kh&ocirc;ng c&ograve;n bị đ&oacute;ng khung rằng chỉ d&agrave;nh cho người tốt nghiệp c&aacute;c ng&agrave;nh kỹ thuật.</p>\r\n', 'Không chỉ săn việc ở các ngân hàng, ngày càng nhiều sinh viên muốn tìm cơ hội ở các công ty công nghệ vì cho rằng lĩnh vực này còn phát triển.', '2023-12-16 22:48:51.795', '2023-12-16 22:48:51.777', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2F233A8690-1702470885.jpg?alt=media&token=03442527-b96b-484a-8e26-f1c3ba51972c', '1', '7');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Chân váy da thành mốt hot năm 2024', '<p>Da được xem l&agrave; chất liệu kinh điển, gi&uacute;p người mặc trở n&ecirc;n sang trọng. Nếu m&ugrave;a lạnh năm nay, &aacute;o kho&aacute;c da được ưa chuộng, sang năm sau, ch&acirc;n v&aacute;y chất liệu n&agrave;y sẽ xuất hiện trong cả m&ugrave;a mốt Xu&acirc;n H&egrave; lẫn Thu Đ&ocirc;ng. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/00031-givenchy-spring-2024-ready-1702457608.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=G0b9_TuFBvGtMZpyCICgaQ\" /></p>\r\n\r\n<p>Trong khi Acne Studios tung ra ch&acirc;n v&aacute;y si&ecirc;u ngắn m&agrave;u n&acirc;u, Givenchy chọn phong c&aacute;ch sang trọng v&agrave; gợi cảm với ch&acirc;n v&aacute;y midi. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/00030-alaia-spring-2024-ready-to-1702457609.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=RpZz7E1U40BCFTR0DPZ9Sg\" /></p>\r\n\r\n<p>Ala&iuml;a đem tới v&aacute;y b&uacute;t ch&igrave; ngắn tới đầu gối, phối bra top đồng điệu. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/00008-ami-spring-2024-menswear-c-1702457610.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=V9k1D2VatmxWNF6xllQstQ\" /></p>\r\n\r\n<p>Ami tung ra kiểu v&aacute;y xẻ t&agrave; cao tới h&ocirc;ng, d&agrave;nh cho những c&ocirc; g&aacute;i tự tin về đ&ocirc;i ch&acirc;n. Ảnh:&nbsp;<em>Gorunway</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/vay-da-1702457606.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=oVRuY56fQM4kA4_ZOFFLmA\" /></p>\r\n\r\n<p>Từ đầu m&ugrave;a thu, giới y&ecirc;u thời trang đ&atilde; theo đuổi phong c&aacute;ch n&agrave;y với c&aacute;ch phối đa dạng. Ảnh:&nbsp;<em>TST</em></p>\r\n\r\n<p><img alt=\"\" src=\"https://i1-giaitri.vnecdn.net/2023/12/13/vay-da-2-1702457607.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=wyg_1Lx59ef9JlF6M3aMFg\" /></p>\r\n\r\n<p>Theo&nbsp;<em>Vogue</em>, ch&acirc;n v&aacute;y da được nhiều người y&ecirc;u th&iacute;ch v&igrave; dễ phối đồ, ph&ugrave; hợp nhiều ho&agrave;n cảnh như đi chơi, đi l&agrave;m v&agrave; dự tiệc. Ảnh:&nbsp;<em>TST</em></p>\r\n', 'Chân váy da được nhiều hãng như Givenchy, Acne Studios, Alaïa lăng xê, trở thành mốt hot năm sau.', '2023-12-16 22:51:19.572', '2023-12-16 22:51:19.571', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2Fhinh-anh-dep-1.jpg?alt=media&token=7d9f0025-7c50-4c67-a89e-08211ec027ef', '4', '9');
+INSERT INTO `ims`.`post` (`Title`, `Description`, `Excerpt`, `CreatedAt`, `UpdatedAt`, `IsPublic`, `ImageUrl`, `AuthorId`, `CategoryId`) VALUES ('Những truyền thống Giáng sinh ít người biết', '<p>Dưới đ&acirc;y l&agrave; một số phong tục v&agrave; truyền thống Gi&aacute;ng sinh tr&ecirc;n thế giới.</p>\r\n\r\n<p><strong>Động vật biết n&oacute;i trong đ&ecirc;m Gi&aacute;ng sinh ở Ba Lan</strong></p>\r\n\r\n<p>Ở Ba Lan người d&acirc;n tin rằng c&aacute;c con vật được ban tặng khả năng biết n&oacute;i trong đ&ecirc;m Gi&aacute;ng sinh. Ch&uacute;a Jesus gi&aacute;ng sinh b&ecirc;n m&aacute;ng cỏ vốn l&agrave; m&aacute;ng đựng thức ăn của gia s&uacute;c v&agrave; khi người ch&agrave;o đời, c&aacute;c lo&agrave;i vật trong trang trại đ&atilde; c&uacute;i đầu ch&agrave;o đ&oacute;n. Do đ&oacute;, c&aacute;c lo&agrave;i vật được ban tặng m&oacute;n qu&agrave; c&oacute; khả năng n&oacute;i tiếng người trong đ&ecirc;m 24/12. Nhiều trẻ em Ba Lan sẽ thường cố gắng tr&ograve; chuyện với c&aacute;c con ch&oacute;, m&egrave;o l&agrave; th&uacute; cưng của ch&uacute;ng trong đ&ecirc;m Noel.</p>\r\n\r\n<p><strong>Đ&oacute;n Gi&aacute;ng sinh sớm ở H&agrave; Lan</strong></p>\r\n\r\n<p>Tại H&agrave; Lan, người d&acirc;n đ&oacute;n Gi&aacute;ng sinh sớm. Đ&ecirc;m 5/12 được trẻ em mong chờ nhất v&igrave; th&aacute;nh Sinterklaas sẽ đến ph&aacute;t qu&agrave;. Ch&uacute;ng sẽ để một chiếc gi&agrave;y b&ecirc;n l&ograve; sưởi, h&aacute;t những b&agrave;i h&aacute;t Gi&aacute;ng sinh H&agrave; Lan v&agrave; chờ qu&agrave; đến.</p>\r\n\r\n<p><img alt=\"Một người đàn ông trong trang phục thánh Sinterklaas. Ảnh: Nos\" src=\"https://i1-dulich.vnecdn.net/2023/12/13/2048x1152-4228-1702400829.jpg?w=680&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=8XINP5asrdPGSFMWGZ3wIw\" /></p>\r\n\r\n<p>Một người đ&agrave;n &ocirc;ng trong trang phục th&aacute;nh Sinterklaas. Ảnh:&nbsp;<em>Nos</em></p>\r\n\r\n<p>Đức cũng c&oacute; truyền thống tương tự. Tối ng&agrave;y 5/12, một ng&agrave;y trước ng&agrave;y Th&aacute;nh Nicholas, trẻ em Đức sẽ đ&aacute;nh sạch gi&agrave;y v&agrave; để ch&uacute;ng gần l&ograve; sưởi. S&aacute;ng h&ocirc;m sau, ch&uacute;ng sẽ nhận được những chiếc gi&agrave;y chứa đầy chocolate v&agrave; kẹo ngọt, m&oacute;n qu&agrave; được th&aacute;nh Nicholas ban tặng như một lời khen ngợi v&igrave; đ&atilde; ngoan ngo&atilde;n suốt năm qua.</p>\r\n\r\n<p>Qu&yacute;t v&agrave; c&aacute;c m&oacute;n qu&agrave; nhỏ cũng được đặt trong gi&agrave;y, tương tự như tặng qu&agrave; Gi&aacute;ng sinh trong tất ở những quốc gia kh&aacute;c. Với những đứa trẻ chưa ngoan, khoai t&acirc;y thối l&agrave; &quot;phần thường&quot; thay thế kẹo đựng trong gi&agrave;y.</p>\r\n\r\n<p><strong>Trượt patin trong đ&ecirc;m Gi&aacute;ng sinh ở Venezuela</strong></p>\r\n\r\n<p>Nhiều người sẽ d&agrave;nh thời gian đ&ecirc;m Gi&aacute;ng sinh với bạn b&egrave; tại qu&aacute;n rượu địa phương, số kh&aacute;c uống chocolate v&agrave; xem một bộ phim tại nh&agrave;. Với người d&acirc;n Venezuela, đ&acirc;y l&agrave; một đ&ecirc;m trượt patin th&uacute; vị.</p>\r\n\r\n<p>V&agrave;o đ&ecirc;m Gi&aacute;ng sinh, người d&acirc;n thủ đ&ocirc; Caracas sẽ di chuyển đến c&aacute;c địa điểm linh thi&ecirc;ng dự th&aacute;nh lễ tr&ecirc;n gi&agrave;y trượt.</p>\r\n\r\n<p>Trượt băng dịp n&agrave;y l&agrave; truyền thống phổ biến đến mức nhiều con phố cấm &ocirc;t&ocirc; để người d&acirc;n trượt patin an to&agrave;n v&agrave; tận hưởng kh&ocirc;ng kh&iacute; lễ hội vui vẻ.</p>\r\n\r\n<p><strong>Mổ lợn dịp Gi&aacute;ng sinh ở Romania</strong></p>\r\n\r\n<p>C&aacute;c gia đ&igrave;nh ở v&ugrave;ng n&ocirc;ng th&ocirc;n sẽ tập trung lại v&agrave; hiến tế một con lợn được nu&ocirc;i trong nh&agrave;. Sau đ&oacute; họ d&ugrave;ng thịt của con lợn n&agrave;y để nấu đồ ăn cho dịp Gi&aacute;ng sinh. Sự kiện n&agrave;y thường diễn ra v&agrave;o ng&agrave;y 20/12 v&agrave; được gọi l&agrave; Ziua de Ignat. Ng&agrave;y nay, nhiều người d&acirc;n cho rằng đ&acirc;y l&agrave; một truyền thống t&agrave;n &aacute;c với động vật n&ecirc;n kh&ocirc;ng c&ograve;n phổ biến như trước.</p>\r\n\r\n<p><strong>&Ocirc;ng gi&agrave; Noel lướt s&oacute;ng tại Mỹ v&agrave; Australia</strong></p>\r\n\r\n<p>Gi&aacute;ng sinh ở Australia l&agrave; m&ugrave;a h&egrave;, thời tiết n&oacute;ng nực. Do đ&oacute; người d&acirc;n v&agrave; du kh&aacute;ch đ&atilde; quen thuộc với h&igrave;nh ảnh c&aacute;c &ocirc;ng gi&agrave; Noel mặc bộ đồ Gi&aacute;ng sinh đỏ rực, ch&acirc;n đi ủng v&agrave; lướt s&oacute;ng tr&ecirc;n mặt biển.</p>\r\n\r\n<p>Truyền thống lan rộng sang Mỹ, đặc biệt v&agrave;o s&aacute;ng ng&agrave;y 24/12, mọi người từ khắp đất nước tụ tập để xem h&agrave;ng trăm người lướt s&oacute;ng trong trang phục &ocirc;ng gi&agrave; Noel tr&ecirc;n b&atilde;i biển Cocoa ở bang Florida.</p>\r\n\r\n<p><strong>Mua xổ số dịp Gi&aacute;ng sinh ở T&acirc;y Ban Nha</strong></p>\r\n\r\n<p>Xổ số Gi&aacute;ng sinh ở T&acirc;y Ban Nha hay El Gordo l&agrave; một trong những giải xổ số lớn nhất thế giới v&igrave; tiền thưởng l&ecirc;n đến 2 tỷ euro. Hầu hết người d&acirc;n đều mua. Truyền thống n&agrave;y bắt đầu từ năm 1812 v&agrave; đến nay n&oacute; vẫn l&agrave; một truyền thống th&uacute; vị, được người d&acirc;n T&acirc;y Ban Nha y&ecirc;u th&iacute;ch.</p>\r\n', 'Người Ba Lan tin rằng động vật sẽ biết nói vào đêm Giáng sinh còn người dân Tây Ban Nha đổ xô đi mua sổ xố.', '2023-12-16 22:53:17.022', '2023-12-16 22:53:17.021', '1', 'https://firebasestorage.googleapis.com/v0/b/imsmanagement-35781.appspot.com/o/User%2FVNE-Probe-6416-1702438337.jpg?alt=media&token=12b094b3-a21b-4d62-bec4-8e2ec6b9ad07', '3', '10');
+
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (1, 'MAE101', 'Mathematics for Engineering', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (2, 'CEA201', 'Computer Organization and Architecture', 1, 'Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.Proin eu mi. Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem.Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (3, 'CSI101', 'Connecting to Computer Science', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (4, 'PRF192', 'Programming Fundamentals', 1, 'Fusce consequat. Nulla nisl. Nunc nisl.Duis bibendum, felis sed interdum venenatis, turpis enim blandit mi, in porttitor pede justo eu massa. Donec dapibus. Duis at velit eu est congue elementum.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (5, 'SSG101', 'Working in Group Skills', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (6, 'PRJ321', 'Web-Based Java Applications', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (7, 'NWC202', 'Computer Networking', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (8, 'SWE102', 'Introduction to Software Engineering', 0, 'In hac habitasse platea dictumst. Morbi vestibulum, velit id pretium iaculis, diam erat fermentum justo, nec condimentum neque sapien placerat ante. Nulla justo.Aliquam quis turpis eget elit sodales scelerisque. Mauris sit amet eros. Suspendisse accumsan tortor quis turpis.', 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (9, 'JPD121', 'Elementary Japanese 1.2', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (10, 'LAB221', 'Desktop Java Lab', 0, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (11, 'JPD131', 'Elementary Japanese 2.1', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (12, 'LAB231', 'Web Java Lab', 0, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (13, 'PRN292', '.NET and C#', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (14, 'SWR301', 'Software Requirements', 0, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (15, 'SWQ391', 'Software Quality Assurance and Testing', 1, null, 2);
+insert into `IMS`.`Subject` (Id, Code, Name, IsActive, Description, SubjectManagerId) values (16, 'OJS201', 'On the job training	', 1, null, 2);
+
+
+insert into `IMS`.`Assignment` (Id, Name, Description, Weight, SubjectId) values (1, 'Assignment 1', null, 10, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description, Weight, SubjectId) values (2, 'Assignment 2', null, 10, 1);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (3, 'Assignment 3', null,  10,1);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (4, 'Assignment 1', null,  10,2);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (5, 'Assignment 2', null,  10,2);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (6, 'Assignment 3', null,  10,2);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (7, 'Assignment 1', null,  10,3);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (8, 'Assignment 2', null,  10,3);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (9, 'Assignment 3', null,  10,3);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (10, 'Assignment 1', null, 10, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (11, 'Assignment 2', null, 10, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (12, 'Assignment 3', null, 10, 4);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (13, 'Assignment 1', null, 10, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (14, 'Assignment 2', null, 10, 5);
+insert into `IMS`.`Assignment` (Id, Name, Description,Weight, SubjectId) values (15, 'Assignment 3', null, 10, 5);
+
+
+
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (1,'IS1234',NULL,4,1,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (2,'IS1235',NULL,4,2,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (3,'IS1236',NULL,4,3,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (4,'IS1237',NULL,4,4,0);
+INSERT INTO `IMS`.`Class` (`Id`,`Name`,`Description`,`TeacherId`,`SubjectId`,`IsActive`) VALUES (5,'IS1238',NULL,4,5,0);
+
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('5', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('6', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('7', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('8', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('9', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('10', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('11', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('12', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('13', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('14', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('15', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('16', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('17', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('18', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('19', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('20', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('21', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('22', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('23', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('24', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('25', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('26', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('27', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('28', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('29', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('30', '1');
+INSERT INTO `ims`.`classstudent` (`StudentId`, `ClassId`) VALUES ('31', '1');
+
+INSERT INTO `ims`.`project` (`Name`,`GroupName`,`Status`, `ClassId`, `LeaderId`) VALUES
+('HumanResourceManagement','G1', '1', '1', '5'),
+('HumanResourceManagement111','G2', '1', '1', '5'),
+('FinancialProject', 'G2', '1', '1', '12'),
+('CustomerManagementSystem', 'G2', '1', '1', '18'),
+('LogisticsProject', 'G2', '1', '1', '24'),
+('ECommerceApp', 'G2', '1', '1', '30');
+
+INSERT INTO `Milestone` (`Title`, `Description`, `StartDate`, `EndDate`, `ProjectId`, `ClassId`, `AssignmentId`) VALUES
+('Milestone 1', 'Description for Milestone 1', '2023-01-01', '2023-02-01', 1, 1, NULL),
+('Milestone 2', 'Description for Milestone 2', '2023-03-01', '2023-04-01', 1, 1, NULL),
+('Milestone 3', 'Description for Milestone 3', '2023-05-01', '2023-06-01', 1, 1, NULL);
+
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('5', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('6', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('7', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('8', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('9', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('10', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('11', '1');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('12', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('13', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('14', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('15', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('16', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('17', '2');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('18', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('19', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('20', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('21', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('22', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('23', '3');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('24', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('25', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('26', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('27', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('28', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('29', '4');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('4', '5');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('30', '5');
+INSERT INTO `ims`.`projectstudent` (`StudentId`, `ProjectId`) VALUES ('31', '5');
+
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (1,1,17,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (2,2,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (3,3,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (4,4,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (5,5,17,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (6,1,18,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (7,2,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (8,3,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (9,5,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (10,4,18,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (11,1,19,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (12,2,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (13,3,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (14,5,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (15,4,19,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (16,1,20,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (17,2,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (18,3,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (19,5,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (20,4,20,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (21,1,21,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (22,2,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (23,3,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (24,5,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (25,4,21,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (26,1,22,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (27,2,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (28,3,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (29,5,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (30,4,22,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (31,1,23,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (32,2,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (33,3,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (34,5,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (35,4,23,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (36,1,26,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (37,2,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (38,3,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (39,5,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (40,4,26,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (41,1,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (42,2,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (43,3,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (44,5,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (45,4,27,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (46,1,28,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (47,2,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (48,3,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (49,5,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (50,4,28,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (51,1,29,0,0,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (52,2,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (53,3,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (54,5,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (55,4,29,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (56,1,31,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (57,2,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (58,3,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (59,5,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (60,4,31,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (61,1,32,1,1,1,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (62,2,32,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (63,3,32,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (64,5,32,0,1,0,0,0);
+INSERT INTO `IMS`.`Permission` (`Id`,`RoleId`,`PageId`,`CanCreate`,`CanRead`,`CanUpdate`,`CanExport`,`CanDelete`) VALUES (65,4,32,0,1,0,0,0);

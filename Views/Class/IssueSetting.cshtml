@@ -22,11 +22,16 @@
             <i class="fa-solid fa-list me-1"></i>
             Class Issue Setting
         </div>
-        <div class="col-md-auto">
-            <a class="btn btn-primary" id="newIssueSettingBtn">
+        @if (pageAcess.CanAdd)
+        {
+
+
+            <div class="col-md-auto">
+                <a class="btn btn-primary" id="newIssueSettingBtn">
                 <i class="fas fa-plus"></i> New Issue Setting
             </a>
         </div>
+        }
     </div>
     <div class="card-body">
         <form asp-controller="Class" asp-action="IssueSetting" asp-route-id="@ViewBag.ClassId" method="get">
@@ -66,7 +71,7 @@
                             {
                                 <form asp-action="ToggleIssueSettingStatus" asp-controller="Class" asp-route-id="@issueSetting.Id" method="post">
                                     <input type="hidden" name="ClassId" value="@issueSetting.ClassId" />
-                                    <button type="submit" class="btn btn-success btn-sm">
+                                    <button type="submit" class="btn btn-success btn-sm" @(pageAcess.CanUpdate ? "" : "disabled")>
                                         Active
                                     </button>
                                 </form>
@@ -76,7 +81,7 @@
                             {
                                 <form asp-action="ToggleIssueSettingStatus" asp-controller="Class" asp-route-id="@issueSetting.Id" method="post">
                                     <input type="hidden" name="ClassId" value="@issueSetting.ClassId" />
-                                    <button type="submit" class="btn btn-secondary btn-sm">
+                                    <button type="submit" class="btn btn-secondary btn-sm" @(pageAcess.CanUpdate ? "" : "disabled")>
                                         Deactive
                                     </button>
                                 </form>

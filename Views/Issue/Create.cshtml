@@ -7,7 +7,7 @@
 
 <h3 class="mt-5">New Issue</h3>
 
-@using (Html.BeginForm("Create", "Issue", FormMethod.Post, new { @class = "my-5", @id = "editForm2" }))
+@using (Html.BeginForm("Create", "Issue", FormMethod.Post, new { @class = "my-5", @id = "editForm2", enctype = "multipart/form-data" }))
 {
     <div class="d-flex flex-column" style="gap: 24px">
 
@@ -33,12 +33,19 @@
         </div>
 
         <div class="row mb-3">
+
+            <div class="col-12 mb-4">
+                @Html.LabelFor(model => model.File, "Document", new { @class = "control-label mb-1" })
+                <input class="form-control" type="file" asp-for="File">
+            </div>
+
             <div class="col-6 mb-4">
                 <div class="form-group">
                     @Html.LabelFor(model => model.AssigneeId, "Assignee", new { @class = "control-label mb-1" })
                     @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Assignees, "Id", "Name"), "Select an assignee", new { @class = "form-control" })
                 </div>
             </div>
+
 
             <div class="col-6 mb-4">
                 <div class="form-group">

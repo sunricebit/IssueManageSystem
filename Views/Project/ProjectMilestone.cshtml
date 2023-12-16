@@ -115,11 +115,11 @@
 
                     <div class="mb-3">
                         <label for="startDate" class="form-label">Start Date</label>
-                        <input type="date" class="form-control" id="startDate">
+                        <input type="date" class="form-control" id="startDate" onchange="validateDates()">
                     </div>
                     <div class="mb-3">
                         <label for="endDate" class="form-label">End Date</label>
-                        <input type="date" class="form-control" id="endDate">
+                        <input type="date" class="form-control" id="endDate" onchange="validateDates()">
                     </div>
                     <input type="hidden" class="form-control" id="projectId" value="@Model.Id">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closePopup()">Close</button>
@@ -130,7 +130,19 @@
         </div>
     </div>
 </div>
+<script>
+    function validateDates() {
+        var startDate = document.getElementById('startDate').value;
+        var endDate = document.getElementById('endDate').value;
 
+        if (startDate && endDate) {
+            if (startDate > endDate) {
+                alert('End date must be greater than start date');
+                document.getElementById('endDate').value = '';
+            }
+        }
+    }
+</script>
 <script>
     function openPopupAddMilestone() {
         var popup = document.getElementById("exampleModal");

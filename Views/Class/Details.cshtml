@@ -49,61 +49,131 @@
                         </div>
                     }
                     <div class="row">
-                      
                         <input type="hidden" asp-for="Id" value="@Model.Id" />
+                                       
                         <div id="generalSection">
                        
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="name">Class Name*</label>
-                                    <input type="text" name="Name" asp-for="Name" class="form-control" value="@Model.Name" required />
-                                </div>
-                            </div>
-
-                          
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="TeacherId">Teacher</label>
-                                    <select name="TeacherId" class="form-control">
-                                        @foreach (var teacher in ViewBag.Teacher)
-                                        {
-                                            <option value="@teacher.Id" name="TeacherId" selected="@(teacher.Id == Model.TeacherId)">@teacher.Name</option>
-                                        }
-                                    </select>
-                                    <input type="hidden" name="TeacherId" value="@Model.TeacherId" />
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="SubjectId">Subject</label>
-                                    <select name="SubjectId" class="form-control">
-                                        @foreach (var subject in ViewBag.Subject)
-                                        {
-                                            <option value="@subject.Id" name="SubjectId" selected="@(subject.Id == Model.SubjectId)">@subject.Name</option>
-                                        }
-                                    </select>
-                                    <input type="hidden" name="SubjectId" value="@Model.SubjectId" />
-                                </div>
-                            </div>
-
-                          
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="description">Description</label>
-                                    <textarea name="description" class="form-control">@Model.Description</textarea>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="statusToggle">Status</label>
-                                    <div class="form-check form-switch">
-                                        <input type="hidden" name="IsActive" value="false" />
-                                        <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" @(Model.IsActive ? "checked" : "") onchange="changeStatus()" />
+                            @if (pageAcess.CanUpdate)
+                            {
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">Class Name*</label>
+                                        <input type="text" name="Name" asp-for="Name" class="form-control" value="@Model.Name" required />
                                     </div>
                                 </div>
-                            </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">Class Name*</label>
+                                        <input type="text" name="Name" asp-for="Name" class="form-control" value="@Model.Name" required readonly/>
+                                    </div>
+                                </div>
+                            }
+                            @if (pageAcess.CanUpdate)
+                           {
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="TeacherId">Teacher</label>
+                                        <select name="TeacherId" class="form-control" >
+                                            @foreach (var teacher in ViewBag.Teacher)
+                                            {
+                                                <option value="@teacher.Id" name="TeacherId" selected="@(teacher.Id == Model.TeacherId)">@teacher.Name</option>
+                                            }
+                                        </select>
+                                        <input type="hidden" name="TeacherId" value="@Model.TeacherId" />
+                                    </div>
+                                </div>
+                           }
+                           else
+                           {
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="TeacherId">Teacher</label>
+                                        <select name="TeacherId" class="form-control" disabled>
+                                            @foreach (var teacher in ViewBag.Teacher)
+                                            {
+                                                <option value="@teacher.Id" name="TeacherId" readonly selected="@(teacher.Id == Model.TeacherId)">@teacher.Name</option>
+                                            }
+                                        </select>
+                                        <input type="hidden" name="TeacherId" value="@Model.TeacherId" />
+                                    </div>
+                                </div>
+                           }
+                            @if (pageAcess.CanUpdate)
+                            {
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="SubjectId">Subject</label>
+                                        <select name="SubjectId" class="form-control">
+                                            @foreach (var subject in ViewBag.Subject)
+                                            {
+                                                <option value="@subject.Id" name="SubjectId"  selected="@(subject.Id == Model.SubjectId)">@subject.Name</option>
+                                            }
+                                        </select>
+                                        <input type="hidden" name="SubjectId" value="@Model.SubjectId" />
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="SubjectId">Subject</label>
+                                        <select name="SubjectId" class="form-control" disabled>
+                                            @foreach (var subject in ViewBag.Subject)
+                                            {
+                                                <option value="@subject.Id" name="SubjectId" readonly selected="@(subject.Id == Model.SubjectId)">@subject.Name</option>
+                                            }
+                                        </select>
+                                        <input type="hidden" name="SubjectId" value="@Model.SubjectId" />
+                                    </div>
+                                </div>
+                            }
+                            @if (pageAcess.CanUpdate)
+                            {
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="description">Description</label>
+                                        <textarea name="description" class="form-control">@Model.Description</textarea>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="description">Description</label>
+                                        <textarea name="description" readonly class="form-control">@Model.Description</textarea>
+                                    </div>
+                                </div>
+                            }
+                            @if (pageAcess.CanUpdate)
+                            {
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="statusToggle">Status</label>
+                                        <div class="form-check form-switch">
+                                            <input type="hidden" name="IsActive" value="false" />
+                                            <input type="checkbox" class="form-check-input" id="statusToggle" name="Status" @(Model.IsActive ? "checked" : "") onchange="changeStatus()" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="statusToggle">Status</label>
+                                        <div class="form-check form-switch">
+                                            <input type="hidden" name="IsActive" value="false" />
+                                            <input type="checkbox" class="form-check-input"  disabled id="statusToggle" name="Status" @(Model.IsActive ? "checked" : "") onchange="changeStatus()" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                           
                         </div>
                     </div>
 

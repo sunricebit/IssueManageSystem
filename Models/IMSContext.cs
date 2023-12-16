@@ -176,6 +176,8 @@ namespace IMS.Models
                     .HasColumnType("datetime(3)")
                     .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
 
+                entity.Property(e => e.FileName).HasMaxLength(100);
+
                 entity.Property(e => e.Title).HasColumnType("text");
 
                 entity.Property(e => e.UpdatedAt)
