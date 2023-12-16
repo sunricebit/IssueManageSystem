@@ -1,4 +1,6 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Microsoft.AspNetCore.Diagnostics;
+
+var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<IMSContext>(options => new IMSContext());
@@ -42,6 +44,24 @@ app.Use(async (context, next) =>
         context.Request.Path = "/Error/404";
         await next();
     }
+});
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500; // or another status code
+        context.Response.ContentType = "text/html";
+
+        var exception = context.Features.Get<IExceptionHandlerFeature>();
+        if (exception != null)
+        {
+            var errorMessage = exception.Error.Message;
+
+            // Redirect to the error page with the error message in the query string
+            context.Response.Redirect($"/Error/InternalServerError?message={Uri.EscapeDataString(errorMessage)}");
+        }
+    });
 });
 
 app.UseSession();
