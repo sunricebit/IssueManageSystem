@@ -15,6 +15,8 @@ namespace IMS.Models
         public string? Description { get; set; }
         public int? MilestoneId { get; set; }
         public int ProjectId { get; set; }
+        public string? DocumentUrl { get; set; }
+        public string? FileName { get; set; }
         public int AuthorId { get; set; }
         public int? AssigneeId { get; set; }
         public int TypeId { get; set; }
@@ -28,10 +30,10 @@ namespace IMS.Models
         public virtual User Author { get; set; } = null!;
         public virtual Milestone? Milestone { get; set; }
         public virtual Issue? ParentIssue { get; set; }
-        public virtual IssueSetting Process { get; set; } = null!;
+        public virtual Issuesetting Process { get; set; } = null!;
         public virtual Project Project { get; set; } = null!;
-        public virtual IssueSetting Status { get; set; } = null!;
-        public virtual IssueSetting Type { get; set; } = null!;
+        public virtual Issuesetting Status { get; set; } = null!;
+        public virtual Issuesetting Type { get; set; } = null!;
         public virtual ICollection<Issue> InverseParentIssue { get; set; }
     }
 }

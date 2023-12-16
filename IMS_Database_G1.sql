@@ -162,6 +162,8 @@ CREATE TABLE `issue` (
   `Description` longtext COLLATE utf8mb4_unicode_ci,
   `MilestoneId` int DEFAULT NULL,
   `ProjectId` int NOT NULL,
+  `DocumentUrl` longtext COLLATE utf8mb4_unicode_ci,
+  `FileName` varchar(100) COLLATE utf8mb4_unicode_ci,
   `AuthorId` int NOT NULL,
   `AssigneeId` int DEFAULT NULL,
   `TypeId` int NOT NULL,
