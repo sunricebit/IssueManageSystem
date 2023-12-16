@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IMS.ViewModels.Permission;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Text.Json;
 
 namespace IMS.Common
 {
@@ -57,6 +59,10 @@ namespace IMS.Common
                     // Nếu chưa có thì add và cấp quyền cho admin, các user khác sẽ có quyền read
                     permissionService.CreateNewPermission(pageLink);
                 }
+
+                PermissionViewModel permissionVM = permissionService.GetPermissionViewModel(user.RoleId);
+                string permissionString = JsonSerializer.Serialize(permissionVM);
+                context.HttpContext.Session.SetString("Permission", permissionString);
 
                 // Có rồi thì check quyền Access -> các quyền khác ngoài read cập nhật trong màn hình permission
                 if (!permissionService.CheckAccess(pageLink, user.Role.Value))
