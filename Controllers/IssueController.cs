@@ -1,4 +1,6 @@
 using System.Linq;
+using Firebase.Auth;
+using Firebase.Storage;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -55,6 +57,9 @@ public class NewIssue
 
     [Display(Name = "Issue parent")]
     public int? ParentIssueId { get; set; }
+
+    [Display(Name = "Document")]
+    public IFormFile? File { get; set; }
 }
 
 namespace IMS.Controllers
@@ -195,12 +200,30 @@ namespace IMS.Controllers
 
         [Route("{projectId}/issues/{issueId:int}/edit")]
         [HttpPost]
-        public async Task<IActionResult> Edit(Issue issue, int projectId, int issueId, [FromServices] ErrorHelper errorHelper)
+        public async Task<IActionResult> Edit(Issue issue, IFormFile? file, int projectId, int issueId, [FromServices] ErrorHelper errorHelper)
         {
             try
             {
                 var issueToUpdate = await context.Issues.FirstOrDefaultAsync(x => x.Id == issueId);
                 if (issueToUpdate == null) return RedirectToAction("NotFound", "Error");
+
+
+
+                if (file != null && file.Length > 0)
+                {
+                    if (issue.DocumentUrl != null && issue.FileName != null)
+                    {
+                        await DeleteDocument(issue.FileName);
+                    }
+
+                    string? documentUrl = null;
+
+                    using var stream = file.OpenReadStream();
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var downloadLink = await UploadFromFirebase(stream, fileName);
+
+                    documentUrl = downloadLink;
+                }
 
                 issueToUpdate.Title = issue.Title;
                 issueToUpdate.TypeId = issue.TypeId;
@@ -235,6 +258,7 @@ namespace IMS.Controllers
 
             if (project == null) return RedirectToAction("NotFound", "Error");
 
+
             var assignees = project.Students.ToList();
             var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
             var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
@@ -267,6 +291,19 @@ namespace IMS.Controllers
                 var project = context.Projects.SingleOrDefault(project => project.Id == projectId);
                 if (project == null) return RedirectToAction("NotFound", "Error");
 
+                string? documentUrl = null;
+                string? filename = null;
+
+                if (vm.File != null && vm.File.Length > 0)
+                {
+                    using var stream = vm.File.OpenReadStream();
+                    filename = Guid.NewGuid().ToString() + Path.GetExtension(vm.File.FileName);
+                    var downloadLink = await UploadFromFirebase(stream, filename);
+
+                    documentUrl = downloadLink;
+                }
+
+
                 int userId = HttpContext.Session.GetUser()!.Id;
                 Issue issue = new()
                 {
@@ -279,7 +316,9 @@ namespace IMS.Controllers
                     ProjectId = project.Id,
                     AuthorId = userId,
                     AssigneeId = vm.AssigneeId,
-                    ParentIssueId = vm.ParentIssueId
+                    ParentIssueId = vm.ParentIssueId,
+                    DocumentUrl = documentUrl,
+                    FileName = filename
                 };
 
                 context.Issues.Add(issue);
@@ -293,6 +332,58 @@ namespace IMS.Controllers
                 return RedirectToAction("Index");
             }
         }
+
+        public async Task<string> UploadFromFirebase(Stream stream, string fileName)
+        {
+            string ApiKey = "AIzaSyBjstBnMJX7h_NlJ5-vqcQE0V-Ldaztnk8";
+            string Bucket = "imsmanagement-35781.appspot.com";
+            string AuthEmail = "abc@gmail.com";
+            string AuthPassword = "123456";
+
+            var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
+
+            var token = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
+            if (token == null) return "";
+            string accessToken = token.FirebaseToken;
+            var firebaseStorage = new FirebaseStorage(Bucket, new FirebaseStorageOptions
+            {
+                AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken)
+            });
+
+            var path = $"documents/{fileName}";
+
+            var task = await firebaseStorage.Child(path).PutAsync(stream);
+
+            var downloadUrl = await firebaseStorage.Child(path).GetDownloadUrlAsync();
+            return downloadUrl;
+        }
+
+        public async Task<string> DeleteDocument(string fileName)
+        {
+            string ApiKey = "AIzaSyBjstBnMJX7h_NlJ5-vqcQE0V-Ldaztnk8";
+            string Bucket = "imsmanagement-35781.appspot.com";
+            string AuthEmail = "abc@gmail.com";
+            string AuthPassword = "123456";
+
+            var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
+
+            var token = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
+            if (token == null) return "";
+            string accessToken = token.FirebaseToken;
+            var firebaseStorage = new FirebaseStorage(Bucket, new FirebaseStorageOptions
+            {
+                AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken)
+            });
+
+            var path = $"documents/{fileName}";
+
+            await firebaseStorage.Child(path).DeleteAsync();
+
+            var downloadUrl = await firebaseStorage.Child(path).GetDownloadUrlAsync();
+            await auth.SignInWithOAuthAsync(FirebaseAuthType.EmailAndPassword, accessToken);
+            return downloadUrl;
+        }
+
 
         public IActionResult GetDataByProjectId(int? projectId)
         {
@@ -334,7 +425,7 @@ namespace IMS.Controllers
             else
             {
                 var userId = HttpContext.Session.GetUser()!.Id;
-                User? user = context.Users.SingleOrDefault(user => user.Id == userId);
+                Models.User? user = context.Users.SingleOrDefault(user => user.Id == userId);
                 if (user == null) return RedirectToAction("SignIn", "Auth");
 
                 var userData = context.Users
@@ -383,13 +474,13 @@ namespace IMS.Controllers
         {
             var userId = HttpContext.Session.GetUser()!.Id;
 
-            User? user = context.Users.Include(user => user.Role).SingleOrDefault(user => user.Id == userId);
+            Models.User? user = context.Users.Include(user => user.Role).SingleOrDefault(user => user.Id == userId);
             if (user == null) return RedirectToAction("SignIn", "Auth");
 
             ViewBag.Projects = new List<Project>();
             ViewBag.Milestones = new List<Milestone>();
-            ViewBag.Authors = new List<User>();
-            ViewBag.Assignees = new List<User>();
+            ViewBag.Authors = new List<Models.User>();
+            ViewBag.Assignees = new List<Models.User>();
             ViewBag.Statuses = context.IssueSettings.Where(setting => setting.Type == "STATUS").ToList();
 
             var userData = context.Users
