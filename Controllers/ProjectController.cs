@@ -61,7 +61,8 @@ namespace IMS.Controllers
 
             if (!string.IsNullOrEmpty(searchByName))
             {
-                projects = projects.Where(p => p.Name.Contains(searchByName)).ToList();
+                projects = projects.Where(p => p.Name.ToLower().Contains(searchByName.ToLower()) ).ToList();
+
             }
 
             ViewBag.SearchValue = searchByName;

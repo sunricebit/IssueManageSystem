@@ -33,45 +33,57 @@ namespace IMS.Controllers
             int tempPageNumber = pageNumber ?? 1;
             int tempPageSize = 10;
             Paginate<Class> paginate = new Paginate<Class>(tempPageNumber, tempPageSize);
+            User user = HttpContext.Session.GetUser();
+
             Dictionary<string, dynamic> filter = new Dictionary<string, dynamic>(), search = new Dictionary<string, dynamic>();
+            IEnumerable<Class> classes = new List<Class>();
+            if (user.Role.Value == RoleUser.Admin || user.Role.Value == RoleUser.Manager)
+            {
+                classes = _classService.GetClasses();
+                ViewBag.ClassList = _classService.GetClasses();
+            }
+            if (user.Role.Value == RoleUser.Student)
+            {
+                classes = _classService.GetClassesByStudent(user.Id);
+                ViewBag.ClassList = _classService.GetClassesByTeacher(user.Id);
+            }
+            if (user.Role.Value == RoleUser.Teacher)
+            {
+                classes = _classService.GetClassesByTeacher(user.Id);
+                ViewBag.ClassList = _classService.GetClassesByTeacher(user.Id);
+            }
             if (filterByTeacher != null && !filterByTeacher.Equals("All"))
             {
                 int teacherid = _classService.GetTeacherIdByNameAndEmail(filterByTeacher);
-                filter.Add("TeacherId", teacherid);
+                classes = classes.Where( c=> c.TeacherId == teacherid).ToList();
             }
             if (filterbyStatus != null && !filterbyStatus.Equals("All"))
             {
-                filter.Add("IsActive", filterbyStatus);
+                classes = classes.Where(c => c.IsActive == filterbyStatus).ToList();
             }
-                if (filterBySubject != null && !filterBySubject.Equals("All"))
-                {
+            if (filterBySubject != null && !filterBySubject.Equals("All"))
+            {
                 int subjectid = _classService.GetSubjectId(filterBySubject);
-                    filter.Add("SubjectId", subjectid);
-                }
+                classes = classes.Where(c => c.SubjectId == subjectid).ToList();
+            }
 
-                if (!string.IsNullOrEmpty(searchByValue))
-                {
-                    search.Add("Name", searchByValue);
-                    search.Add("Description", searchByValue);
+            if (!string.IsNullOrEmpty(searchByValue))
+            {
+                classes = classes.Where( c=> c.Name.ToLower().Contains(searchByValue.ToLower())).ToList();
 
-                }
 
-                ViewBag.TeacherValue = _classService.GetAllTeachers();
-                ViewBag.StatusValue = filterbyStatus;
-                ViewBag.SubjectValue = _classService.GetSubjects();
-                ViewBag.SearchValue = searchByValue;
-                List<Class> classes = new List<Class>();
-                foreach (var Class in paginate.GetListPaginate<Class>(filter, search))
-                {
-                    var classWithStudents = _classService.GetClass(Class.Id);
-                    classes.Add(classWithStudents);
+            }
 
-                }
-                var subject = _classService.GetSubjects();
+            ViewBag.TeacherValue = _classService.GetAllTeachers();
+            ViewBag.StatusValue = filterbyStatus;
+            ViewBag.SubjectValue = _classService.GetSubjects();
+            ViewBag.SearchValue = searchByValue;
+           
+            var subject = _classService.GetSubjects();
                 ViewBag.Subject = subject;
-                ViewBag.ClassList = classes;
                 ViewBag.Action = "ClassList";
-                ViewBag.Pagination = paginate.GetPagination();
+            ViewBag.ClassList = paginate.GetListPaginate(classes.ToList());
+            ViewBag.Pagination = paginate.GetPagination();
             ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
             return View();
             
@@ -85,6 +97,7 @@ namespace IMS.Controllers
             var teacher = _userService.GetTeacher();
             ViewBag.Teacher = teacher;
             var Class = _classService.GetClass(id);
+            ViewBag.ErrorMessage = TempData["ErrorMessage"] as string;
             if (Class == null)
             {
                 return NotFound();
@@ -195,8 +208,9 @@ namespace IMS.Controllers
                 ViewBag.Subject = subject2;
                 var teacher2 = _userService.GetTeacher();
                 ViewBag.Teacher = teacher2;
-                ViewBag.ErrorMessage = "Class is already exist.";
-                return View("Details",classViewModel);
+
+                TempData["ErrorMessage"] = "Class is already exist.";
+                return RedirectToAction("Details",new { id= classViewModel.Id });
                 
             }
             Class1.Name = classViewModel.Name;
@@ -302,7 +316,7 @@ namespace IMS.Controllers
                 Milestone = Milestone.Where(item => item.Title.ToLower().Contains(searchString.ToLower())).ToList();
             }
             ViewBag.MilestoneList = Milestone;
-            return View("Milestones",ClassViewModel);
+            return View(ClassViewModel);
         }
         [HttpGet("IssueSetting/{id}")]
         [CustomAuthorize]
@@ -353,16 +367,16 @@ namespace IMS.Controllers
             _milestoneService.AddMilestone(milestone);
 
             
-            return RedirectToAction("Index");
+            return RedirectToAction("Milestones",new { milestone.ClassId});
         }
         [HttpPost("AddStudent")]
         public IActionResult AddStudent(int ClassId, string Name)
         {
            if (_classService.AddStudentToClass(ClassId, Name) == false)
             {
-                ViewBag.ErrorMessage = "Student is already exist.";
+                TempData["ErrorMessage"] = "Student is already exist.";
             };
-            return RedirectToAction("Index");
+            return RedirectToAction("People",new { id=ClassId});
         }
         [HttpPost("People/{id}")]
         public IActionResult RemoveStudent(int id,string email)
@@ -389,7 +403,7 @@ namespace IMS.Controllers
 
             ViewBag.Student = students;
             _classService.RemoveStudentFromClass(id, email);
-            return View("People",ClassViewModel);
+            return RedirectToAction("People",new { id = ClassViewModel.Id });
         }
         [HttpPost("CreateIssueSetting")]
         public IActionResult CreateIssueSetting(IssueSettingViewModel issueSettingViewModel, [FromServices] ErrorHelper message)
@@ -412,7 +426,7 @@ namespace IMS.Controllers
                 message.Success = "Add Issue Setting success";
             }
             message.Error = checkDup;
-            return RedirectToAction("IssueSetting", issueSettingViewModel.Id);
+            return RedirectToAction("IssueSetting", new { id = issueSettingViewModel.Id });
         }
         [HttpPost("ToggleIssueSettingStatus")]
         public IActionResult ToggleIssueSettingStatus(int id,int classid)
@@ -456,7 +470,7 @@ namespace IMS.Controllers
             };
             IEnumerable<Milestone> Milestone = _classService.GetMilestone(id);
             ViewBag.MilestoneList = Milestone;
-            return View("Milestones", ClassViewModel);
+            return RedirectToAction("Milestones", new { id = ClassViewModel.Id });
         }
     }
    

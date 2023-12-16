@@ -44,13 +44,17 @@
             <i class="fas fa-table me-1"></i>
             Students Table
         </div>
-        
-        
-            <div class="col-md-auto">
-                <a class="btn btn-primary" onclick="openPopupAddStudent()">
+
+            @if (pageAcess.CanAdd)
+            {
+
+
+                <div class="col-md-auto">
+                    <a class="btn btn-primary" onclick="openPopupAddStudent()">
                     <i class="fas fa-plus"></i> New
                 </a>
             </div>
+            }
         
     </div>
     <div class="card-body">
@@ -134,17 +138,22 @@
                                     </a>
                                 </td>
                             }
-                            <td>
-                                <div class="btn-group" role="group" aria-label="User Actions">
+                                @if (pageAcess.CanDelete)
+                                {
 
-                                        <form id="removeStudentForm" asp-action="RemoveStudent" asp-route-id="@Model.Id" asp-route-email="@student.Email" asp-controller="Class" method="post" onsubmit="">
-                                            <button type="submit" class="btn btn-danger">
-                                                <i class="fas fa-trash"></i> Remove
-                                            </button>
-                                        </form>
-                                </div>
-                            </td>
-                        </tr>
+
+                                    <td>
+                                        <div class="btn-group" role="group" aria-label="User Actions">
+
+                                            <form id="removeStudentForm" asp-action="RemoveStudent" asp-route-id="@Model.Id" asp-route-email="@student.Email" asp-controller="Class" method="post" onsubmit="">
+                                                <button type="submit" class="btn btn-danger">
+                                                    <i class="fas fa-trash"></i> Remove
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
                     }
                 </tbody>
             </table>

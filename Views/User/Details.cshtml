@@ -98,15 +98,15 @@
                                 </div>
                             </div>
                         </div>
-                        @if (pageAcess.CanUpdate)
-                        {
+                        
+                        
                             <div class="row">
                                 <div class="col-md-6">
-                                    <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="submit" class="btn btn-primary" @(pageAcess.CanUpdate ? "" : "disabled")>Save</button>
                                     <a href="/User/Index" class="btn btn-primary">Back to Users</a>
                                 </div>
                             </div>
-                        }
+                        
                     </form>
                 </div>
             </div>

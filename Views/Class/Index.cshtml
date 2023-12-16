@@ -18,11 +18,16 @@
                 <i class="fas fa-table me-1"></i>
                 Class Table
             </div>
-            <div class="col-md-auto">
-                <a class="btn btn-primary" asp-controller="Class" asp-action="Create">
+            @if (pageAcess.CanAdd)
+            {
+
+
+                <div class="col-md-auto">
+                    <a class="btn btn-primary" asp-controller="Class" asp-action="Create">
                     <i class="fas fa-plus"></i> New Class
                 </a>
             </div>
+            }
         </div>
         <div class="card-body">
             <div class="mb-3 row">
@@ -101,7 +106,7 @@
                             {
                                 <td>
                                     <form asp-action="ToggleStatus" asp-route-id="@classItem.Id" method="post">
-                                        <button type="submit" class="btn btn-success btn-sm">
+                                        <button type="submit" class="btn btn-success btn-sm" @(pageAcess.CanUpdate ? "" : "disabled")>
                                             Active
                                         </button>
                                     </form>
@@ -111,7 +116,7 @@
                             {
                                 <td>
                                     <form asp-action="ToggleStatus" asp-route-id="@classItem.Id" method="post">
-                                        <button type="submit" class="btn btn-secondary btn-sm">
+                                        <button type="submit" class="btn btn-secondary btn-sm" @(pageAcess.CanUpdate ? "" : "disabled")>
                                             Inactive
                                         </button>
                                     </form>
@@ -126,7 +131,7 @@
                                     @if (@classItem.IsActive == true)
                                     {
                                         <form asp-action="ToggleStatus" asp-route-id="@classItem.Id" asp-controller="Class" method="post" onsubmit="">
-                                            <button type="submit" class="btn btn-danger">
+                                            <button type="submit" class="btn btn-danger" @(pageAcess.CanUpdate ? "" : "disabled")>
                                                 <i class="fas fa-trash"></i> Deactivate
                                             </button>
                                         </form>
@@ -134,7 +139,7 @@
                                     else
                                     {
                                         <form asp-action="ToggleStatus" asp-route-id="@classItem.Id" asp-controller="Class" method="post" onsubmit="">
-                                            <button type="submit" class="btn btn-success">
+                                            <button type="submit" class="btn btn-success" @(pageAcess.CanUpdate ? "" : "disabled")>
                                                 <i class="fas fa-trash"></i> Activate
                                             </button>
                                         </form>
