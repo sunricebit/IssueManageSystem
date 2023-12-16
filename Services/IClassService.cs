@@ -23,5 +23,6 @@ namespace IMS.Services
         public bool AddStudentToClass(int classId, string email);
         public bool RemoveStudentFromClass(int classId, string email);
         public IEnumerable<Assignment> GetAssignments(int subjectid);
+        public List<User> GetStudentInClass(int classId);
     }
 }
