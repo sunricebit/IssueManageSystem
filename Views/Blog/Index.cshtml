@@ -52,8 +52,10 @@
                     <div class="d-grid justify-content-between tm-text-gray" style="width: 280px;">
                         <h4 class="tm-text" style="color:#009999">@post.Title</h4>
                         <span >@post.Excerpt</span>
-                        <span class="tm-text-gray-light">Author: @post.AuthorName</span>
-                        <span class="tm-text-gray-light">Category: @post.CategoryName</span>
+                        <div style="display: grid">
+                            <span class="tm-text-gray-light">Author: @post.AuthorName</span>
+                            <span class="tm-text-gray-light">Category: @post.CategoryName</span>
+                        </div>
                     </div>
                 </div>
             }

@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using IMS.Models;
 using IMS.ViewModels.Milestone;
 using IMS.ViewModels.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ namespace IMS.Controllers
         private readonly IClassService _classService;
         private readonly IssueSettingDAO _isDAO;
         private readonly IMilestoneService _milestoneService;
+      
 
         public ProjectController(IProjectService projectService, IClassService classService, IssueSettingDAO isDAO, IMilestoneService milestoneService)
         {
@@ -224,6 +226,59 @@ namespace IMS.Controllers
             message.Error = checkDup;
             return RedirectToAction("IssueSetting", new { id = p.Id });
         }
+        [Route("Member")]
+        [CustomAuthorize]
+        public IActionResult Member(string? searchString, int id,string filterbyStatus)
+        {
+            ViewBag.ProjectId = id;
+            ViewBag.ErrorMessage = TempData["ErrorMessage"] as string;
+            ViewBag.SuccessMessage = TempData["SuccessMessage"] as string; 
+           
+            User u = HttpContext.Session.GetUser();
+            Project p = _projectService.GetProject(id);
+            var members = _projectService.GetStudentInProject(id);
+            if (!string.IsNullOrEmpty(filterbyStatus) && filterbyStatus != "ALL")
+            {
+                if (filterbyStatus == "true")
+                {
+                    members = members.Where(item => item.Status == true).ToList();
+                }
+                else
+                {
+                    members = members.Where(item => item.Status == false).ToList();
+                }
+            }
+            if (!string.IsNullOrEmpty(searchString))    
+            {
+               
+                members = members.Where(item => item.Name.ToLower().Contains(searchString.ToLower())
+                || item.Email.ToLower().Contains(searchString.ToLower())).ToList();
+            }
+            ViewBag.Student = members;
+            return View();
+        }
+        [HttpPost("AddStudent")]
+        public IActionResult AddStudent(int projectid, string Name)
+        {
+            if (_projectService.AddStudentToProject(projectid, Name) == false)
+            {
+                TempData["ErrorMessage"] = "Student is already exist.";
+                return RedirectToAction("Member", new { id=projectid });
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Student added to the project successfully.";
+                return RedirectToAction("Member", new { id = projectid });
+            }
+        }
+        [HttpPost("RemoveStudent")]
+        public IActionResult RemoveStudent(int id, string email)
+        {
+            
+            _projectService.RemoveStudentFromProject(id, email);
+
+            return RedirectToAction("Member", new {id = id});
+        }
 
         [Route("IssueSetting")]
         [CustomAuthorize]
@@ -290,6 +345,7 @@ namespace IMS.Controllers
             ViewBag.MilestoneList = milestone;
             return View(projectViewModel);
         }
+
 
         [HttpPost("CreateMilestone")]
         public IActionResult CreateMilestone(MilestoneViewModel model)

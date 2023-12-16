@@ -49,49 +49,47 @@
     </div>
     @Html.HiddenFor(model => model.Tab, new { @id = "tabselect" })
     <ul class="nav nav-tabs mt-4">
-        <li class="nav-item">
-            <button type="button" onclick="tabChange('all')" class="nav-link @(Model.Tab == "all" ? "active" :"")">All</button>
-        </li>
-        <li class="nav-item">
-            <button type="button" onclick="tabChange('task')" class="nav-link @(Model.Tab == "task" ? "active" :"")">Task</button>
-        </li>
-        <li class="nav-item">
-            <button type="button" onclick="tabChange('requirement')" class="nav-link @(Model.Tab == "requirement" ? "active" :"")">Requirement</button>
-        </li>
-        <li class="nav-item">
-            <button type="button" onclick="tabChange('question')" class="nav-link @(Model.Tab == "question" ? "active" :"")">Question</button>
-        </li>
-        <li class="nav-item">
-            <button type="button" onclick="tabChange('defect')" class="nav-link @(Model.Tab == "defect" ? "active" :"")">Defect</button>
-        </li>
+        @foreach (var item in ViewBag.Types)
+        {
+            <li class="nav-item">
+                <button type="button" onclick="tabChange('@item.Value')" class="nav-link @(Model.Tab == item.Value ? "active" :"")">@item.Name</button>
+            </li>
+        }
     </ul>
     <div class="py-4">
         <div class="row mb-4 align-items-end">
             <div class="col-3">
                 <div class="form-group mb-3">
                     @Html.LabelFor(model => model.ProjectId, new { @class = "control-label mb-1" })
-                    @Html.DropDownListFor(model => model.ProjectId, new SelectList(ViewBag.Projects, "Id", "Name"), "Select a manager", new { @class = "form-control", @id = "project" })
+                    @Html.DropDownListFor(model => model.ProjectId, new SelectList(ViewBag.Projects, "Id", "Name"), "Select a project", new { @class = "form-control", @id = "projectSelect", onchange = "myFunction()" })
                 </div>
             </div>
 
             <div class="col-3">
                 <div class="form-group mb-3">
                     @Html.LabelFor(model => model.MilestoneId, new { @class = "control-label mb-1" })
-                    @Html.DropDownListFor(model => model.MilestoneId, new SelectList(ViewBag.Milestones, "Id", "Title"), "Select a milestone", new { @class = "form-control", @id = "project" })
+                    @Html.DropDownListFor(model => model.MilestoneId, new SelectList(ViewBag.Milestones, "Id", "Title"), "Select a milestone", new { @class = "form-control", @id = "milestoneSelect" })
                 </div>
             </div>
 
-            <div class="col-3">
+            <div class="col-2">
+                <div class="form-group mb-3">
+                    @Html.LabelFor(model => model.StatusId, new { @class = "control-label mb-1" })
+                    @Html.DropDownListFor(model => model.StatusId, new SelectList(ViewBag.Statuses, "Id", "Value"), "Select a status", new { @class = "form-control", @id = "milestoneSelect" })
+                </div>
+            </div>
+
+            <div class="col-2">
                 <div class="form-group mb-3">
                     @Html.LabelFor(model => model.AuthorId, new { @class = "control-label mb-1" })
-                    @Html.DropDownListFor(model => model.AuthorId, new SelectList(ViewBag.Authors, "Id", "Name"), "Select an author", new { @class = "form-control", @id = "project" })
+                    @Html.DropDownListFor(model => model.AuthorId, new SelectList(ViewBag.Authors, "Id", "Name"), "Select an author", new { @class = "form-control", @id = "authorSelect" })
                 </div>
             </div>
 
             <div class="col-2">
                 <div class="form-group mb-3">
                     @Html.LabelFor(model => model.AssigneeId, new { @class = "control-label mb-1" })
-                    @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Assignees, "Id", "Name"), "Select an assignee", new { @class = "form-control", @id = "project" })
+                    @Html.DropDownListFor(model => model.AssigneeId, new SelectList(ViewBag.Assignees, "Id", "Name"), "Select an assignee", new { @class = "form-control", @id = "assigneeSelect" })
                 </div>
             </div>
             <div class="col-1">
@@ -150,6 +148,10 @@
 }
 
 
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
 <script>function newIssue() {
         var any = document.getElementById("projectIdToNew");
         var value = any.value;
@@ -161,6 +163,42 @@
     function tabChange(tab) {
         document.getElementById("tabselect").value = tab
         document.forms["myForm"].submit();
+    }
+
+    function myFunction() {
+        var projectId = $('#projectSelect').val();
+        projectId = parseInt(projectId);
+        $.ajax({
+            url: '/Issue/GetDataByProjectId',
+            type: 'GET',
+            data: { projectId: projectId },
+            success: function (data) {
+                // Update the milestone dropdown
+                var milestoneDropdown = $('#milestoneSelect');
+                milestoneDropdown.empty();
+                milestoneDropdown.append($('<option></option>').val(null).text('Select a milestone'));
+                $.each(JSON.parse(data.milestonesJson), function (index, item) {
+                    milestoneDropdown.append($('<option></option>').val(item.Id).text(item.Title));
+                });
+
+                // Update the author dropdown
+                var authorDropdown = $('#authorSelect');
+                authorDropdown.empty();
+                authorDropdown.append($('<option></option>').val(null).text('Select an author'));
+                $.each(JSON.parse(data.authorsJson), function (index, item) {
+                    authorDropdown.append($('<option></option>').val(item.Id).text(item.Name));
+                });
+
+                // Update the assignee dropdown
+                var assigneeDropdown = $('#assigneeSelect');
+                assigneeDropdown.empty();
+                assigneeDropdown.append($('<option></option>').val(null).text('Select an assignee'));
+                $.each(JSON.parse(data.assigneesJson), function (index, item) {
+                    assigneeDropdown.append($('<option></option>').val(item.Id).text(item.Name));
+                });
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
     }</script>
-
-
