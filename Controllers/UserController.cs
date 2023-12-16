@@ -136,7 +136,7 @@ namespace IMS.Controllers
         }
 
         [HttpPost("Create")]
-        public async Task<IActionResult> Create(UserViewModel? userView, IFormFile avatarFile)
+        public async Task<IActionResult> Create(UserViewModel? userView, IFormFile avatarFile, [FromServices] ErrorHelper message) 
         {
 
             if (avatarFile != null && avatarFile.Length > 0)
@@ -152,7 +152,9 @@ namespace IMS.Controllers
                 }
                 var fileStream2 = new FileStream(filePath, FileMode.Open);
                 var downloadLink = await UploadFromFirebase(fileStream2, avatarFile.FileName);
-
+                // Delete in server
+                fileStream2.Close();
+                System.IO.File.Delete(filePath);
                 userView.Avatar = downloadLink;
             }
 
@@ -178,11 +180,18 @@ namespace IMS.Controllers
                 Description = userView.Description
             };
            
-            userService.AddUser(user);
+            if (userService.CheckValid(user))
+            {
+                userService.AddUser(user);
+                message.Success = "Add user success!";
+            }
+            else
+            {
+                message.Error = "This email has been used!";
+            }
 
             var roles = userService.GetRole();
             ViewBag.Roles = roles;
-
             return RedirectToAction("Index");
         }
         public async Task<string> UploadFromFirebase(FileStream stream, string filename)
@@ -290,8 +299,10 @@ namespace IMS.Controllers
                             Gender = true
                             };
 
-
-                            userService.AddUser(user);
+                            if (userService.CheckValid(user))
+                            {
+                                userService.AddUser(user);
+                            }
                         }
                     }
                 }

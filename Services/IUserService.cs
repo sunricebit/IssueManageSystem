@@ -14,6 +14,7 @@
             IEnumerable<User> FilterByRole(int roleid);
             IEnumerable<User> FilterByStatus(bool status);
             public IEnumerable<User> GetTeacher();
-        public IEnumerable<Post> GetPost(int id);
-        }
+            public IEnumerable<Post> GetPost(int id);
+            public bool CheckValid(User user);
+    }
 }

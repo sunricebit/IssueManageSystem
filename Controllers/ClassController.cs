@@ -76,6 +76,7 @@ namespace IMS.Controllers
             return View();
             
         }
+
         [HttpGet("Details/{id}")]
         [CustomAuthorize]
         public IActionResult Details(int id, [FromServices] IChkPgAcessService chkPgAcess)
@@ -105,20 +106,20 @@ namespace IMS.Controllers
             ViewBag.PageAccess = chkPgAcess.GetPageAccess(HttpContext);
             return View(ClassViewModel);
         }
+
         [HttpGet("Create")]
+        [CustomAuthorize]
         public IActionResult Create()
         {
-
             var subject = _classService.GetSubjects();
             ViewBag.Subject = subject;
             return View();
 
         }
+
         [HttpPost("Create")]
         public IActionResult Create(ClassViewModel classViewModel, string teacherInput)
         {
-            
-
             if (!ModelState.IsValid)
             {
                 var subject2 = _classService.GetSubjects();
@@ -304,6 +305,7 @@ namespace IMS.Controllers
             ViewBag.MilestoneList = Milestone;
             return View("Milestones",ClassViewModel);
         }
+
         [HttpGet("IssueSetting/{id}")]
         [CustomAuthorize]
         public IActionResult IssueSetting(int id,string searchString, [FromServices] IChkPgAcessService chkPgAcess)
@@ -339,6 +341,7 @@ namespace IMS.Controllers
 
             return View("IssueSetting");
         }
+
         [HttpPost("CreateMilestone")]
         public IActionResult CreateMilestone(MilestoneViewModel model)
         {

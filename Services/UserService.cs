@@ -83,6 +83,15 @@ namespace IMS.Services
 
             return _context.Posts.Where( p => p.AuthorId == id).ToList();
         }
-      
+
+        public bool CheckValid(User user)
+        {
+            User u = _context.Users.FirstOrDefault(u => u.Email == user.Email);
+            if (u != null)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

@@ -231,11 +231,14 @@ namespace IMS.Controllers
 
         [Route("Member")]
         [CustomAuthorize]
-        public IActionResult Member(string? searchString, int id,string filterbyStatus, [FromServices] IChkPgAcessService chkPgAcessService)
+        public IActionResult Member(string? searchString, int id,string filterbyStatus, 
+            [FromServices] IChkPgAcessService chkPgAcessService, [FromServices] ErrorHelper message)
         {
             ViewBag.ProjectId = id;
-            ViewBag.ErrorMessage = TempData["ErrorMessage"] as string;
-            ViewBag.SuccessMessage = TempData["SuccessMessage"] as string; 
+            //ViewBag.ErrorMessage = TempData["ErrorMessage"] as string;
+            //ViewBag.SuccessMessage = TempData["SuccessMessage"] as string; 
+            message.Error = TempData["ErrorMessage"] as string;
+            message.Success = TempData["SuccessMessage"] as string;
 
             User u = HttpContext.Session.GetUser();
             Project p = _projectService.GetProject(id);
@@ -265,16 +268,16 @@ namespace IMS.Controllers
         }
 
         [HttpPost("AddStudent")]
-        public IActionResult AddStudent(int projectid, string Name)
+        public IActionResult AddStudent(int projectid, string Name, [FromServices] ErrorHelper errorMessage)
         {
             if (_projectService.AddStudentToProject(projectid, Name) == false)
             {
-                TempData["ErrorMessage"] = "Student is already exist.";
+                errorMessage.Error = "Student is already exist.";
                 return RedirectToAction("Member", new { id = projectid });
             }
             else
             {
-                TempData["SuccessMessage"] = "Student added to the project successfully.";
+                errorMessage.Success = "Student added to the project successfully.";
                 return RedirectToAction("Member", new { id = projectid });
             }
         }
@@ -356,7 +359,7 @@ namespace IMS.Controllers
 
 
         [HttpPost("CreateMilestone")]
-        public IActionResult CreateMilestone(MilestoneViewModel model)
+        public IActionResult CreateMilestone(MilestoneViewModel model, [FromServices] ErrorHelper errorMessage)
         {
             var project = _projectService.GetProject((int)model.ProjectId);
             Milestone milestone = new Milestone()
@@ -370,6 +373,7 @@ namespace IMS.Controllers
             };
             milestone.Status = false;
             _milestoneService.AddMilestone(milestone);
+            errorMessage.Success = "Add milestone success. Please reload this page.";
             return RedirectToAction("ProjectMilestone", new { id = model.ProjectId  });
         }
 
