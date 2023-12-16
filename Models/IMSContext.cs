@@ -176,6 +176,8 @@ namespace IMS.Models
                     .HasColumnType("datetime(3)")
                     .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
 
+                entity.Property(e => e.FileName).HasMaxLength(100);
+
                 entity.Property(e => e.Title).HasColumnType("text");
 
                 entity.Property(e => e.UpdatedAt)
@@ -247,9 +249,7 @@ namespace IMS.Models
 
                 entity.Property(e => e.Description).HasMaxLength(200);
 
-                entity.Property(e => e.Color)
-                    .HasMaxLength(10)
-                    .HasDefaultValueSql("'#009966'");
+                entity.Property(e => e.Name).HasMaxLength(50);
 
                 entity.Property(e => e.Status)
                     .IsRequired()
@@ -312,7 +312,6 @@ namespace IMS.Models
                 entity.Property(e => e.StartDate).HasColumnType("datetime(3)");
 
                 entity.Property(e => e.Title).HasColumnType("text");
-                entity.Property(e => e.Status).HasDefaultValueSql("'1'");
 
                 entity.HasOne(d => d.Assignment)
                     .WithMany(p => p.Milestones)
@@ -377,7 +376,9 @@ namespace IMS.Models
 
                 entity.Property(e => e.Title).HasColumnType("text");
 
-                entity.Property(e => e.UpdatedAt).HasColumnType("datetime(3)");
+                entity.Property(e => e.UpdatedAt)
+                    .HasColumnType("datetime(3)")
+                    .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'");
 
                 entity.HasOne(d => d.Author)
                     .WithMany(p => p.Posts)

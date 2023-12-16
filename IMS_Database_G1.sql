@@ -125,6 +125,8 @@ CREATE TABLE `Issue` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Title` TEXT NOT NULL,
     `Description` LONGTEXT NULL,
+    `DocumentUrl` LONGTEXT NULL,
+    `FileName` VARCHAR(100) NULL,
     `MilestoneId` INTEGER NULL,
     `ProjectId` INTEGER NOT NULL,
     `AuthorId` INTEGER NOT NULL,
@@ -145,6 +147,7 @@ CREATE TABLE `IssueSetting` (
     `Id` INTEGER NOT NULL AUTO_INCREMENT,
     `Type` VARCHAR(20) NOT NULL,
     `Value` VARCHAR(100) NOT NULL,
+    `Name` VARCHAR(50) NOT NULL,
     `Description` VARCHAR(200) NULL,
     `Color` VARCHAR(10) NOT NULL DEFAULT '#009966',
     `Status` BOOLEAN NOT NULL DEFAULT true,
@@ -370,20 +373,19 @@ INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`)
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (31,'PAGE_LINK','/Subject/Index',0,0,NULL);
 INSERT INTO `IMS`.`Setting` (`Id`,`Type`,`Value`,`Order`,`Status`,`Description`) VALUES (32,'PAGE_LINK','/UserProfile/User',0,0,NULL);
 
-INSERT INTO `IMS`.`IssueSetting` (`Type`,`Value`)
+INSERT INTO `IMS`.`IssueSetting` (`Type`, `Value`, `Name`)
 VALUES
-        ('TYPE', 'Requirement'),
-        ('TYPE', 'Task'),
-        ('TYPE', 'Q&A'),
-        ('TYPE', 'Defect'),
-        ('STATUS', 'To do'),
-        ('STATUS', 'Doing'),
-        ('STATUS', 'Done'),
-        ('PROCESS', 'Coding'),
-        ('PROCESS', 'Req'),
-        ('PROCESS', 'Testing'),
-        ('PROCESS', 'Design');
-
+        ('TYPE', 'R', 'Requirement'),
+        ('TYPE', 'T', 'Task'),
+        ('TYPE', 'Q', 'Q&A'),
+        ('TYPE', 'D', 'Defect'),
+        ('STATUS', 'Todo', 'To do'),
+        ('STATUS', 'Doing', 'Doing'),
+        ('STATUS', 'Done', 'Done'),
+        ('PROCESS', 'Coding', 'Coding'),
+        ('PROCESS', 'Req', 'Req'),
+        ('PROCESS', 'Testing', 'Testing'),
+        ('PROCESS', 'Design', 'Design');
        
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (1, 'admin@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 1, 'Kincaid Itzakson', 'https://robohash.org/etasperioresexcepturi.png?size=100x100&set=set1', 0, '0950564222', null, 1);
 INSERT INTO `IMS`.`User` (`Id`, `Email`, `Password`, `RoleId`, `Name`, `Avatar`, `Gender`, `Phone`, `Address`, `Status`) VALUES (2, 'manager@gmail.com', '$2a$11$w9pEIVd27QqscyODByaqh./dZlCob8WHntaoI/VzF/07MY45cokVG', 2, 'Queenie Suff', 'https://robohash.org/consectetursuntet.png?size=100x100&set=set1', null, '0654960037', '36459 Nevada Trail', 1);

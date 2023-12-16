@@ -1,12 +1,18 @@
+using System.Linq;
+using Firebase.Auth;
+using Firebase.Storage;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 public class IssueViewModel
 {
-    public string Tab { get; set; } = "all";
+    public string Tab { get; set; } = "A";
     public string? Search { get; set; } = "";
 
     [Display(Name = "Project")]
     public int? ProjectId { get; set; }
+    [Display(Name = "Status")]
+    public int? StatusId { get; set; }
     [Display(Name = "Milestone")]
     public int? MilestoneId { get; set; }
     [Display(Name = "Author")]
@@ -51,6 +57,9 @@ public class NewIssue
 
     [Display(Name = "Issue parent")]
     public int? ParentIssueId { get; set; }
+
+    [Display(Name = "Document")]
+    public IFormFile? File { get; set; }
 }
 
 namespace IMS.Controllers
@@ -63,6 +72,7 @@ namespace IMS.Controllers
         {
             context = _context;
         }
+
 
         [HttpPost]
         public async Task<IActionResult> UpdateStatus(int issueId, string type, int selectedValue)
@@ -190,12 +200,30 @@ namespace IMS.Controllers
 
         [Route("{projectId}/issues/{issueId:int}/edit")]
         [HttpPost]
-        public async Task<IActionResult> Edit(Issue issue, int projectId, int issueId, [FromServices] ErrorHelper errorHelper)
+        public async Task<IActionResult> Edit(Issue issue, IFormFile? file, int projectId, int issueId, [FromServices] ErrorHelper errorHelper)
         {
             try
             {
                 var issueToUpdate = await context.Issues.FirstOrDefaultAsync(x => x.Id == issueId);
                 if (issueToUpdate == null) return RedirectToAction("NotFound", "Error");
+
+
+
+                if (file != null && file.Length > 0)
+                {
+                    if (issue.DocumentUrl != null && issue.FileName != null)
+                    {
+                        await DeleteDocument(issue.FileName);
+                    }
+
+                    string? documentUrl = null;
+
+                    using var stream = file.OpenReadStream();
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var downloadLink = await UploadFromFirebase(stream, fileName);
+
+                    documentUrl = downloadLink;
+                }
 
                 issueToUpdate.Title = issue.Title;
                 issueToUpdate.TypeId = issue.TypeId;
@@ -230,6 +258,7 @@ namespace IMS.Controllers
 
             if (project == null) return RedirectToAction("NotFound", "Error");
 
+
             var assignees = project.Students.ToList();
             var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
             var types = context.IssueSettings.Where(s => s.Type == "TYPE").ToList();
@@ -262,6 +291,19 @@ namespace IMS.Controllers
                 var project = context.Projects.SingleOrDefault(project => project.Id == projectId);
                 if (project == null) return RedirectToAction("NotFound", "Error");
 
+                string? documentUrl = null;
+                string? filename = null;
+
+                if (vm.File != null && vm.File.Length > 0)
+                {
+                    using var stream = vm.File.OpenReadStream();
+                    filename = Guid.NewGuid().ToString() + Path.GetExtension(vm.File.FileName);
+                    var downloadLink = await UploadFromFirebase(stream, filename);
+
+                    documentUrl = downloadLink;
+                }
+
+
                 int userId = HttpContext.Session.GetUser()!.Id;
                 Issue issue = new()
                 {
@@ -274,7 +316,9 @@ namespace IMS.Controllers
                     ProjectId = project.Id,
                     AuthorId = userId,
                     AssigneeId = vm.AssigneeId,
-                    ParentIssueId = vm.ParentIssueId
+                    ParentIssueId = vm.ParentIssueId,
+                    DocumentUrl = documentUrl,
+                    FileName = filename
                 };
 
                 context.Issues.Add(issue);
@@ -289,6 +333,140 @@ namespace IMS.Controllers
             }
         }
 
+        public async Task<string> UploadFromFirebase(Stream stream, string fileName)
+        {
+            string ApiKey = "AIzaSyBjstBnMJX7h_NlJ5-vqcQE0V-Ldaztnk8";
+            string Bucket = "imsmanagement-35781.appspot.com";
+            string AuthEmail = "abc@gmail.com";
+            string AuthPassword = "123456";
+
+            var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
+
+            var token = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
+            if (token == null) return "";
+            string accessToken = token.FirebaseToken;
+            var firebaseStorage = new FirebaseStorage(Bucket, new FirebaseStorageOptions
+            {
+                AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken)
+            });
+
+            var path = $"documents/{fileName}";
+
+            var task = await firebaseStorage.Child(path).PutAsync(stream);
+
+            var downloadUrl = await firebaseStorage.Child(path).GetDownloadUrlAsync();
+            return downloadUrl;
+        }
+
+        public async Task<string> DeleteDocument(string fileName)
+        {
+            string ApiKey = "AIzaSyBjstBnMJX7h_NlJ5-vqcQE0V-Ldaztnk8";
+            string Bucket = "imsmanagement-35781.appspot.com";
+            string AuthEmail = "abc@gmail.com";
+            string AuthPassword = "123456";
+
+            var auth = new FirebaseAuthProvider(new FirebaseConfig(ApiKey));
+
+            var token = await auth.SignInWithEmailAndPasswordAsync(AuthEmail, AuthPassword);
+            if (token == null) return "";
+            string accessToken = token.FirebaseToken;
+            var firebaseStorage = new FirebaseStorage(Bucket, new FirebaseStorageOptions
+            {
+                AuthTokenAsyncFactory = () => Task.FromResult(token.FirebaseToken)
+            });
+
+            var path = $"documents/{fileName}";
+
+            await firebaseStorage.Child(path).DeleteAsync();
+
+            var downloadUrl = await firebaseStorage.Child(path).GetDownloadUrlAsync();
+            await auth.SignInWithOAuthAsync(FirebaseAuthType.EmailAndPassword, accessToken);
+            return downloadUrl;
+        }
+
+
+        public IActionResult GetDataByProjectId(int? projectId)
+        {
+            if (projectId.HasValue)
+            {
+                var project = context.Projects
+                    .Where(p => p.Id == projectId)
+                    .Select(p => new
+                    {
+                        Students = p.Students.Select(s => new { s.Id, s.Name }),
+                        Issues = p.Issues.Select(i => new { i.Id, i.Title }),
+                        Milestones = p.Milestones.Select(m => new { m.Id, m.Title }),
+                        Class = new { Milestones = p.Class.Milestones.Select(cm => new { cm.Id, cm.Title }) }
+                    })
+                    .SingleOrDefault();
+
+                if (project == null) return RedirectToAction("NotFound", "Error");
+
+                var authors = project.Students.ToList();
+                var assignees = authors.Select(user => user).ToList();
+                assignees.Insert(0, new { Id = -1, Name = "Not yet" });
+
+                var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
+
+                string authorsJson = JsonConvert.SerializeObject(authors, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                string assigneesJson = JsonConvert.SerializeObject(assignees, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                string milestonesJson = JsonConvert.SerializeObject(milestones, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                return Json(new { authorsJson, assigneesJson, milestonesJson });
+            }
+            else
+            {
+                var userId = HttpContext.Session.GetUser()!.Id;
+                Models.User? user = context.Users.SingleOrDefault(user => user.Id == userId);
+                if (user == null) return RedirectToAction("SignIn", "Auth");
+
+                var userData = context.Users
+                    .Where(user => user.Id == userId)
+                    .Select(user => new
+                    {
+                        ProjectsNavigation = user.ProjectsNavigation.Select(project => new
+                        {
+                            project.Id,
+                            project.Name,
+                            Class = new { Milestones = project.Class.Milestones.Select(clsMilestone => new { clsMilestone.Id, clsMilestone.Title }) },
+                            Students = project.Students.Select(student => new { student.Id, student.Name }),
+                            Milestones = project.Milestones.Select(projectMilestone => new { projectMilestone.Id, projectMilestone.Title })
+                        })
+                    })
+                    .AsSplitQuery()
+                    .SingleOrDefault()!;
+
+                var milestones = userData.ProjectsNavigation.SelectMany(project => project.Class.Milestones).Union(userData.ProjectsNavigation.SelectMany(project => project.Milestones)).DistinctBy(milestone => milestone.Id).ToList();
+                milestones.Insert(0, new { Id = -1, Title = "Not yet" });
+                var authors = userData.ProjectsNavigation.SelectMany(project => project.Students).DistinctBy(students => students.Id).ToList();
+                var assignees = authors.Select(user => user).ToList();
+                assignees.Insert(0, new { Id = -1, Name = "Not yet" });
+
+                string authorsJson = JsonConvert.SerializeObject(authors, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                string assigneesJson = JsonConvert.SerializeObject(assignees, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                string milestonesJson = JsonConvert.SerializeObject(milestones, Formatting.Indented, new JsonSerializerSettings
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+                });
+                return Json(new { authorsJson, assigneesJson, milestonesJson });
+            }
+        }
+
+
 
         [Route("issues")]
         [CustomAuthorize]
@@ -296,13 +474,14 @@ namespace IMS.Controllers
         {
             var userId = HttpContext.Session.GetUser()!.Id;
 
-            User? user = context.Users.Include(user => user.Role).SingleOrDefault(user => user.Id == userId);
+            Models.User? user = context.Users.Include(user => user.Role).SingleOrDefault(user => user.Id == userId);
             if (user == null) return RedirectToAction("SignIn", "Auth");
 
             ViewBag.Projects = new List<Project>();
             ViewBag.Milestones = new List<Milestone>();
-            ViewBag.Authors = new List<User>();
-            ViewBag.Assignees = new List<User>();
+            ViewBag.Authors = new List<Models.User>();
+            ViewBag.Assignees = new List<Models.User>();
+            ViewBag.Statuses = context.IssueSettings.Where(setting => setting.Type == "STATUS").ToList();
 
             var userData = context.Users
                  .Include(user => user.ProjectsNavigation).ThenInclude(project => project.Class).ThenInclude(cls => cls.Milestones)
@@ -312,18 +491,65 @@ namespace IMS.Controllers
                  .SingleOrDefault(user => user.Id == userId)!;
 
             var projects = userData.ProjectsNavigation.ToList();
-            var milestones = userData.ProjectsNavigation.SelectMany(project => project.Class.Milestones).Union(userData.ProjectsNavigation.SelectMany(project => project.Milestones)).DistinctBy(milestone => milestone.Id).ToList();
-            milestones.Insert(0, new Milestone() { Id = -1, Title = "Not yet" });
-            var authors = userData.ProjectsNavigation.SelectMany(project => project.Students).DistinctBy(students => students.Id).ToList();
-            var assignees = new List<User>(authors);
-            assignees.Insert(0, new User() { Id = -1, Name = "Not yet" });
-
             ViewBag.Projects = projects;
-            ViewBag.Milestones = milestones;
-            ViewBag.Authors = authors;
-            ViewBag.Assignees = assignees;
-
             if (projects.Count == 0) return View(vm);
+
+
+            if (vm.ProjectId.HasValue)
+            {
+                var project = context.Projects
+                     .Where(p => p.Id == vm.ProjectId)
+                     .Select(p => new
+                     {
+                         Students = p.Students.Select(s => new { s.Id, s.Name }),
+                         Issues = p.Issues.Select(i => new { i.Id, i.Title }),
+                         Milestones = p.Milestones.Select(m => new { m.Id, m.Title }),
+                         Class = new { Milestones = p.Class.Milestones.Select(cm => new { cm.Id, cm.Title }) }
+                     })
+                     .SingleOrDefault();
+
+                if (project == null) return RedirectToAction("NotFound", "Error");
+
+                var milestones = project.Milestones.Union(project.Class.Milestones).DistinctBy(milestone => milestone.Id).ToList();
+                milestones.Insert(0, new { Id = -1, Title = "Not yet" });
+                var authors = project.Students.ToList();
+                var assignees = authors.Select(user => user).ToList();
+                assignees.Insert(0, new { Id = -1, Name = "Not yet" });
+
+                ViewBag.Milestones = milestones;
+                ViewBag.Authors = authors;
+                ViewBag.Assignees = assignees;
+
+            }
+            else
+            {
+                var userdData2 = context.Users
+                    .Where(user => user.Id == userId)
+                    .Select(user => new
+                    {
+                        ProjectsNavigation = user.ProjectsNavigation.Select(project => new
+                        {
+                            project.Id,
+                            project.Name,
+                            Class = new { Milestones = project.Class.Milestones.Select(clsMilestone => new { clsMilestone.Id, clsMilestone.Title }) },
+                            Students = project.Students.Select(student => new { student.Id, student.Name }),
+                            Milestones = project.Milestones.Select(projectMilestone => new { projectMilestone.Id, projectMilestone.Title })
+                        })
+                    })
+                    .AsSplitQuery()
+                    .SingleOrDefault()!;
+
+                var milestones = userdData2.ProjectsNavigation.SelectMany(project => project.Class.Milestones).Union(userdData2.ProjectsNavigation.SelectMany(project => project.Milestones)).DistinctBy(milestone => milestone.Id).ToList();
+                milestones.Insert(0, new { Id = -1, Title = "Not yet" });
+                var authors = userdData2.ProjectsNavigation.SelectMany(project => project.Students).DistinctBy(students => students.Id).ToList();
+                var assignees = authors.Select(user => user).ToList();
+                assignees.Insert(0, new { Id = -1, Name = "Not yet" });
+
+                ViewBag.Milestones = milestones;
+                ViewBag.Authors = authors;
+                ViewBag.Assignees = assignees;
+            }
+
 
             //-----------MAIN----------
             IQueryable<Issue> issues = context.Issues.AsQueryable().Where(issue => projects.Contains(issue.Project));
@@ -353,6 +579,11 @@ namespace IMS.Controllers
                 }
             }
 
+            if (vm.StatusId != null)
+            {
+                issues = issues.Where(issue => issue.StatusId == vm.StatusId);
+            }
+
             //Author
             if (vm.AuthorId != null)
             {
@@ -372,26 +603,18 @@ namespace IMS.Controllers
                 }
             }
 
-            switch (vm.Tab)
+            if (vm.Tab != "A")
             {
-                case "requirement":
-                    issues = issues.Where(issue => issue.Type.Value == "Requirement");
-                    break;
-                case "task":
-                    issues = issues.Where(issue => issue.Type.Value == "Task");
-                    break;
-                case "question":
-                    issues = issues.Where(issue => issue.Type.Value == "Q&A");
-                    break;
-                case "defect":
-                    issues = issues.Where(issue => issue.Type.Value == "Defect");
-                    break;
+                issues = issues.Where(issue => issue.Type.Value == vm.Tab);
             }
+
+            var types = context.IssueSettings.Where(setting => setting.Type == "TYPE").ToList();
+            types.Insert(0, new IssueSetting() { Value = "A", Name = "All" });
+            ViewBag.Types = types;
 
             issues = issues
                 .Include(issue => issue.Type)
                 .Include(issue => issue.Status)
-                .Include(issue => issue.Process)
                 .Include(issue => issue.Process)
                 .Include(issue => issue.Milestone)
                 .Include(issue => issue.Author)

@@ -68,6 +68,12 @@
             }
             return true;
         }
+        public IEnumerable<User> GetStudentInProject(int projectid)
+        {
+            var members = _context.Projects.Where(c => c.Id == projectid).SelectMany(c => c.Students).ToList();
+            return members;
+        }
+
 
         public List<Project> GetProjectByTeacher(int teacherId)
         {
@@ -78,6 +84,35 @@
                 resultList.AddRange(c.Projects);
             }
             return resultList;
+        }
+
+        public bool RemoveStudentFromProject(int projectid, string email)
+        {
+            var project = _context.Projects.Include(p => p.Students).FirstOrDefault(c => c.Id == projectid);
+            var student = _context.Users.FirstOrDefault(u => u.Email == email);
+            project.Students.Remove(student);
+            _context.SaveChanges();
+            return true;
+        }
+
+        public bool AddStudentToProject(int projectid, string email)
+        {
+            Project project = _context.Projects.Include(c => c.Students).FirstOrDefault(c => c.Id == projectid);
+            var student = _context.Users.FirstOrDefault(u => u.Email == email);
+
+            if (project == null || student == null)
+            {
+                return false;
+            }
+
+            if (project.Students.Contains(student))
+            {
+                return false;
+            }
+
+            project.Students.Add(student);
+            _context.SaveChanges();
+            return true;
         }
     }
 }

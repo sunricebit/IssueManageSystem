@@ -71,7 +71,10 @@
     }
 </style>
 
+<div>
+
 <h3 class="text-h3 mb-4 mt-4">User detail</h3>
+</div>
 
 
 @if (Model.Avatar == null)
@@ -98,6 +101,7 @@ else
 <div>
     <hr />
     <div class="row" style="padding:10px">
+        <a href="/change-password" style="padding-bottom: 16px">Password change</a>
         <form asp-action="EditUserProfile" id="form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />

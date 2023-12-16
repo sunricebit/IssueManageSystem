@@ -1,5 +1,4 @@
-﻿
-@*
+﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
@@ -36,13 +35,20 @@
                     <label for="searchString" class="form-label">Search:</label>
                     <input type="text" id="searchString" name="searchString" class="form-control" placeholder="Search..." value="">
                 </div>
-                
+
                 <div class="col-md-3 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary">Search Page</button>
                 </div>
             </div>
         </form>
         <table class="table" id="issueSettingTable" style="table-layout: fixed">
+            <thead>
+                <tr>
+                    <th class="label-column">Type/Value</th>
+                    <th>Decription</th>
+                    <th class="action-column">Action</th>
+                </tr>
+            </thead>
             <tbody>
                 @foreach (IssueSetting issueSetting in ViewBag.IssueSettingList)
                 {
@@ -75,7 +81,7 @@
                                     </button>
                                 </form>
                             }
-                       
+
                         </td>
                     </tr>
                 }

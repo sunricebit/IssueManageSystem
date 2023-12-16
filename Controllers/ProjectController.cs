@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Office2010.Excel;
+using IMS.Models;
 using IMS.ViewModels.Milestone;
 using IMS.ViewModels.Validation;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,7 @@ namespace IMS.Controllers
         private readonly IClassService _classService;
         private readonly IssueSettingDAO _isDAO;
         private readonly IMilestoneService _milestoneService;
+      
 
         public ProjectController(IProjectService projectService, IClassService classService, IssueSettingDAO isDAO, IMilestoneService milestoneService)
         {
@@ -201,18 +203,19 @@ namespace IMS.Controllers
         }
 
         [HttpPost("CreateIssueSetting")]
-        public IActionResult CreateIssueSetting(IssueSettingViewModel issueSettingViewModel, [FromServices] ErrorHelper message)
+        public IActionResult CreateIssueSetting(IssueSettingViewModel IssueSettingViewModel, [FromServices] ErrorHelper message)
         {
-            Project p = _projectService.GetProject((int)issueSettingViewModel.ProjectId);
+            Project p = _projectService.GetProject((int)IssueSettingViewModel.ProjectId);
             IssueSetting iS = new IssueSetting()
             {
-                Type = issueSettingViewModel.Type,
-                Value = issueSettingViewModel.Value,
-                Description = issueSettingViewModel.Description,
-                ProjectId = issueSettingViewModel.ProjectId,
+                Type = IssueSettingViewModel.Type,
+                Value = IssueSettingViewModel.Value,
+                Name = IssueSettingViewModel.Name,
+                Description = IssueSettingViewModel.Description,
+                ProjectId = IssueSettingViewModel.ProjectId,
                 ClassId = p.ClassId,
-                Color = issueSettingViewModel.Color,
-                Status = issueSettingViewModel.Status,
+                Color = IssueSettingViewModel.Color,
+                Status = IssueSettingViewModel.Status,
             };
 
             string checkDup = _isDAO.CheckDuplicate(iS);
@@ -222,7 +225,67 @@ namespace IMS.Controllers
                 message.Success = "Add Issue Setting success";
             }
             message.Error = checkDup;
-            return RedirectToAction("IssueSetting", new { projectId = p.Id });
+
+            return RedirectToAction("IssueSetting", new { id = p.Id });
+        }
+
+        [Route("Member")]
+        [CustomAuthorize]
+        public IActionResult Member(string? searchString, int id,string filterbyStatus, [FromServices] IChkPgAcessService chkPgAcessService)
+        {
+            ViewBag.ProjectId = id;
+            ViewBag.ErrorMessage = TempData["ErrorMessage"] as string;
+            ViewBag.SuccessMessage = TempData["SuccessMessage"] as string; 
+
+            User u = HttpContext.Session.GetUser();
+            Project p = _projectService.GetProject(id);
+            ViewBag.StudentInClass = _classService.GetStudentInClass(p.ClassId);
+            var members = _projectService.GetStudentInProject(id);
+
+            if (!string.IsNullOrEmpty(filterbyStatus) && filterbyStatus != "ALL")
+            {
+                if (filterbyStatus == "true")
+                {
+                    members = members.Where(item => item.Status == true).ToList();
+                }
+                else
+                {
+                    members = members.Where(item => item.Status == false).ToList();
+                }
+            }
+            if (!string.IsNullOrEmpty(searchString))    
+            {
+               
+                members = members.Where(item => item.Name.ToLower().Contains(searchString.ToLower())
+                || item.Email.ToLower().Contains(searchString.ToLower())).ToList();
+            }
+            ViewBag.PageAccess = chkPgAcessService.GetPageAccess(HttpContext);
+            ViewBag.Student = members;
+            return View();
+        }
+
+        [HttpPost("AddStudent")]
+        public IActionResult AddStudent(int projectid, string Name)
+        {
+            if (_projectService.AddStudentToProject(projectid, Name) == false)
+            {
+                TempData["ErrorMessage"] = "Student is already exist.";
+                return RedirectToAction("Member", new { id = projectid });
+            }
+            else
+            {
+                TempData["SuccessMessage"] = "Student added to the project successfully.";
+                return RedirectToAction("Member", new { id = projectid });
+            }
+        }
+
+        [HttpPost("RemoveStudent")]
+        public IActionResult RemoveStudent(int id, string email)
+        {
+            
+            _projectService.RemoveStudentFromProject(id, email);
+
+            return RedirectToAction("Member", new {id = id});
         }
 
         [Route("IssueSetting")]
@@ -235,31 +298,31 @@ namespace IMS.Controllers
 
             ViewBag.ProjectId = id;
 
-            List<IssueSetting> issueSettings = _isDAO.GetIssueSettingByProject(id);
+            List<IssueSetting> IssueSettings = _isDAO.GetIssueSettingByProject(id);
             if (!string.IsNullOrEmpty(searchString))
             {
-                issueSettings = issueSettings.Where(item => item.Type.ToLower().Contains(searchString.ToLower())
+                IssueSettings = IssueSettings.Where(item => item.Type.ToLower().Contains(searchString.ToLower())
                 || item.Value.ToLower().Contains(searchString.ToLower())).ToList();
             }
-            ViewBag.IssueSettingList = issueSettings;
+            ViewBag.IssueSettingList = IssueSettings;
             return View();
         }
 
         [HttpPost("ToggleIssueSettingStatus")]
         public IActionResult ToggleIssueSettingStatus(int id, int projectId)
         {
-            var issueSetting = _isDAO.GetIssueSettingById(id);
+            var IssueSetting = _isDAO.GetIssueSettingById(id);
 
-            if (issueSetting == null)
+            if (IssueSetting == null)
             {
                 return NotFound();
             }
 
-            issueSetting.Status = !issueSetting.Status;
+            IssueSetting.Status = !IssueSetting.Status;
 
-            _isDAO.UpdateIssueSetting(issueSetting);
+            _isDAO.UpdateIssueSetting(IssueSetting);
 
-            return RedirectToAction("IssueSetting", new { projectId = projectId });
+            return RedirectToAction("IssueSetting", new { id = projectId });
         }
 
         [HttpGet("Milestones/{id}")]
@@ -291,6 +354,7 @@ namespace IMS.Controllers
             return View(projectViewModel);
         }
 
+
         [HttpPost("CreateMilestone")]
         public IActionResult CreateMilestone(MilestoneViewModel model)
         {
@@ -304,8 +368,9 @@ namespace IMS.Controllers
                 ClassId = project.ClassId,
                 ProjectId = model.ProjectId,
             };
+            milestone.Status = false;
             _milestoneService.AddMilestone(milestone);
-            return RedirectToAction("ProjectMilestone");
+            return RedirectToAction("ProjectMilestone", new { id = model.ProjectId  });
         }
 
         [HttpPost("ClosedMilestone")]
@@ -327,7 +392,7 @@ namespace IMS.Controllers
             };
             IEnumerable<Milestone> Milestone = _classService.GetMilestoneByProject(id);
             ViewBag.MilestoneList = Milestone;
-            return View("ProjectMilestone", projectViewModel);
+            return View("ProjectMilestone", new { id = project.Id });
         }
     }
 }

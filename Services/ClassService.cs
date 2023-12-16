@@ -47,18 +47,10 @@ namespace IMS.Services
         }
         public bool RemoveStudentFromClass(int classId, string email)
         {
-            var @class = _context.Classes.FirstOrDefault(c => c.Id == classId);
+            var @class = _context.Classes.Include(c=>c.Students).FirstOrDefault(c => c.Id == classId);
             var student = _context.Users.FirstOrDefault(u => u.Email == email);
 
-            if (@class == null || student == null)
-            {
-                return false; 
-            }
-
-            if (!@class.Students.Contains(student))
-            {
-                return false;
-            }
+         
 
             @class.Students.Remove(student);
 
@@ -69,7 +61,7 @@ namespace IMS.Services
 
         public List<Milestone> GetMilestone(int id)
         {
-            var milestone = _context.Milestones.Where(m => m.ClassId == id).ToList();
+            var milestone = _context.Milestones.Where(m => m.ClassId == id && m.ProjectId == null).ToList();
             return milestone;
         }
 
@@ -77,7 +69,7 @@ namespace IMS.Services
         {
             Project p = _context.Projects.FirstOrDefault(p => p.Id == id);
             List<Milestone> milestone = _context.Milestones.Where(m => m.ProjectId == id).ToList();
-            milestone.AddRange(_context.Milestones.Where(m => m.ClassId == p.ClassId).ToList());
+            milestone.AddRange(_context.Milestones.Where(m => m.ClassId == p.ClassId && m.ProjectId == null).ToList());
             return milestone;
         }
 
@@ -173,6 +165,13 @@ namespace IMS.Services
         public IEnumerable<Class> GetClassesByTeacher(int teacherId)
         {
             return _context.Users.Include(u => u.Classes).ThenInclude(c => c.Students).FirstOrDefault(u => u.Id == teacherId).Classes;
+        }
+
+        public List<User> GetStudentInClass(int classId)
+        {
+            List<User> user = new List<User>();
+            user = _context.Classes.Include(c => c.Students).FirstOrDefault(c => c.Id == classId).Students.ToList();
+            return user;
         }
     }
 }
