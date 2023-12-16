@@ -41,6 +41,7 @@
     <Folder Include="wwwroot\assets\" />
     <Folder Include="Views\Auth\" />
     <Folder Include="Extensions\" />
+    <Folder Include="wwwroot\Avatars\" />
     <Folder Include="wwwroot\img\" />
     <Folder Include="Views\Subject\" />
     <Folder Include="ViewModels\Subject\" />
