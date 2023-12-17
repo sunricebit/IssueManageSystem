@@ -52,7 +52,7 @@
             </div>
 
             <p class="text-muted">
-                Document: @Model.FileName - <a href="@Url.ActionLink("Download", "Issue", new {fileUrl = Model.DocumentUrl})">Click here to download</a>
+                Document: @Model.FileName - <a href="@Model.DocumentUrl">Click here to download</a>
             </p>
 
             <div id="parentIssueContainer mt-4">
